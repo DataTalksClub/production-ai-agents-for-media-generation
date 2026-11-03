@@ -193,6 +193,9 @@ Each module reports cost per asset, so you'll know what a run costs before you s
 
 * Nebius DevRel team (course content and delivery)
 * [Nebius Academy](https://nebius.com/certification) (content and expert support)
+* [Mikhail Rozhkov](https://linkedin.com/in/mnrozhkov/) (Senior PM, Serverless AI @ Nebius)
+* [Marouane Khoukh](https://linkedin.com/in/marouanekhoukh/) (AI Engineer, DevRel @ Nebius)
+* [Aleksandr Iziumov](https://linkedin.com/in/aiziumov/) (Staff Customer Engineer, AI & Agentic)
 * [Alexey Grigorev](https://linkedin.com/in/agrigorev) (DataTalks.Club: course logistics and community)
 
 Nebius in the course:
