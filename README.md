@@ -204,6 +204,8 @@ Each module reports cost per asset, so you'll know what a run costs before you s
 People behind this course:
 * [Alexey Grigorev](https://linkedin.com/in/agrigorev): the founder of DataTalks.Club and the creator of its free courses.
 * [Mikhail Rozhkov](https://www.linkedin.com/in/mnrozhkov/): a Senior Product Manager for Serverless AI at Nebius, where he took Serverless AI (GPU Jobs and Endpoints) from concept to public launch. He is an AI/ML engineer with a background in MLOps and robotics, and he co-leads the Nebius side of the course "Production AI Agents for Generative Media".
+* [Marouane Khoukh](https://linkedin.com/in/marouanekhoukh/): AI Engineer, DevRel at Nebius.
+* [Aleksandr Iziumov](https://linkedin.com/in/aiziumov/): Staff Customer Engineer, AI & Agentic at Nebius.
 
 ## FAQ
 
