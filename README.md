@@ -1,14 +1,9 @@
-<h1 align="center">
-    <strong>Production AI Agents for Generative Media</strong>
-</h1>
-
 <p align="center">
-Build, scale and monitor agents that run image, video and audio models on serverless GPUs.<br>
-Free · open-source (MIT) · project-based · by Nebius × DataTalks.Club
+  <img src="images/course-cover.png" alt="Production AI Agents for Generative Media: build, scale and monitor agents that run image, video and audio models on serverless GPUs. Free, open source (MIT), project-based. Nebius × DataTalks.Club" width="100%">
 </p>
 
 <p align="center">
-<b>Starts Mon 16 Nov 2026 · <a href="https://courses.datatalks.club/register/production-ai-agents-generative-media/">Apply here</a></b>
+<b>Starts Mon 16 Nov 2026 · Apply by Mon 30 Nov · <a href="https://courses.datatalks.club/register/production-ai-agents-generative-media/">Apply here</a></b>
 </p>
 
 > How do you build a production AI system when an agent can launch expensive, slow, failure-prone GPU workloads that produce large media artifacts?
@@ -21,17 +16,9 @@ Media agents are an engineering problem, not a prompting problem. In this course
 4. **Check:** regenerates the asset when it is not good enough
 5. **Scale:** from 1 to 1,000+ records, with a cost per asset
 
-Two examples run through the course:
-
-* **Santa Christmas Challenge (worked example):** a child profile becomes a personalized gift card with a Santa voice message
-* **Product catalog (capstone example):** a product record becomes ad creative with a voice-over or a short video. When it fails the check, the agent revises and regenerates
-
-**Format:** a Welcome session (Module 0), then 4 modules over 5 weeks (Module 1 runs for two weeks), ~8–10 h/week, plus a capstone project. Lectures are pre-recorded, with a weekly live office hour.
-
-1. Make it work
-2. Make it intelligent
-3. Make it scale
-4. Make it production-ready
+<p align="center">
+  <img src="images/diagram-media-factory.png" alt="The Personalized Media Factory: a brief goes to an agent (Module 2), GPU models generate image, voice or video (Module 1), a check (Module 4) sends assets that aren't good enough back to the agent to revise and regenerate, and the factory scales from 1 to 1,000+ records with a cost per asset (Module 3)" width="100%">
+</p>
 
 ## What You'll Learn
 
@@ -40,7 +27,29 @@ Two examples run through the course:
 * How to fan out batch workloads on spot GPUs, handle failures and report cost per asset
 * How to add evals, tracing and SLOs so you can say what a media agent costs and when it is good enough to ship
 
+## Dates
+
+All times are CET. Modules run Monday to Sunday. More on this cohort: [cohorts/2026](cohorts/2026).
+
+| Date | What | Due / live session |
+|---|---|---|
+| Tue 3 Nov 2026 | Workshop: "Build a Media Agent: CPU Agent, GPU Models as Tools" | Live, 16:30-18:00 · [Register](https://luma.com/tj2nbrl2) · [Code](https://github.com/DataTalksClub/build-media-agent-workshop) |
+| Tue 10 Nov 2026 | Module 0: Welcome session and pre-course Q&A | Live, 17:00-18:00 · [Register](https://luma.com/i4x6x2zy) |
+| Mon 16 Nov 2026 | Course launch | Live, 17:00-18:00 · [Register](https://luma.com/xey7h50c) |
+| Mon 16 - Sun 29 Nov 2026 | Module 1 (two weeks) | Homework 1 and capstone proposal |
+| **Mon 30 Nov 2026** | **Applications close** | [Apply](https://courses.datatalks.club/register/production-ai-agents-generative-media/) |
+| Mon 30 Nov - Sun 6 Dec 2026 | Module 2 | Homework 2, due Sun 6 Dec |
+| Mon 7 - Sun 13 Dec 2026 | Module 3 | Homework 3 (leaderboard), due Sun 13 Dec |
+| Mon 14 - Sun 20 Dec 2026 | Module 4 | Capstone brief |
+| Fri 15 Jan 2027 | Capstone due, then peer review | Capstone |
+
+Materials and dates may change.
+
 ## Modules
+
+<p align="center">
+  <img src="images/diagram-course-roadmap.png" alt="Course structure: Module 0 Welcome, Module 1 Make it work, Module 2 Make it intelligent, Module 3 Make it scale, Module 4 Make it production-ready, then the capstone" width="100%">
+</p>
 
 ### Module 0: Welcome
 
@@ -52,7 +61,7 @@ Tue 10 Nov 2026, live. Why media agents are an engineering problem, not a prompt
 
 ### [Module 1: Consistent Media Generation on Serverless GPUs](/01-generative-media-workloads)
 
-Mon 16 – Sun 29 Nov 2026 (two weeks)
+Mon 16 - Sun 29 Nov 2026 (two weeks)
 
 * Media model landscape
 * Templates, containers and model cache
@@ -64,7 +73,7 @@ Mon 16 – Sun 29 Nov 2026 (two weeks)
 
 ### [Module 2: Multi-Agent Media Workflows](/02-agents-that-use-gpus)
 
-Mon 30 Nov – Sun 6 Dec 2026
+Mon 30 Nov - Sun 6 Dec 2026
 
 * The agent loop from scratch
 * GPU models as typed tools over MCP
@@ -74,7 +83,7 @@ Mon 30 Nov – Sun 6 Dec 2026
 
 ### [Module 3: Batch Media Generation at Scale](/03-scaling-reliability-cost)
 
-Mon 7 – Sun 13 Dec 2026
+Mon 7 - Sun 13 Dec 2026
 
 * Fan-out on spot GPUs
 * Per-item checkpoints
@@ -85,7 +94,7 @@ Mon 7 – Sun 13 Dec 2026
 
 ### [Module 4: Evals, Tracing and SLOs](/04-evaluation-observability-production)
 
-Mon 14 – Sun 20 Dec 2026
+Mon 14 - Sun 20 Dec 2026
 
 * System, agent and media evals
 * Multimodal judges
@@ -96,6 +105,10 @@ Mon 14 – Sun 20 Dec 2026
 ### [Capstone Project](/projects)
 
 A multimodal agent using at least two GPU media models, shared publicly and running on Nebius Serverless AI. You write the proposal in Module 1 and submit the project by **Fri 15 Jan 2027**, then review your peers' projects.
+
+<p align="center">
+  <img src="images/capstone-requirements.png" alt="Capstone requirements: an agent with 2+ tools, an async GPU workload, assets in object storage, an eval suite, tracing, an SLO, a cost report, and proof that a killed run resumes without redoing finished work" width="100%">
+</p>
 
 Your project needs:
 
@@ -109,6 +122,8 @@ Your project needs:
 * Proof that a killed run resumes without redoing finished work
 
 Ideas: a marketing studio, podcast producer, video localization, storybook generator, product ad agent or paper-to-explainer video.
+
+Share your progress as you go: see [Learning in public](learning-in-public.md).
 
 ## Who Should Join
 
@@ -131,33 +146,18 @@ Prior LLM or MLOps course experience helps but isn't required.
 
 **Not covered:** diffusion maths, training foundation models, deep fine-tuning, CUDA, Kubernetes, RAG, LLM fundamentals.
 
-## Dates
-
-All times are CET (Berlin). Modules run Monday to Sunday.
-
-| Date | What | Due / live session |
-|---|---|---|
-| Tue 3 Nov 2026 | Promo workshop: "Build a Media Agent: CPU Agent, GPU Models as Tools" | Live, 16:30–18:00 · [Register](https://luma.com/tj2nbrl2) |
-| Tue 10 Nov 2026 | Module 0: Welcome session and pre-course Q&A | Live, 17:00–18:00 · [Register](https://luma.com/i4x6x2zy) |
-| Mon 16 Nov 2026 | Course launch | Live, 17:00–18:00 · [Register](https://luma.com/xey7h50c) |
-| Mon 16 – Sun 29 Nov 2026 | Module 1 (two weeks) | Homework 1 and capstone proposal |
-| Mon 30 Nov – Sun 6 Dec 2026 | Module 2 | Homework 2, due Sun 6 Dec |
-| Mon 7 – Sun 13 Dec 2026 | Module 3 | Homework 3 (leaderboard), due Sun 13 Dec |
-| Mon 14 – Sun 20 Dec 2026 | Module 4 | Capstone brief |
-| Fri 15 Jan 2027 | Capstone due, then peer review | Capstone |
-
-Materials and dates may change.
-
 ## How to Join
 
 The course is free. Seats in the live cohort are limited, so it is application only.
 
-1. [Apply here](https://courses.datatalks.club/register/production-ai-agents-generative-media/) and tell us what you are building.
+1. [Apply here](https://courses.datatalks.club/register/production-ai-agents-generative-media/) by **Mon 30 Nov 2026** and tell us what you are building.
 2. We review every application, usually within 2 business days.
 3. Approved applicants join the live cohort: shared deadlines, peer-reviewed homework and the capstone.
 4. Get GPU credits through the [Nebius AI Builder Program](https://dev.nebius.com/builders).
 
 "Live cohort" means shared deadlines and peer-reviewed homework, not mandatory live classes. Lectures are pre-recorded, and there is a weekly live office hour.
+
+You can apply after the course starts on Mon 16 Nov: Module 1 runs two weeks, so you have time to catch up.
 
 Not applying? All materials are in this repo and anyone can follow along. You'll need your own GPU access to run the code.
 
@@ -189,50 +189,42 @@ Each module reports cost per asset, so you'll know what a run costs before you s
 * **Reference platform:** Nebius Serverless AI (Jobs, Endpoints) and Nebius Token Factory
 * **Model licences:** open-weights models come with their own licences. Check before commercial use.
 
-## Your Instructors and Partners
+## Course Creators
 
-* Nebius DevRel team (course content and delivery)
-* [Nebius Academy](https://nebius.com/certification) (content and expert support)
-* [Alexey Grigorev](https://linkedin.com/in/agrigorev) (DataTalks.Club: course logistics and community)
+<p align="center">
+  <img src="images/partners-light.png" alt="Production AI Agents for Generative Media: build, scale and monitor agents that run image, video and audio models on serverless GPUs. Nebius × DataTalks.Club" width="100%">
+</p>
 
-Nebius in the course:
-
+* [DataTalks.Club](https://datatalks.club/): a community of data enthusiasts who learn and grow together. We share knowledge, help each other, and make data science more accessible.
+* [Nebius](https://nebius.com/): the Nebius DevRel team creates and teaches the course.
+* [Nebius Academy](https://nebius.com/certification): content and expert support.
 * [Nebius Serverless AI](https://nebius.com/serverless): the reference platform for code-alongs and homework. Run containerized AI workloads on GPUs without managing infrastructure.
 * [Nebius AI Builder Program](https://dev.nebius.com/builders): how applicants get GPU credits. Free to join: credits, runnable examples and cookbooks, technical office hours and a community of AI builders.
 
-## Sponsors
+People behind this course:
+* [Alexey Grigorev](https://linkedin.com/in/agrigorev): the founder of DataTalks.Club and the creator of its free courses.
+* [Mikhail Rozhkov](https://www.linkedin.com/in/mnrozhkov/): a Senior Product Manager for Serverless AI at Nebius, where he took Serverless AI (GPU Jobs and Endpoints) from concept to public launch. He is an AI/ML engineer with a background in MLOps and robotics, and he co-leads the Nebius side of the course "Production AI Agents for Generative Media".
 
-A special thanks to our course sponsors for making this initiative possible!
+## FAQ
 
-<p align="center">
-  <a href="https://nebius.com/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="images/logos/nebius-logo-white.svg">
-      <img height="60" src="images/logos/nebius-logo-color.svg" alt="Nebius">
-    </picture>
-  </a>
-</p>
+**Do I need my own GPU?**
+No GPU or cluster to manage: the models run as Jobs and Endpoints on Nebius Serverless AI. Applicants get GPU credits through the [Nebius AI Builder Program](https://dev.nebius.com/builders); usage beyond the credits is billed to your account. If you follow along without applying, you need your own GPU access.
 
-<p align="center">
-  <a href="https://nebius.com/certification">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="images/logos/nebius-academy-logo-light.svg">
-      <img height="40" src="images/logos/nebius-academy-logo-dark.svg" alt="Nebius Academy">
-    </picture>
-  </a>
-</p>
+**Can I join after the course starts?**
+Yes, until applications close on Mon 30 Nov 2026. Module 1 runs two weeks, so late joiners can catch up.
 
-## About DataTalks.Club
+**Do I have to attend live sessions?**
+No. Lectures are pre-recorded and live classes aren't mandatory. The Welcome session, the course launch and the weekly office hour are live.
 
-DataTalks.Club is a community of data enthusiasts who learn and grow together. We share knowledge, help each other, and make data science more accessible.
+**What if I'm not approved?**
+All materials are public (MIT), so you can follow along on your own, with your own GPU access.
 
-Join us:
-• [Website](https://datatalks.club/)
-• [Slack Community](https://datatalks.club/slack.html)
-• [Newsletter](https://us19.campaign-archive.com/home/?u=0d7822ab98152f5afc118c176&id=97178021aa)
-• [Events](http://lu.ma/dtc-events)
-• [Calendar](https://calendar.google.com/calendar/?cid=ZjhxaWRqbnEwamhzY3A4ODA5azFlZ2hzNjBAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ)
-• [YouTube](https://www.youtube.com/@DataTalksClub/featured)
-• [GitHub](https://github.com/DataTalksClub)
-• [LinkedIn](https://www.linkedin.com/company/datatalks-club/)
-• [Twitter](https://twitter.com/DataTalksClub)
+**Am I locked into Nebius?**
+No. The code is OpenAI- and S3-compatible, so you can run it elsewhere. Nebius Serverless AI and Nebius Token Factory are the reference platform for the code-alongs and homework.
+
+**Can I use the generated media commercially?**
+Open-weights models come with their own licences. Check each model's licence before commercial use.
+
+## Getting Help
+
+Ask questions in the [DataTalks.Club Slack](https://datatalks.club/slack.html) and bring them to the weekly live office hour.
