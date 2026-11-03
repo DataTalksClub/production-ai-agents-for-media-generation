@@ -142,7 +142,6 @@ All times are CET (Berlin). Modules run Monday to Sunday.
 | Mon 16 Nov 2026 | Course launch | Live, 17:00–18:00 · [Register](https://luma.com/xey7h50c) |
 | Mon 16 – Sun 29 Nov 2026 | Module 1 (two weeks) | Homework 1 and capstone proposal |
 | Mon 30 Nov – Sun 6 Dec 2026 | Module 2 | Homework 2, due Sun 6 Dec |
-| Mon 30 Nov 2026 | Applications close | |
 | Mon 7 – Sun 13 Dec 2026 | Module 3 | Homework 3 (leaderboard), due Sun 13 Dec |
 | Mon 14 – Sun 20 Dec 2026 | Module 4 | Capstone brief |
 | Fri 15 Jan 2027 | Capstone due, then peer review | Capstone |
