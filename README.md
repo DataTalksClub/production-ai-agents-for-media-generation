@@ -1,17 +1,3 @@
-<p align="center">
-  <a href="https://nebius.com/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="images/logos/nebius-logo-white.svg">
-      <img src="images/logos/nebius-logo-color.svg" alt="Nebius" height="48">
-    </picture>
-  </a>
-  &nbsp;&nbsp;&nbsp;&nbsp;
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="images/logos/nebius-academy-logo-light.svg">
-      <img src="images/logos/nebius-academy-logo-dark.svg" alt="Nebius Academy" height="28">
-    </picture>
-</p>
-
 <h1 align="center">
     <strong>Production AI Agents for Generative Media</strong>
 </h1>
@@ -214,6 +200,28 @@ Nebius in the course:
 
 * [Nebius Serverless AI](https://nebius.com/serverless): the reference platform for code-alongs and homework. Run containerized AI workloads on GPUs without managing infrastructure.
 * [Nebius AI Builder Program](https://dev.nebius.com/builders): how applicants get GPU credits. Free to join: credits, runnable examples and cookbooks, technical office hours and a community of AI builders.
+
+## Sponsors
+
+A special thanks to our course sponsors for making this initiative possible!
+
+<p align="center">
+  <a href="https://nebius.com/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="images/logos/nebius-logo-white.svg">
+      <img height="60" src="images/logos/nebius-logo-color.svg" alt="Nebius">
+    </picture>
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://nebius.com/certification">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="images/logos/nebius-academy-logo-light.svg">
+      <img height="40" src="images/logos/nebius-academy-logo-dark.svg" alt="Nebius Academy">
+    </picture>
+  </a>
+</p>
 
 ## About DataTalks.Club
 
