@@ -1,3 +1,17 @@
+<p align="center">
+  <a href="https://nebius.com/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="images/logos/nebius-logo-white.svg">
+      <img src="images/logos/nebius-logo-color.svg" alt="Nebius" height="48">
+    </picture>
+  </a>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="images/logos/nebius-academy-logo-light.svg">
+      <img src="images/logos/nebius-academy-logo-dark.svg" alt="Nebius Academy" height="28">
+    </picture>
+</p>
+
 <h1 align="center">
     <strong>Production AI Agents for Generative Media</strong>
 </h1>
