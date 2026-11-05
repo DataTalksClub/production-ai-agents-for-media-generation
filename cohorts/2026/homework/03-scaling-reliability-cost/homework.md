@@ -13,12 +13,12 @@ In this homework, you scale the Personalized Media Factory to 200 records over 1
 * Assets per record: card text, image and voice. Video for a 10-record sample only, picked with a fixed seed.
 * Models (fixed for the leaderboard): Sana for images, Kokoro-82M for voice, Wan2.2-I2V-A14B for the video sample
 * Jobs: 10 spot Jobs in parallel (`--preemptible --follows-spot-price`), each with a `--timeout`
-* Your configuration from [3.3](../../../../03-scaling-reliability-cost/README.md#33-optimizing-cost-per-asset-cold-start-vram-and-speed)
-* A `budget_usd` and a judge pass-rate floor on the run, as in [3.4](../../../../03-scaling-reliability-cost/README.md#34-breaking-the-pipeline-on-purpose)
+* Your configuration from [3.3](../../../../03-scaling-reliability-cost/03-optimizing-cost.md)
+* A `budget_usd` and a judge pass-rate floor on the run, as in [3.4](../../../../03-scaling-reliability-cost/04-breaking-the-pipeline.md)
 
 ### Run
 
-* Before you launch, predict the wall time and the total run cost with the [3.1](../../../../03-scaling-reliability-cost/README.md#31-one-to-1000-fan-out-with-jobs) formulas
+* Before you launch, predict the wall time and the total run cost with the [3.1](../../../../03-scaling-reliability-cost/01-fan-out.md) formulas
 * Launch the run. At about 50%, cancel at least one Job with `nebius ai job cancel`, then resume with the same `run_id`
 * Take the spot and on-demand rates from [Nebius pricing](https://docs.nebius.com/compute/resources/pricing) and write down the date
 

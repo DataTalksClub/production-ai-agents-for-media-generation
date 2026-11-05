@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="../images/module-1-cover.png" alt="Module 1, Make it work: Consistent Media Generation on Serverless GPUs. Media model landscape, templates, containers and model cache, seeds, fitting VRAM, startup, load and generation time. You ship Homework 1: GPU Media Worker" width="100%">
+</p>
+
 # Module 1: Generative Media Workloads
 
 Welcome to Module 1 of Production AI Agents for Generative Media! These two weeks we make it work: run image, video and audio models on serverless GPUs, for serving and for batch, and measure what one asset costs.
@@ -11,7 +15,11 @@ Welcome to Module 1 of Production AI Agents for Generative Media! These two week
 * Video Link (Coming Soon)
 * Slides (Coming Soon)
 
-## Learning Objectives
+<p align="center">
+  <img src="../images/diagram-media-factory.png" alt="The Personalized Media Factory: a brief goes to an agent, GPU models generate image, voice or video, a check sends assets that aren't good enough back to revise and regenerate, and the factory scales from 1 to 1,000+ records with a cost per asset" width="100%">
+</p>
+
+## What you will learn
 
 By the end of this module, you will be able to:
 
@@ -21,16 +29,17 @@ By the end of this module, you will be able to:
 * Run the same generation for serving (Endpoint) and for batch inference (Job), and choose between them
 * Measure startup, readiness and generation time, and turn them into marginal and total cost per asset
 
-## 1.1 Landscape: Modalities and Model Families
+## Lessons
 
-* Modalities: text-to-image, image editing, text-to-video, image-to-video, text-to-speech, text-to-music
-* What changes between them: output size, steps, frames, VRAM, seconds per asset
-* Why video is expensive: frames × resolution × denoising steps
-* Model families (high level): size, VRAM, latency, quality
-* Licences: what you can and cannot ship. Read the model card.
-* Real projects: 2–3 short cases from Nebius customers and partners. Workload, scale, what broke, what they changed.
+1. [1.1 Landscape: Modalities and Model Families](01-landscape.md)
+2. [1.2 First Media Generation in a Few Minutes](02-first-generation.md)
+3. [1.3 Containers for Generative AI](03-containers.md)
+4. [1.4 Serving vs Batch Inference: the Same Generation for Different Use Cases](04-serving-vs-batch.md)
+5. [1.5 Measuring Startup, Load and Generation Costs](05-measuring-costs.md)
 
-The models used in this module, all with 1-click templates in the [Serverless AI Cookbook](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/README.md):
+## Models used in this module
+
+All with 1-click templates in the [Serverless AI Cookbook](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/README.md). The default path is [Sana](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-sana/README.md) on L40S; the others are there to explore.
 
 | Task | Model | Template GPU |
 |---|---|---|
@@ -44,80 +53,9 @@ The models used in this module, all with 1-click templates in the [Serverless AI
 | Text-to-speech | [Chatterbox](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-chatterbox/README.md) | H100 |
 | Text-to-music | [ACE-Step 1.5](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-ace-step-1-5/README.md) | H100 |
 
-## 1.2 First Media Generation in a Few Minutes
-
-Pick one option. The default path is Option A with [Sana](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-sana/README.md) on L40S. The other models in the 1.1 table are there to explore.
-
-**Option A: Endpoint + Jupyter on your laptop**
-
-* Deploy an Endpoint from a cookbook template in the web console (1-click, fields pre-filled)
-* Endpoint lifecycle: create → STARTING → RUNNING → ready → stop. RUNNING is not ready: requests fail until `/v1/models` returns JSON.
-* Call it from a local notebook with plain HTTP: `/v1/images/generations`, `/v1/audio/speech`. Based on [`01_simple_media_agent.ipynb`](https://github.com/DataTalksClub/build-media-agent-workshop/blob/main/01_simple_media_agent.ipynb) from the workshop.
-* Save the asset locally
-* Stop the Endpoint
-
-Done when: you have the asset file on your laptop and the Endpoint is stopped.
-
-**Option B: JupyterLab on a GPU (DevLabs)**
-
-* Start [JupyterLab on Nebius](https://docs.nebius.com/applications/standalone/jupyterlab) on a GPU
-* Load several models from Hugging Face with Diffusers and play with them: prompt, seed, steps, resolution
-* Watch VRAM and time per asset as you change them
-* Write down the run configuration so you can repeat it: prompt, seed, parameters, pinned model revision, GPU, library versions
-* Stop JupyterLab
-
-Done when: you have generated assets with two models and JupyterLab is stopped.
-
-A seed makes a run repeatable, not identical everywhere. The same configuration can still give slightly different outputs on a different GPU, driver or PyTorch version, or with non-deterministic kernels. See [PyTorch: Reproducibility](https://docs.pytorch.org/docs/2.15/notes/randomness.html).
-
-Code is OpenAI-compatible, so the pattern ports elsewhere.
-
-## 1.3 Containers for Generative AI
-
-High level. Optimization (cold start, model cache, VRAM, `torch.compile`) is in [3.3](../03-scaling-reliability-cost#33-optimizing-cost-per-asset-cold-start-vram-and-speed).
-
-* Template vs bring-your-own container: when the cookbook template is enough
-* CUDA/PyTorch base images
-* Weights vs image: what goes where, HF cache, pinned revisions
-* Secrets: env at runtime, never in the image
-* I/O: inputs and outputs through a bucket mount or S3
-* Bad Dockerfile → production Dockerfile, side by side (reading, no lab)
-
-## 1.4 Serving vs Batch Inference: the Same Generation for Different Use Cases
-
-* Serving (Endpoint) when a human or an agent waits on the result. Batch (Job) when it produces an artifact you store.
-* The same generation as a batch Job: from the CLI (`nebius ai job create`) or from Python
-* Job lifecycle: QUEUED → RUNNING → COMPLETED or FAILED. Jobs stop on completion. Endpoints don't.
-* Store Job outputs in Object Storage: create a bucket and access keys, then mount the bucket to the Job or write with boto3 (S3-compatible, `endpoint_url`)
-* Run the 1.2 generation as a Job with the same configuration (prompt, seed, parameters, model revision). Compare the two assets: they match only if the GPU, runtime and deterministic settings also match.
-* What bills: Endpoints while RUNNING, even when idle. Jobs while running. Disks and buckets while they exist.
-* Set a `--timeout` on every Job
-* What this means for scale: preview of [Module 3](../03-scaling-reliability-cost)
-
-Done when: the Job is COMPLETED, its asset is in your bucket, and you can say whether it matches the 1.2 asset and why.
-
-## 1.5 Measuring Startup, Load and Generation Costs
-
-* Four measurements, kept separate:
-  * Deployment startup (observed): create → RUNNING, from status transitions
-  * Readiness wait (observed, Endpoint): RUNNING → first JSON from `/v1/models`. A proxy for model load: it also includes server start and weight download.
-  * Model load (internal), where available: a timer around model loading in your own code (Job, JupyterLab) or a load time in server logs. Template Endpoints may not expose it.
-  * Request latency: send → response, per asset, measured by the client. For a Job or JupyterLab, the generation timer in your code.
-* Billable interval, defined separately: the time you pay for. An Endpoint bills while it runs, idle or not. A Job bills while it runs. Your timers explain where that time goes, but the bill is the billable interval × rate. See [Serverless AI pricing](https://docs.nebius.com/serverless/pricing-quotas).
-* Cold vs warm: the first asset is not the typical asset
-* Cost per asset:
-  * Marginal compute cost, `c = rate × t_gen`: the cost of one more asset on a running, ready deployment
-  * Fixed cost of one run, `F = rate × (t_start + t_ready)`. `t_ready` is the readiness wait for an Endpoint, or model load for a Job or JupyterLab.
-  * Total run cost per asset for `N` assets: `F / N + c`
-  * Assumes one shared startup per run, assets generated one after another, and no idle gaps. Idle time adds `rate × t_idle` to the run.
-* Worked example: the reference Sana run, Endpoint vs Job at 1, 10 and 100 assets
-* Practice: recompute the total run cost per asset for your own `N`, and add 10 minutes of idle time before you stop the Endpoint
-
-Done when: you have `metrics.json` with all four measurements and your cost per asset at 1, 10 and 100 assets.
-
 ## Homework 1: GPU Media Worker
 
-Generate one media asset with any model from the [table in 1.1](#11-landscape-modalities-and-model-families), measure it, and compare its cost with a per-call API.
+Generate one media asset with any model from the [table above](#models-used-in-this-module), measure it, and compare its cost with a per-call API.
 
 * Notebook or `.py` script, your choice
 * Report your model, generation time and cost per asset, and the creative idea behind your asset
@@ -128,6 +66,33 @@ Questions and submission: [homework.md](../cohorts/2026/homework/01-generative-m
 ## Capstone Proposal
 
 Write a one-page proposal for your capstone: problem, records, two GPU media models and a budget estimate. Template: [projects](../projects).
+
+## Module structure (proposed)
+
+One page per lesson at the module root, all code flat in `code/`, images in `images/`.
+
+```text
+01-generative-media-workloads/
+├── README.md                       # lessons index
+├── 01-landscape.md                 # one page per lesson
+├── 02-first-generation.md
+├── 03-containers.md                # bad vs production Dockerfile, line by line
+├── 04-serving-vs-batch.md
+├── 05-measuring-costs.md
+├── images/                         # NN-slug-MM-what.jpg
+└── code/
+    ├── README.md                   # how to run each file, env vars
+    ├── endpoint_quickstart.ipynb   # 1.2 A: laptop notebook → template Endpoint
+    ├── jupyterlab_models.ipynb     # 1.2 B: JupyterLab on GPU, several HF models
+    ├── Dockerfile.bad              # 1.3: what not to do
+    ├── Dockerfile                  # 1.3: production version
+    ├── generate.py                 # 1.4: one generation; same code in a Job and in JupyterLab
+    ├── call_endpoint.py            # 1.4: same prompt + seed through an Endpoint
+    ├── submit_job.sh               # 1.4: nebius ai job create … --timeout
+    ├── measure_endpoint.py         # 1.5: create → RUNNING → /v1/models ready → N generations
+    ├── measure_job.py              # 1.5: Job status transitions + generate.py timings
+    └── cost.py                     # 1.5: metrics.json + GPU $/h → cost per asset
+```
 
 # Community Notes
 

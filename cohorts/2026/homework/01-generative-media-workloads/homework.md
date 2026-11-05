@@ -39,7 +39,7 @@ Templates for all of them: [Serverless AI Cookbook](https://github.com/nebius/se
 
 ### Generate and measure
 
-See [1.5 Measuring Startup, Load and Generation Costs](../../../../01-generative-media-workloads/README.md#15-measuring-startup-load-and-generation-costs).
+See [1.5 Measuring Startup, Load and Generation Costs](../../../../01-generative-media-workloads/05-measuring-costs.md).
 
 * Turn your creative idea into a prompt.
 * Generate the asset **at least 3 times** with the same prompt, seed and parameters. Small differences between runs can happen; see 1.2.

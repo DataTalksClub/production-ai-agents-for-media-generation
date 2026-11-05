@@ -96,9 +96,10 @@ Mon 7 - Sun 13 Dec 2026
 Mon 14 - Sun 20 Dec 2026
 
 * Evaluating generative systems: system, agent and media
-* Multimodal judges and calibration
+* Judge calibration and regression gates
 * Observability and tracing
 * Designing for production: architecture, SLO, dashboard and alerts
+* Production concerns and the capstone brief: auth, quotas, abuse, prompt injection, content safety, licensing and provenance
 * No homework: you apply Module 4 in your capstone (**capstone brief**)
 
 ### [Capstone Project](/projects)

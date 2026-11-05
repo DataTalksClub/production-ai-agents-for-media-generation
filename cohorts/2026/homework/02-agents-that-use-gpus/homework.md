@@ -26,6 +26,7 @@ must_not: real brand names, logos, readable text or code
   * Keyframe (text-to-image): Sana by default. Also fine: Qwen-Image, Z-Image-Turbo.
   * Video (image-to-video): Wan2.2-I2V-A14B.
 * Call the tools as plain functions or over MCP, your choice.
+* Rubric: start from the 2.5 rubric v1 (`rubric.yaml`) or write your own. Give it a version.
 * Use a `.py` script or a notebook.
 
 ### Build the agent
@@ -55,12 +56,12 @@ Start one run with the fixture as attempt 1. The judge must return `RETRY`, and 
 * Recovery from the fixture, visible in the trace
 * At most 2 video generations in the whole homework, including retries. Video is the most expensive asset.
 * A second identical call to any GPU tool is a cache hit, not a new generation (2.2). The cache key includes the content hash of the keyframe you pass to the video model.
-* Every model request, tool call and check writes one event to `events.jsonl` with: `event_id`, `kind`, `name`, `call_id`, `workload` and `workload_id`, `attempt`, `verdict`, `t_gen_s`, `cost_usd`
+* Every model request, tool call and check writes one event to `events.jsonl` with: `event_id`, `kind`, `name`, `call_id`, `workload` and `workload_id`, `attempt`, `verdict`, `t_gen_s`, `cost_usd`. Judge events also carry `rubric_version`, `judge_model` and `reasons`.
 * Watch the final video once yourself, and write one sentence on whether it matches the brief. The judge only saw the keyframe.
 
 ### Compute the cost per video
 
-Use the Module 1 terms. See [1.5](../../../../01-generative-media-workloads/README.md#15-measuring-startup-load-and-generation-costs).
+Use the Module 1 terms. See [1.5](../../../../01-generative-media-workloads/05-measuring-costs.md).
 
 * For every GPU generation, including rejected keyframes: `c = rate × t_gen`. For the video, `t_gen` runs from submit to `completed`, so it includes queue time.
 * For every LLM and judge call: tokens × the Token Factory price per token
