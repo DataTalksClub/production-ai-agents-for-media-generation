@@ -1,7 +1,7 @@
 ## Homework 1: GPU Media Worker
 
 > [!NOTE]
-> You need a Nebius project with credits. See [Module 1](../../../../01-generative-media-workloads/README.md).
+> You need a Nebius project with credits. See [Module 1](../../../../01-consistent-media-generation-on-serverless-gpus/README.md).
 > Stop or delete every Endpoint, Job and JupyterLab when you're done. A forgotten Endpoint bills while it's RUNNING.
 
 In this homework, you generate one media asset on a GPU, measure it, and decide when self-hosting beats a per-call API.
@@ -39,7 +39,7 @@ Templates for all of them: [Serverless AI Cookbook](https://github.com/nebius/se
 
 ### Generate and measure
 
-See [1.5 Measuring Startup, Load and Generation Costs](../../../../01-generative-media-workloads/05-measuring-costs.md).
+See [1.5 Measuring Startup, Load and Generation Costs](../../../../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md).
 
 * Turn your creative idea into a prompt.
 * Generate the asset **at least 3 times** with the same prompt, seed and parameters. Small differences between runs can happen; see 1.2.

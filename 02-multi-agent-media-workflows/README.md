@@ -2,12 +2,12 @@
   <img src="../images/module-2-cover.png" alt="Module 2, Make it intelligent: Multi-Agent Media Workflows. The agent loop, GPU models as typed tools over MCP, long-running tools, planner, generator and reviewer. You ship Homework 2: Media Agent" width="100%">
 </p>
 
-# Module 2: Agents That Use GPUs
+# Module 2: Multi-Agent Media Workflows
 
 Welcome to Module 2 of Production AI Agents for Generative Media! This week we make it intelligent: give an agent GPU workloads as tools, keep the agent on CPU, and build a planner, generator and reviewer loop that regenerates an asset instead of accepting the first output.
 
 > [!NOTE]
-> This module builds on Module 1: the Endpoints, Jobs, Object Storage bucket and cost terms from [1.4](../01-generative-media-workloads/04-serving-vs-batch.md) and [1.5](../01-generative-media-workloads/05-measuring-costs.md). The agent's LLM runs on [Nebius Token Factory](https://docs.tokenfactory.nebius.com/quickstart), an OpenAI-compatible API.
+> This module builds on Module 1: the Endpoints, Jobs, Object Storage bucket and cost terms from [1.4](../01-consistent-media-generation-on-serverless-gpus/04-serving-vs-batch.md) and [1.5](../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md). The agent's LLM runs on [Nebius Token Factory](https://docs.tokenfactory.nebius.com/quickstart), an OpenAI-compatible API.
 
 > [!WARNING]
 > Make sure you stop or delete your resources (Endpoints, Jobs) when you finish the module to avoid charges. An Endpoint bills while it's RUNNING, even when the agent isn't calling it. Video is the most expensive asset: keep the fast path to two videos or fewer.
@@ -49,14 +49,14 @@ Build a media agent for a short coffee ad video: plan → keyframe → judge →
 * Tools called directly or over MCP, your choice
 * Report the cost per video, split by step, and whether you chose an agent, a workflow or a hybrid for this brief, and why
 
-Questions and submission: [homework.md](../cohorts/2026/homework/02-agents-that-use-gpus/homework.md).
+Questions and submission: [homework.md](../cohorts/2026/homework/02-multi-agent-media-workflows/homework.md).
 
 ## Module structure (proposed)
 
 One page per lesson at the module root, all code flat in `code/`, images in `images/`.
 
 ```text
-02-agents-that-use-gpus/
+02-multi-agent-media-workflows/
 ├── README.md                       # lessons index
 ├── 01-agent-loop.md
 ├── 02-tools.md

@@ -1,7 +1,7 @@
 ## Homework 2: Media Agent
 
 > [!NOTE]
-> You need the Module 1 setup: a Nebius project with credits and an Object Storage bucket. See [Module 2](../../../../02-agents-that-use-gpus/README.md).
+> You need the Module 1 setup: a Nebius project with credits and an Object Storage bucket. See [Module 2](../../../../02-multi-agent-media-workflows/README.md).
 > Stop or delete every Endpoint and Job when you're done. A forgotten Endpoint bills while it's RUNNING.
 
 In this homework, you build an agent that turns a written brief into a short video ad, checks its own keyframe, regenerates it when it isn't good enough, and leaves a trace of every decision.
@@ -61,7 +61,7 @@ Start one run with the fixture as attempt 1. The judge must return `RETRY`, and 
 
 ### Compute the cost per video
 
-Use the Module 1 terms. See [1.5](../../../../01-generative-media-workloads/05-measuring-costs.md).
+Use the Module 1 terms. See [1.5](../../../../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md).
 
 * For every GPU generation, including rejected keyframes: `c = rate × t_gen`. For the video, `t_gen` runs from submit to `completed`, so it includes queue time.
 * For every LLM and judge call: tokens × the Token Factory price per token

@@ -1,7 +1,7 @@
 ---
 video_url: ""
 prev_url: 04-long-running-tools.md
-next_url: ../03-scaling-reliability-cost/01-fan-out.md
+next_url: ../03-batch-media-generation-at-scale/01-fan-out.md
 ---
 # 2.5 Planner, Generator, Reviewer: the Judge Loop
 

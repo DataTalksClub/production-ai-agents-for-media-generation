@@ -1,6 +1,6 @@
 ---
 video_url: ""
-prev_url: ../02-agents-that-use-gpus/05-judge-loop.md
+prev_url: ../02-multi-agent-media-workflows/05-judge-loop.md
 next_url: 02-spot-and-interruption.md
 ---
 # 3.1 One to 1,000: Fan-out with Jobs

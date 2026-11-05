@@ -2,7 +2,7 @@
   <img src="../images/module-1-cover.png" alt="Module 1, Make it work: Consistent Media Generation on Serverless GPUs. Media model landscape, templates, containers and model cache, seeds, fitting VRAM, startup, load and generation time. You ship Homework 1: GPU Media Worker" width="100%">
 </p>
 
-# Module 1: Generative Media Workloads
+# Module 1: Consistent Media Generation on Serverless GPUs
 
 Welcome to Module 1 of Production AI Agents for Generative Media! These two weeks we make it work: run image, video and audio models on serverless GPUs, for serving and for batch, and measure what one asset costs.
 
@@ -61,7 +61,7 @@ Generate one media asset with any model from the [table above](#models-used-in-t
 * Report your model, generation time and cost per asset, and the creative idea behind your asset
 * Find the per-call API price for the same model and compute your self-host breakeven in number of assets
 
-Questions and submission: [homework.md](../cohorts/2026/homework/01-generative-media-workloads/homework.md).
+Questions and submission: [homework.md](../cohorts/2026/homework/01-consistent-media-generation-on-serverless-gpus/homework.md).
 
 ## Capstone Proposal
 
@@ -72,7 +72,7 @@ Write a one-page proposal for your capstone: problem, records, two GPU media mod
 One page per lesson at the module root, all code flat in `code/`, images in `images/`.
 
 ```text
-01-generative-media-workloads/
+01-consistent-media-generation-on-serverless-gpus/
 ├── README.md                       # lessons index
 ├── 01-landscape.md                 # one page per lesson
 ├── 02-first-generation.md

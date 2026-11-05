@@ -2,12 +2,12 @@
   <img src="../images/module-3-cover.png" alt="Module 3, Make it scale: Batch Media Generation at Scale. Fan-out on spot GPUs, per-item checkpoints, breaking the pipeline on purpose, budget-aware agents, quality vs cost. You ship Homework 3: Factory Scale Challenge" width="100%">
 </p>
 
-# Module 3: Scaling, Reliability and Cost
+# Module 3: Batch Media Generation at Scale
 
 Welcome to Module 3 of Production AI Agents for Generative Media! This week we make it scale: run the same generation for every record over parallel spot GPUs, survive a killed run without paying twice, cut the cost per asset, and stop the run when it breaks a budget or a quality bar.
 
 > [!NOTE]
-> This module builds on Module 1 and Module 2: Jobs, the Object Storage bucket and the cost terms from [1.4](../01-generative-media-workloads/04-serving-vs-batch.md) and [1.5](../01-generative-media-workloads/05-measuring-costs.md), the idempotency key from [2.2](../02-agents-that-use-gpus/02-tools.md), tickets from [2.4](../02-agents-that-use-gpus/04-long-running-tools.md) and the judge and rubric v1 from [2.5](../02-agents-that-use-gpus/05-judge-loop.md).
+> This module builds on Module 1 and Module 2: Jobs, the Object Storage bucket and the cost terms from [1.4](../01-consistent-media-generation-on-serverless-gpus/04-serving-vs-batch.md) and [1.5](../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md), the idempotency key from [2.2](../02-multi-agent-media-workflows/02-tools.md), tickets from [2.4](../02-multi-agent-media-workflows/04-long-running-tools.md) and the judge and rubric v1 from [2.5](../02-multi-agent-media-workflows/05-judge-loop.md).
 
 > [!IMPORTANT]
 > Parallel Jobs need quota. Serverless AI Jobs count toward Compute quotas: one VM, one disk and one allocation per running Job, plus GPUs for regular VMs. A new account starts with 2 regular and 2 preemptible VMs per region. Homework 3 runs 10 Jobs in parallel, so request an increase to at least 10 preemptible VMs, 10 disks and the matching allocations before the homework week. How to check and increase quotas: [3.1](01-fan-out.md#quotas-set-your-k).
@@ -51,7 +51,7 @@ Scale the Personalized Media Factory to all 200 records in `kids.csv` over 10 Jo
 * Submit your `summary.json`: records, Jobs, completed, dead-lettered, total cost, cost per accepted asset, saved vs on-demand, p50 and p95 time per asset, judge pass rate, and the resume proof (items done before the kill, items regenerated after it)
 * Leaderboard: ranked by cost per accepted asset, among runs that meet the completion and quality bars
 
-Questions and submission: [homework.md](../cohorts/2026/homework/03-scaling-reliability-cost/homework.md).
+Questions and submission: [homework.md](../cohorts/2026/homework/03-batch-media-generation-at-scale/homework.md).
 
 ## Capstone Step
 
@@ -62,7 +62,7 @@ Run your own records through your capstone pipeline on 100 records (10 for video
 One page per lesson at the module root, all code flat in `code/`, images in `images/`.
 
 ```text
-03-scaling-reliability-cost/
+03-batch-media-generation-at-scale/
 ├── README.md                       # lessons index
 ├── 01-fan-out.md
 ├── 02-spot-and-interruption.md

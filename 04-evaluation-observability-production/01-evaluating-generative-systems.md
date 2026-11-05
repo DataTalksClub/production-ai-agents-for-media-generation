@@ -1,6 +1,6 @@
 ---
 video_url: ""
-prev_url: ../03-scaling-reliability-cost/06-fine-tune-style.md
+prev_url: ../03-batch-media-generation-at-scale/06-fine-tune-style.md
 next_url: 02-multimodal-judges.md
 ---
 # 4.1 Evaluating Generative Systems: System, Agent and Media

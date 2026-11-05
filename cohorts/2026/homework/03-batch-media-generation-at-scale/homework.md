@@ -1,7 +1,7 @@
 ## Homework 3: Factory Scale Challenge
 
 > [!NOTE]
-> You need a Nebius project with credits and a quota of at least 10 preemptible VMs, 10 disks and the matching allocations in your region. A new account starts with 2. Request the increase before you start. See [Module 3](../../../../03-scaling-reliability-cost/README.md).
+> You need a Nebius project with credits and a quota of at least 10 preemptible VMs, 10 disks and the matching allocations in your region. A new account starts with 2. Request the increase before you start. See [Module 3](../../../../03-batch-media-generation-at-scale/README.md).
 > Cancel every Job and stop every Endpoint when you're done.
 
 In this homework, you scale the Personalized Media Factory to 200 records over 10 Jobs in parallel on spot GPUs, survive a kill, and report what one accepted asset costs.
@@ -13,12 +13,12 @@ In this homework, you scale the Personalized Media Factory to 200 records over 1
 * Assets per record: card text, image and voice. Video for a 10-record sample only, picked with a fixed seed.
 * Models (fixed for the leaderboard): Sana for images, Kokoro-82M for voice, Wan2.2-I2V-A14B for the video sample
 * Jobs: 10 spot Jobs in parallel (`--preemptible --follows-spot-price`), each with a `--timeout`
-* Your configuration from [3.3](../../../../03-scaling-reliability-cost/03-optimizing-cost.md)
-* A `budget_usd` and a judge pass-rate floor on the run, as in [3.4](../../../../03-scaling-reliability-cost/04-breaking-the-pipeline.md)
+* Your configuration from [3.3](../../../../03-batch-media-generation-at-scale/03-optimizing-cost.md)
+* A `budget_usd` and a judge pass-rate floor on the run, as in [3.4](../../../../03-batch-media-generation-at-scale/04-breaking-the-pipeline.md)
 
 ### Run
 
-* Before you launch, predict the wall time and the total run cost with the [3.1](../../../../03-scaling-reliability-cost/01-fan-out.md) formulas
+* Before you launch, predict the wall time and the total run cost with the [3.1](../../../../03-batch-media-generation-at-scale/01-fan-out.md) formulas
 * Launch the run. At about 50%, cancel at least one Job with `nebius ai job cancel`, then resume with the same `run_id`
 * Take the spot and on-demand rates from [Nebius pricing](https://docs.nebius.com/compute/resources/pricing) and write down the date
 

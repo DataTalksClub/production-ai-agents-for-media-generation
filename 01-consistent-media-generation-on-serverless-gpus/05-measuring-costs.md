@@ -1,7 +1,7 @@
 ---
 video_url: ""
 prev_url: 04-serving-vs-batch.md
-next_url: ../02-agents-that-use-gpus/01-agent-loop.md
+next_url: ../02-multi-agent-media-workflows/01-agent-loop.md
 ---
 # 1.5 Measuring Startup, Load and Generation Costs
 

@@ -1,6 +1,6 @@
 ---
 video_url: ""
-prev_url: ../01-generative-media-workloads/05-measuring-costs.md
+prev_url: ../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md
 next_url: 02-tools.md
 ---
 # 2.1 The Agent Loop: Deep Dive
