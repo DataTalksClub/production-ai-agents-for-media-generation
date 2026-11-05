@@ -34,11 +34,11 @@ Default path for the whole module: your Homework 3 run folder as input, the 2.5 
 
 ## Lessons
 
-1. [4.1 Evaluating Generative Systems: System, Agent and Media](01-evaluating-generative-systems.md)
-2. [4.2 Judge Calibration and Regression Gates](02-multimodal-judges.md)
-3. [4.3 Observability and Tracing](03-observability-tracing.md)
-4. [4.4 Designing for Production: Architecture, SLO, Dashboard and Alerts](04-designing-for-production.md)
-5. [4.5 Production Concerns and the Capstone Brief](05-production-concerns.md)
+* [4.1 Evaluating Generative Systems: System, Agent and Media](01-evaluating-generative-systems.md)
+* [4.2 Judge Calibration and Regression Gates](02-multimodal-judges.md)
+* [4.3 Observability and Tracing](03-observability-tracing.md)
+* [4.4 Designing for Production: Architecture, SLO, Dashboard and Alerts](04-designing-for-production.md)
+* [4.5 Production Concerns and the Capstone Brief](05-production-concerns.md)
 
 ## Capstone Step
 

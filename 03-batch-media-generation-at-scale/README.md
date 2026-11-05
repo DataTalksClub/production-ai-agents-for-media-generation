@@ -37,11 +37,11 @@ Default path for the whole module: [Sana](https://github.com/nebius/serverless-a
 
 ## Lessons
 
-1. [3.1 One to 1,000: Fan-out with Jobs](01-fan-out.md)
-2. [3.2 Spot GPUs and Design for Interruption](02-spot-and-interruption.md)
-3. [3.3 Optimizing Cost per Asset: Cold Start, VRAM and Speed](03-optimizing-cost.md)
-4. [3.4 Breaking the Pipeline on Purpose](04-breaking-the-pipeline.md)
-5. [3.6 Fine-Tune a Model on a New Style (Optional, Advanced)](06-fine-tune-style.md)
+* [3.1 One to 1,000: Fan-out with Jobs](01-fan-out.md)
+* [3.2 Spot GPUs and Design for Interruption](02-spot-and-interruption.md)
+* [3.3 Optimizing Cost per Asset: Cold Start, VRAM and Speed](03-optimizing-cost.md)
+* [3.4 Breaking the Pipeline on Purpose](04-breaking-the-pipeline.md)
+* [3.6 Fine-Tune a Model on a New Style (Optional, Advanced)](06-fine-tune-style.md)
 
 ## Homework 3: Factory Scale Challenge
 

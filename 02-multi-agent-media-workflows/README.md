@@ -34,11 +34,11 @@ Default path for the whole module: one [PydanticAI](https://pydantic.dev/docs/ai
 
 ## Lessons
 
-1. [2.1 The Agent Loop: Deep Dive](01-agent-loop.md)
-2. [2.2 Tools and Structured Outputs](02-tools.md)
-3. [2.3 GPU Workloads as Agentic Tools](03-gpu-tools.md)
-4. [2.4 Long-running Tools: Submit, Poll, Resume](04-long-running-tools.md)
-5. [2.5 Planner, Generator, Reviewer: the Judge Loop](05-judge-loop.md)
+* [2.1 The Agent Loop: Deep Dive](01-agent-loop.md)
+* [2.2 Tools and Structured Outputs](02-tools.md)
+* [2.3 GPU Workloads as Agentic Tools](03-gpu-tools.md)
+* [2.4 Long-running Tools: Submit, Poll, Resume](04-long-running-tools.md)
+* [2.5 Planner, Generator, Reviewer: the Judge Loop](05-judge-loop.md)
 
 ## Homework 2: Media Agent
 

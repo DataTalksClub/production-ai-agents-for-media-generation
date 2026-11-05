@@ -31,11 +31,11 @@ By the end of this module, you will be able to:
 
 ## Lessons
 
-1. [1.1 Landscape: Modalities and Model Families](01-landscape.md)
-2. [1.2 First Media Generation in a Few Minutes](02-first-generation.md)
-3. [1.3 Containers for Generative AI](03-containers.md)
-4. [1.4 Serving vs Batch Inference: the Same Generation for Different Use Cases](04-serving-vs-batch.md)
-5. [1.5 Measuring Startup, Load and Generation Costs](05-measuring-costs.md)
+* [1.1 Landscape: Modalities and Model Families](01-landscape.md)
+* [1.2 First Media Generation in a Few Minutes](02-first-generation.md)
+* [1.3 Containers for Generative AI](03-containers.md)
+* [1.4 Serving vs Batch Inference: the Same Generation for Different Use Cases](04-serving-vs-batch.md)
+* [1.5 Measuring Startup, Load and Generation Costs](05-measuring-costs.md)
 
 ## Models used in this module
 
