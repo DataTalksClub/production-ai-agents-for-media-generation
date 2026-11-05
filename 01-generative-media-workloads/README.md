@@ -74,7 +74,7 @@ Code is OpenAI-compatible, so the pattern ports elsewhere.
 
 ## 1.3 Containers for Generative AI
 
-High level. Optimization (cold start, model cache, VRAM, `torch.compile`) is in [Module 3](../03-scaling-reliability-cost).
+High level. Optimization (cold start, model cache, VRAM, `torch.compile`) is in [3.3](../03-scaling-reliability-cost#33-optimizing-cost-per-asset-cold-start-vram-and-speed).
 
 * Template vs bring-your-own container: when the cookbook template is enough
 * CUDA/PyTorch base images
