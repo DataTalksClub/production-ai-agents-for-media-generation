@@ -23,7 +23,7 @@ Bring your own records: a CSV or JSONL file with an id column. Records go in, ge
 
 ## Timeline
 
-* Start: Module 1 (two weeks, Mon 16 – Sun 29 Nov 2026) — pick your records and get the first GPU generation working
+* Start: Module 1 (two weeks, Mon 16 – Sun 29 Nov 2026) — pick your records, get the first GPU generation working, and fill in the [Capstone Proposal Template](proposal-template.md)
 * Modules 2–4 (weekly): Mon 30 Nov – Sun 20 Dec 2026
 * Teaching ends: Sun 20 Dec 2026
 * Attempt 1: submit by 15 Jan 2027; complete peer reviews by 22 Jan 2027

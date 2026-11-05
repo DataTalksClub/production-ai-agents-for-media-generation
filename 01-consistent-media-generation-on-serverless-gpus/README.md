@@ -65,28 +65,33 @@ Questions and submission: [homework.md](../cohorts/2026/homework/01-consistent-m
 
 ## Capstone Proposal
 
-Write a one-page proposal for your capstone: problem, records, two GPU media models and a budget estimate. Template: [projects](../projects).
+Write a one-page proposal for your capstone: problem, records, two GPU media models and a budget estimate. Template: [proposal-template.md](../projects/proposal-template.md) in [projects](../projects).
 
-## Run the examples
+## Module structure
 
-Start with the [code guide](code/README.md). The default path is Sana. Notebooks run real generation; automated Python checks need no GPU or credentials.
+One page per lesson at the module root, all code flat in [code/](code/README.md):
 
-```bash
-# From the repository root:
-uv sync
-uv run python 01-consistent-media-generation-on-serverless-gpus/code/smoke_test.py --fake
+```text
+01-consistent-media-generation-on-serverless-gpus/
+├── README.md                       # module overview and lessons index
+├── 01-landscape.md                 # 1.1: modalities, model families, licences
+├── 02-first-generation.md          # 1.2: Option A (Endpoint) & Option B (GPU DevLab)
+├── 03-containers.md                # 1.3: bad vs production Dockerfile, line by line
+├── 04-serving-vs-batch.md          # 1.4: Endpoint vs Job + Object Storage
+├── 05-measuring-costs.md           # 1.5: startup, load, latency, calculate_cost()
+└── code/
+    ├── README.md                   # how to run each file, env vars
+    ├── generation.json             # shared prompt, seed, pinned model commit, params
+    ├── common.py                   # config, metrics.json, trace.jsonl, calculate_cost()
+    ├── endpoint_quickstart.ipynb   # 1.2 Option A (default): laptop notebook → Endpoint
+    ├── jupyterlab_models.ipynb     # 1.2 Option B (optional): GPU DevLab with Diffusers
+    ├── Dockerfile.bad              # 1.3: what not to do
+    ├── Dockerfile                  # 1.3: production worker container
+    ├── generate.py                 # 1.4: sequential Diffusers worker for Job & DevLab
+    ├── call_endpoint.py            # 1.2 & 1.4: ImageGenerator client for an Endpoint
+    ├── measure_endpoint.py         # 1.5: record Endpoint startup, readiness & latency
+    └── measure_job.py              # 1.5: enrich metrics.json with Job lifecycle timestamps
 ```
-
-The lesson pages include Mermaid diagrams, exercises and completion criteria. Code is flat in `code/`; both notebooks run real generation on their configured GPU resource. This draft has no published instructor worker image or live GPU measurements. Read [validation status](VALIDATION.md) before a paid run.
-
-## Worksheets and supporting material
-
-* [Model choice](model-choice.md)
-* [Run report and cost comparison](run-report.md)
-* [Capstone proposal worksheet and example direction](proposal-template.md)
-* [Troubleshooting](TROUBLESHOOTING.md)
-* [Sources and workshop adaptation](SOURCES.md)
-* [Validation and release checklist](VALIDATION.md)
 
 # Community Notes
 

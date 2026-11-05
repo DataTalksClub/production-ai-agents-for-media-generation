@@ -1,80 +1,136 @@
 ---
 video_url: ""
+code:
+  - label: Anti-pattern Dockerfile
+    path: code/Dockerfile.bad
+  - label: Production worker Dockerfile
+    path: code/Dockerfile
 prev_url: 02-first-generation.md
 next_url: 04-serving-vs-batch.md
 ---
 # 1.3 Containers for Generative AI
 
+In this lesson we look at what goes into a container for generative AI and what stays out of it: weights, secrets and outputs. It's a reading lesson with no lab; optimization comes in 3.3. You're done when each problem in `Dockerfile.bad` is matched to its fix in `Dockerfile`.
 
-We read a broken Dockerfile and turn it into a GPU worker container. This is a reading lesson: no image build or paid resource is required. You are done when you can explain each problem in `Dockerfile.bad` and point to its correction or deployment requirement.
+## Template vs bring-your-own container
 
-## A container packages the runtime
+In Lesson 1.2 Option A, we deployed Sana from a 1-click template without writing a `Dockerfile`. When is a prebuilt template enough, and when do you build your own container image?
 
-In the previous lesson, Python could call a remote model without local CUDA. The server was running a different environment: CUDA-enabled PyTorch, Diffusers, model weights and our inference code. A container makes the software environment distributable. The host still provides the GPU and its driver.
+| Question | Use a 1-click Cookbook Template | Bring Your Own Container (BYOC) |
+|---|---|---|
+| **Entrypoint** | Long-lived HTTP server (`/v1/images/generations`) | Custom batch worker (`generate.py`), custom API, or multi-step pipeline |
+| **Model & Revision** | Default model baked into template configuration | Pinned 40-character Hugging Face commit hash (`model_revision`) |
+| **Dependencies** | Fixed by template author | Custom libraries, pinned versions, or extra pre/post-processing |
+| **Best for** | Quickstarts, standard interactive Endpoints | Reproducible batch Jobs (Lesson 1.4), custom workflows, production pinning |
 
 ```mermaid
 flowchart TB
-    Image[Container image: runtime and worker code] --> Process[GPU worker process]
-    Weights[Hub checkpoint at a pinned commit] --> Cache[Runtime model cache]
-    Cache --> Process
-    Secret[Runtime secret injection] --> Process
-    Input[generation.json] --> Process
-    Process --> Output[Persistent output bucket]
-    GPU[Host GPU and compatible driver] --> Process
+  subgraph Image ["Inside the Container Image (Built Once, Linux amd64)"]
+    CUDA["CUDA Runtime + cuDNN\n(pytorch:2.13.0-cuda13.0-cudnn9-runtime)"]
+    Wheels["Pinned Python Libraries\n(diffusers, transformers, accelerate)"]
+    Code["Worker Code & Default Config\n(common.py, generate.py, generation.json)"]
+    CUDA --> Wheels --> Code
+  end
+
+  subgraph Runtime ["Outside the Image (Mounted or Injected at Runtime)"]
+    Secrets["Runtime Secrets / Env Vars\n(TOKEN, HF_TOKEN)"]
+    Cache["Model Weights Cache\n(HF_HOME on disk or shared filesystem)"]
+    Bucket["Object Storage Mount\n(s3://bucket mounted at /outputs)"]
+  end
+
+  Secrets -->|"--env"| Code
+  Cache -->|"from_pretrained()"| Code
+  Code -->|"writes PNG + metrics.json"| Bucket
 ```
 
-Three things have different lifecycles: the image can be built once; model weights can be downloaded and cached; outputs belong to individual runs. Keeping these separate lets you change prompts without rebuilding the runtime and retain results after a Job exits.
+## CUDA and PyTorch base images
 
-| Use a template when… | Bring your own container when… |
-|---|---|
-| Its model and API already meet your needs | You need a custom pipeline or worker entry point |
-| You want the shortest path to a first asset | You need control of checkpoint loading and dependencies |
-| You accept the template's runtime choices | You can maintain and validate the runtime yourself |
+Generative media models rely on compiled CUDA kernels inside PyTorch. Two rules prevent the most common container failures:
 
-## Read the bad example
+1. **Always build for `linux/amd64`:** Cloud GPU nodes (L40S, H100) run on `x86_64` (`linux/amd64`). If you build on an Apple Silicon Mac without `--platform linux/amd64`, Docker produces an `arm64` image that fails to start on the GPU host.
+2. **Start from a matched PyTorch + CUDA runtime base image:** Installing `torch` from the default CPU index (`https://download.pytorch.org/whl/cpu`) or an unpinned `python:latest` base gives you a container where `torch.cuda.is_available()` is `False` even when an L40S GPU is attached. Starting from `pytorch/pytorch:2.13.0-cuda13.0-cudnn9-runtime` provides a tested CUDA 13.0 runtime, cuDNN 9, and matching PyTorch build out of the box.
 
-Open [Dockerfile.bad](code/Dockerfile.bad). It is deliberately unsafe and should not be built. The fake token is only a teaching placeholder.
+## Weights vs image
+
+Model checkpoints are large: Sana 1.6B is ~9 GB, ACE-Step 1.5 is ~10 GB, and Wan 2.2 video models range from 10 GB to 35 GB.
+
+Why shouldn't you run `snapshot_download(...)` inside `docker build` to bake the weights into the container image?
+
+- **Image pull time dominates cold start:** Every Serverless GPU Job starts on a fresh node and pulls your container image over the network. Even for a runtime image without baked weights, `IMAGE_PULLING` took `127.13–148.06 s` inside a `225.17 s` total startup on `gpu-l40s-a` `[measured: 2026-11-02, gpu-l40s-a, 1gpu-8vcpu-32gb, eu-north1]`. Adding 10–35 GB of model weights to the image bloats every push, pull, and code rebuild.
+- **Weight revisions change independently of code:** Keeping weights outside the image lets you pin `"model_revision": "ac0da2ff55fbe434795be0dce883042e4d49e2fc"` in `generation.json` and download them at runtime into `HF_HOME`.
+
+What happens if you attach a persistent cache at `HF_HOME` across Jobs? We measured the exact same Sana 1.6B spec twice on `gpu-l40s-a` — first with a cold cache, then with a warm cache on a shared POSIX compute filesystem `[measured: 2026-11-02, gpu-l40s-a, 1gpu-8vcpu-32gb, eu-north1]`:
+
+| Phase | Cold Cache | Warm Cache | What Changed |
+|---|---|---|---|
+| **Weight download** | `26.60 s` | `0.24 s` | Saved `26.37 s` (no network fetch from Hugging Face) |
+| **Model load to GPU (`load_s`)** | `13.29 s` | `12.85 s` | Flat (`~13 s` in both runs to read weights into VRAM) |
+| **Generation (`t_gen`)** | `4.46 s` | `4.37 s` | Flat (`~4.4 s` per `1024x1024` image, byte-identical output) |
+
+This gives us an important mental model for Module 3: **caching weights removes the network download (`26.60 s → 0.24 s`), not the GPU memory load (`~13 s`)**.
+
+> [!IMPORTANT]
+> **Keep `HF_HOME` on container disk or a POSIX compute filesystem — never on an S3 Object Storage FUSE mount.** Hugging Face Hub caches rely on relative symlinks (`snapshots/<sha>` → `blobs/<sha>`), `chmod`, and atomic file renames (`os.replace`), which S3 FUSE mounts do not support. Use the mounted S3 bucket (`/outputs`) strictly for reading input records and writing finished outputs.
+
+## Secrets
+
+Never put API keys, Hugging Face tokens, or S3 credentials in a `Dockerfile`:
+
+- Writing `ENV HF_TOKEN=...` bakes the secret into the image config and layer history (`docker inspect` and `docker history` show it in plain text to anyone who pulls the image).
+- Running `COPY . /app` without a strict `.dockerignore` sweeps local `.env` files and credentials into the image layer.
+
+Instead:
+
+1. Use an allowlist `.dockerignore` (see [code/.dockerignore](code/.dockerignore)) that ignores `*` and explicitly permits only `common.py`, `generate.py`, and `generation.json`.
+2. Pass secrets at runtime via `--env` or platform secret bindings when creating the Endpoint or Job.
+
+## Inputs and outputs
+
+A container filesystem is ephemeral: when a Job reaches `COMPLETED` or `FAILED`, everything written to `/tmp` or local container directories disappears with the container.
+
+- **Inputs (`generation.json`):** Kept small, human-readable, and free of secrets. It defines the model ID, 40-char commit hash, prompt, seed, and resolution.
+- **Outputs (`/outputs`):** The worker writes generated PNGs (`asset-000.png`), `metrics.json`, and `trace.jsonl` to `/outputs/...`. When we run the container as a Serverless Job in Lesson 1.4, we mount an Object Storage bucket at `/outputs` (`--volume "s3://${BUCKET}:/outputs:rw"`) so every artifact survives after the container exits.
+
+## Bad Dockerfile vs production Dockerfile
+
+Let's compare [code/Dockerfile.bad](code/Dockerfile.bad) and [code/Dockerfile](code/Dockerfile) line by line.
+
+Here is [code/Dockerfile.bad](code/Dockerfile.bad):
 
 ```dockerfile
+# DO NOT BUILD: intentionally bad teaching example. All tokens are fictitious.
 FROM --platform=linux/arm64 python:latest
 RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
 RUN pip install diffusers transformers
 ENV HF_TOKEN=NOT_A_REAL_TOKEN
 COPY . /app
+WORKDIR /app
+RUN python -c "from huggingface_hub import snapshot_download; snapshot_download('Efficient-Large-Model/Sana_1600M_1024px_diffusers')"
+CMD ["python", "generate.py", "--out", "/tmp/results"]
 ```
 
-The first line forces an architecture that does not match our target L40S worker environment, and `latest` can change underneath us. A successful laptop build is not proof that an image will run on the target. Build the real image for `linux/amd64` and record its pushed digest.
-
-The second line installs CPU PyTorch. A GPU attached to the machine cannot turn that package into a CUDA build. The unpinned installation on the third line can resolve differently later. Use a CUDA-enabled base and explicit dependency versions, then test them together.
-
-An `ENV` token becomes image metadata. Deleting it in a later layer does not reliably remove it from history. Supply credentials at runtime through the platform's secret mechanism. `COPY .` can also bring `.env`, credentials and generated artifacts into the image. Our [.dockerignore](code/.dockerignore) allows only the worker files.
-
-The bad file then downloads a floating checkpoint at build time and writes outputs to `/tmp/results`. This couples a large weight payload to the image and loses results when the container is discarded. Baking weights can be a deliberate deployment choice, but it is not our default. Here we pin the Hub revision in configuration and write to a persistent output mount.
-
-## Read the corrected worker
-
-Open [Dockerfile](code/Dockerfile). Its base and library versions follow the inspected cookbook runtime:
+And here is the corrected worker in [code/Dockerfile](code/Dockerfile):
 
 ```dockerfile
 FROM pytorch/pytorch:2.13.0-cuda13.0-cudnn9-runtime
-ENV HF_HOME=/cache/huggingface
+ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 PIP_BREAK_SYSTEM_PACKAGES=1 HF_HOME=/cache/huggingface
+RUN pip install diffusers==0.39.0 transformers==5.13.1 accelerate==1.14.0 sentencepiece==0.2.1 protobuf==6.33.0
 WORKDIR /app
 COPY common.py generate.py generation.json /app/
+RUN mkdir -p /cache /outputs
 CMD ["python", "/app/generate.py", "--n", "1", "--out", "/outputs/run"]
 ```
 
-The full file installs explicit dependency versions and creates cache/output directories. `HF_HOME` chooses the cache location; it does not magically make that cache persistent. Likewise, `/outputs` is just a directory until the deployment mounts storage there. In 1.4, the Job mount supplies that persistence.
+Every flaw in `Dockerfile.bad` maps directly to its fix in `Dockerfile`:
 
-The Dockerfile is a course worker, not a claim of complete production hardening. Its base tag still needs a resolved digest in a release record; transitive dependencies and the host driver also affect the environment. The [validation checklist](VALIDATION.md) tracks the GPU build/run evidence still required. Image size, model download time and cold-start latency remain unmeasured.
+| Line in `Dockerfile.bad` | Why It Breaks in Production | Fix in `code/Dockerfile` |
+|---|---|---|
+| `FROM --platform=linux/arm64 python:latest` | Wrong CPU architecture (`arm64` instead of `linux/amd64`), no CUDA runtime, and floating `:latest` tag. | `FROM pytorch/pytorch:2.13.0-cuda13.0-cudnn9-runtime` built with `docker buildx build --platform linux/amd64`. |
+| `RUN pip install torch .../whl/cpu` | Installs CPU-only PyTorch; `torch.cuda.is_available()` returns `False` on the GPU node. | Inherit the matched CUDA 13.0 PyTorch pre-installed in the base image. |
+| `RUN pip install diffusers transformers` | Unpinned libraries resolve to different versions on future builds and omit `accelerate` / `sentencepiece`. | Pin exact versions: `diffusers==0.39.0 transformers==5.13.1 accelerate==1.14.0 sentencepiece==0.2.1 protobuf==6.33.0`. |
+| `ENV HF_TOKEN=NOT_A_REAL_TOKEN` | Bakes a secret into the image metadata and layer history. | Omit secrets from the image; inject `HF_TOKEN` at runtime via `--env` only if pulling gated weights. |
+| `COPY . /app` | Copies `.env`, local `runs/`, and git metadata into the image if `.dockerignore` is missing. | `COPY common.py generate.py generation.json /app/` paired with an allowlist `.dockerignore`. |
+| `RUN python -c "...snapshot_download(...)"` | Bakes ~9 GB of unpinned weights into the image layer, slowing every image push/pull. | Set `ENV HF_HOME=/cache/huggingface` and download the pinned `model_revision` at runtime. |
+| `CMD ["python", "generate.py", "--out", "/tmp/results"]` | Writes outputs to ephemeral `/tmp/results`, which is lost as soon as the Job container exits. | Write to `/outputs/run`, where the Job mounts persistent Object Storage (`s3://${BUCKET}:/outputs:rw`). |
 
-## Follow the inputs and outputs
-
-`generation.json` is a small, non-secret input. It fixes the prompt, seed and generation settings. `generate.py` reads it, loads the pipeline once, produces PNGs and writes metrics plus trace events. The worker contains no provider-specific GPU provisioning code. The same Python entry point works in a notebook environment or a container with a compatible runtime.
-
-The container exits when Python exits. A Job uses that exit status to report success or failure. An Endpoint instead needs a long-lived HTTP server; putting the Job's one-shot command behind an Endpoint would not create a functioning API.
-
-## Try it: explain the repair
-
-For each bad line, write its failure mode and the corresponding fix. Your answer should include architecture, CUDA support, dependency versions, checkpoint revision, secrets, build context and persistent output. Then answer: “If I set `HF_HOME`, will the next Job automatically reuse the cache?” No: only a deliberately shared persistent cache would do that.
-
-Container optimization and cache experiments come in Module 3. Next, [run the generation as a Job](04-serving-vs-batch.md).
+In Module 3 (`3.3 Optimizing Cost`), we will measure container cold-start optimizations in detail. Next, let's run `generate.py` as a batch Job and compare it with our Endpoint in [1.4 Serving vs Batch Inference](04-serving-vs-batch.md).

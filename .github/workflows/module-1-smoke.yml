@@ -1,9 +1,9 @@
 name: Module 1 offline smoke
 on:
   push:
-    paths: ['01-consistent-media-generation-on-serverless-gpus/**', 'pyproject.toml', '.github/workflows/module-1-smoke.yml']
+    paths: ['01-consistent-media-generation-on-serverless-gpus/**', 'tests/test_module1_smoke.py', 'pyproject.toml', '.github/workflows/module-1-smoke.yml']
   pull_request:
-    paths: ['01-consistent-media-generation-on-serverless-gpus/**', 'pyproject.toml', '.github/workflows/module-1-smoke.yml']
+    paths: ['01-consistent-media-generation-on-serverless-gpus/**', 'tests/test_module1_smoke.py', 'pyproject.toml', '.github/workflows/module-1-smoke.yml']
 jobs:
   offline:
     runs-on: ubuntu-latest
@@ -12,5 +12,4 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python 01-consistent-media-generation-on-serverless-gpus/code/smoke_test.py --fake
-      - run: bash -n 01-consistent-media-generation-on-serverless-gpus/code/submit_job.sh
+      - run: python -m unittest tests/test_module1_smoke.py -v

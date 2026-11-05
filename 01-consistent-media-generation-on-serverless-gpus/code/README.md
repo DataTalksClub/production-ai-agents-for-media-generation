@@ -1,117 +1,128 @@
-# Module 1 code
+# Module 1 Code Guide
 
-Run shell commands from the **repository root**, unless a command says otherwise. Python 3.12 and [uv](https://docs.astral.sh/uv/getting-started/installation/) are the local prerequisites. CPU clients, cost calculations and offline checks use only the Python standard library. GPU libraries are imported only on the live worker path.
-
-## Automated Python checks
-
-Fake mode is reserved for automated `.py` tests. It is not part of the learner workflow or the notebooks.
-
-```bash
-uv sync
-uv run python 01-consistent-media-generation-on-serverless-gpus/code/smoke_test.py --fake
-```
-
-The test runner invokes the Python entry points with `--fake` to check file handling and arithmetic without network access or a GPU. Fixture metrics are labelled `fake: true` and cannot be used for live cost calculations. Notebooks are checked for syntax and structure only; executing them requires their real Endpoint or GPU runtime.
-
-Every generation gets a fresh run directory. `--out` can choose the directory explicitly, but it must not already exist.
-
-| File | Lesson | Entry point / purpose |
-|---|---|---|
-| `generation.json` | 1.2–1.5 | Shared prompt, model commit, seed and parameters |
-| `endpoint_quickstart.ipynb` | 1.2 A | Laptop walkthrough of `call_endpoint.run` |
-| `jupyterlab_models.ipynb` | 1.2 B | GPU walkthrough of `generate.run`; Sana reference path |
-| `call_endpoint.py` | 1.2, 1.4 | Readiness probe, image request, local output |
-| `generate.py` | 1.2, 1.4 | Pinned Sana loading and repeated generation |
-| `Dockerfile.bad`, `Dockerfile` | 1.3 | Reading exercise; corrected worker can be built |
-| `submit_job.sh` | 1.4 | Explicit Job resource request and bucket mount |
-| `measure_endpoint.py` | 1.5 | Same Endpoint client, accepting observed lifecycle times |
-| `measure_job.py` | 1.5 | Add lifecycle evidence to a downloaded metrics file |
-| `cost.py` | 1.5 | Marginal/fixed costs, N projections and breakeven |
-| `common.py` | all code | Local config, JSON, trace and timestamp helpers |
-| `smoke_test.py` | validation | Automated Python and failure-path checks; notebook syntax checks |
-
-## Endpoint setup
-
-Deploy the official [Sana template](https://github.com/nebius/serverless-ai-cookbook/tree/main/templates/endpoint-sana) in the console; keep token authentication enabled. These scripts do not create resources. Record lifecycle timestamps yourself and stop/delete the Endpoint afterward, even if the client fails. See [1.2](../02-first-generation.md) for the full sequence.
-
-| Variable | Used by | Meaning |
-|---|---|---|
-| `BASE_URL` | Endpoint client | HTTPS origin, **without** `/v1` |
-| `TOKEN` | Endpoint client | Endpoint bearer token, never written to outputs |
-| `ENDPOINT_IMAGE` | Endpoint client | Image reference copied from deployment metadata |
-| `WORKER_IMAGE` | Job wrapper/worker | Pushed worker digest; recorded with configuration |
-| `BUCKET` | Job wrapper | Existing private bucket; credentials in AWS default profile |
-| `RUN_ID` | Job wrapper | Unique safe name, e.g. `fox-20261116T090000Z` |
-| `JOB_TIMEOUT` | Job wrapper | Explicit platform timeout, default `1h` |
-| `GPU_PRESET` | Worker | Optional environment metadata; wrapper sets it |
-| `HF_TOKEN` | GPU Hub loader | Optional private runtime token, not needed for default public weights |
-
-`.env.example` documents names only; the scripts do not auto-load it. Set values in your shell or runtime secret configuration. Do not paste secrets into notebooks, JSON config or shell commands committed to Git.
-
-```bash
-uv run python 01-consistent-media-generation-on-serverless-gpus/code/call_endpoint.py --n 3
-```
-
-The client supports the inspected Sana image API, not every OpenAI-shaped image server. A different template might use different extension fields or return URLs rather than base64 PNGs. Use that template's documentation before adapting it. Nonretryable HTTP errors fail promptly; readiness retries are bounded. Generation requests are not automatically retried.
-
-## Notebooks
+Run shell commands from the **repository root**, unless a command specifies otherwise. You need Python 3.12 and [uv](https://docs.astral.sh/uv/getting-started/installation/).
 
 ```bash
 uv sync --extra notebooks
+```
+
+## Files in `code/`
+
+| File | Lesson | Purpose |
+|---|---|---|
+| `generation.json` | 1.2–1.5 | Shared prompt (Emma's holiday telescope card), pinned Sana commit, seed (`7`), and generation parameters |
+| `endpoint_quickstart.ipynb` | 1.2 Option A *(Default)* | Laptop notebook that calls a deployed Sana Endpoint using `ImageGenerator`, records `metrics.json`, and computes costs |
+| `jupyterlab_models.ipynb` | 1.2 Option B *(Optional)* | GPU DevLab notebook for participants who choose to run Diffusers directly on a GPU VM and inspect VRAM |
+| `call_endpoint.py` | 1.2, 1.4 | Standalone CLI script and `ImageGenerator` client for an OpenAI-compatible image Endpoint |
+| `generate.py` | 1.2, 1.4 | Standalone GPU worker that loads the pinned Sana checkpoint once and runs `--n` sequential generations |
+| `Dockerfile.bad`, `Dockerfile` | 1.3 | Broken vs production GPU worker container definitions |
+| `measure_endpoint.py` | 1.5 | Runs `call_endpoint.py` and attaches observed Endpoint creation, `RUNNING`, and stop timestamps |
+| `measure_job.py` | 1.5 | Attaches observed lifecycle timestamps (`created_at`, `running_at`, `finished_at`) to a `metrics.json` file |
+| `common.py` | 1.2–1.5 | Shared configuration loader, `metrics.json` / `trace.jsonl` writers, and the `calculate_cost()` Python function |
+
+## Environment Variables
+
+See `.env.example` for the full list of variable names. Export variables in your shell before running the scripts or starting Jupyter Lab; never commit tokens or credentials to Git.
+
+| Variable | Used By | Description |
+|---|---|---|
+| `BASE_URL` | `call_endpoint.py`, `measure_endpoint.py`, `endpoint_quickstart.ipynb` | HTTPS origin of your Endpoint (without `/v1`) |
+| `TOKEN` | `call_endpoint.py`, `measure_endpoint.py`, `endpoint_quickstart.ipynb` | Bearer token configured when creating the Endpoint |
+| `ENDPOINT_IMAGE` | `call_endpoint.py` | Optional container image reference from the Endpoint deployment |
+| `QWEN_ENDPOINT_URL`, `QWEN_ENDPOINT_TOKEN` | `endpoint_quickstart.ipynb` | Optional second Endpoint for the `Qwen/Qwen-Image` comparison cell |
+| `WORKER_IMAGE` | `generate.py` | Pushed worker image digest (`registry/sana-worker@sha256:...`) |
+| `BUCKET` | `nebius ai job create` | Name of your private Object Storage bucket |
+| `RUN_ID` | `nebius ai job create` | Unique run identifier (for example `emma-20261116T100000Z`) |
+
+## 1.2 Option A (Default): Laptop + Endpoint
+
+Deploy the [Sana template](https://github.com/nebius/serverless-ai-cookbook/tree/main/templates/endpoint-sana) in the Nebius console with token authentication enabled. Then run either the notebook or the CLI client:
+
+```bash
+export BASE_URL="https://<your-endpoint-host>"
+read -rs TOKEN
+export TOKEN
+
+# Run from CLI:
+uv run python 01-consistent-media-generation-on-serverless-gpus/code/call_endpoint.py --n 3
+
+# Or open endpoint_quickstart.ipynb in Jupyter Lab:
 uv run jupyter lab
 ```
 
-Open either notebook in this directory. They can locate `code/` when started from the repository root, module directory or code directory. Configure the Endpoint credentials or GPU runtime, then run the notebook top to bottom. Both notebooks perform real generation and end with cleanup instructions.
+Stop or delete the Endpoint in the console as soon as your run completes.
 
-For GPU JupyterLab, use a CUDA PyTorch runtime compatible with the pinned versions in the root `gpu` extra. The notebook has an explicit installation cell for the remaining libraries. Do not install a CPU wheel over a working CUDA runtime. The tested-local status does not imply that the live CUDA environment has been validated; see [VALIDATION.md](../VALIDATION.md).
+## 1.2 Option B (Optional): GPU DevLab
 
-The Option B filename follows the module's planned layout. This version implements one Sana pipeline; optional Qwen/Wan/audio exploration uses separate template recipes rather than pretending their pipelines are interchangeable.
-
-## Worker image
-
-Build from the module's **code directory** as context. The Dockerfile uses the inspected cookbook's runtime versions; live build/run verification remains pending. Use a registry your Nebius project can pull from. Follow [Container Registry setup](https://docs.nebius.com/container-registry/quickstart) for authentication and image push.
+If you chose to start a GPU DevLab (JupyterLab on an L40S VM) instead of using an Endpoint from your laptop, clone this repository inside the DevLab and open `jupyterlab_models.ipynb`, or run `generate.py` directly on the GPU:
 
 ```bash
-export WORKER_TAG='YOUR_REGISTRY/sana-worker:module1'
+uv run python 01-consistent-media-generation-on-serverless-gpus/code/generate.py --n 3 --mode jupyterlab
+```
+
+Download your outputs from `runs/01-consistent-media-generation-on-serverless-gpus/` and stop or delete the DevLab in the console when finished.
+
+## 1.4 Build and Submit a Batch Job
+
+To run `generate.py` as a finite Serverless GPU Job writing to Object Storage:
+
+```bash
+export WORKER_TAG="cr.<region>.nebius.cloud/<your-registry-id>/sana-worker:module1"
 docker buildx build --platform linux/amd64 \
   -t "$WORKER_TAG" --push \
   01-consistent-media-generation-on-serverless-gpus/code
-# Inspect the pushed manifest and copy its digest:
+
 docker buildx imagetools inspect "$WORKER_TAG"
-export WORKER_IMAGE='YOUR_REGISTRY/sana-worker@sha256:YOUR_DIGEST'
+export WORKER_IMAGE="cr.<region>.nebius.cloud/<your-registry-id>/sana-worker@sha256:<your-digest>"
+export BUCKET="<your-bucket-name>"
+export RUN_ID="emma-$(date -u +%Y%m%dT%H%M%SZ)"
+
+# Validate the request first with --dry-run, then remove --dry-run to submit:
+nebius ai job create \
+  --name "m1-${RUN_ID}" \
+  --image "$WORKER_IMAGE" \
+  --platform gpu-l40s-a \
+  --preset 1gpu-8vcpu-32gb \
+  --on-demand \
+  --timeout 1h \
+  --restart-policy never \
+  --volume "s3://${BUCKET}:/outputs:rw" \
+  --env "WORKER_IMAGE=${WORKER_IMAGE}" \
+  --env GPU_PRESET=1gpu-8vcpu-32gb \
+  --container-command python \
+  --args "/app/generate.py --config /app/generation.json --n 3 --out /outputs/runs/01-consistent-media-generation-on-serverless-gpus/${RUN_ID}" \
+  --dry-run
 ```
 
-The GPU image provides PyTorch; it does not install another torch wheel. Direct GPU execution outside the container can use `uv sync --extra gpu` on an appropriate Linux GPU host, but validate the installed CUDA build before loading. CPU/macOS learners should use the default dependencies and the remote Endpoint instead.
+## 1.5 Enrich Timestamps and Calculate Cost in Python
 
-The model commit is pinned in `generation.json`. The root `uv.lock` records resolved Python dependencies. The Dockerfile uses separate explicit versions, so record the pushed image digest and actual runtime versions in the run report. No instructor worker image or measured GPU result is supplied yet.
-
-## Job and storage
-
-Configure a private Object Storage bucket and its access keys in an AWS-compatible default profile. See [storage quickstart](https://docs.nebius.com/object-storage/quickstart), [AWS CLI setup](https://docs.nebius.com/object-storage/interfaces/aws-cli) and [Job flags](https://docs.nebius.com/cli/reference/ai/job/create).
-
-Set `WORKER_IMAGE`, `BUCKET` and a new `RUN_ID`. Run `submit_job.sh --dry-run` to validate, then run it without that flag to submit. The default request uses on-demand L40S; costs depend on your actual project, region and runtime. To change the prompt, edit `generation.json` and rebuild the worker so the submitted image contains the new config.
-
-The Job writes to `/outputs/runs/01-consistent-media-generation-on-serverless-gpus/<RUN_ID>/`, which maps to your mounted bucket. Capture the Job ID, inspect its status and logs, verify artifacts on completion, and cancel if it stalls or exceeds your own spending limit. The configured timeout is a failure bound and is not a monetary cap. CLI documentation and cookbook examples disagree on the shortest valid duration; this wrapper uses the documented `1h` minimum. Confirm the installed CLI before launch.
-
-## Measurements and costs
-
-`metrics.json` contains:
-
-- `startup_s`, `ready_wait_s`, `load_s`, `latency_s`, `billable_s` using the definitions in [1.5](../05-measuring-costs.md).
-- `mode`, `fake`, `status` and `billing_basis`, so simulated work and wall-time proxies cannot be mistaken for real invoice evidence.
-- `config`, with exact generation settings. The Endpoint uses `requested_model_revision` and `model_revision: null` because the stock server does not pin/report the actual revision.
-- `env`, with runtime details where readable; unknown Endpoint hardware/software remains null.
-- `assets`, with relative names and SHA-256 digests.
-
-Pass `--created-at` and `--running-at` to `measure_endpoint.py` when starting the readiness probe promptly after observing RUNNING. Later, attach all three lifecycle observations to either an Endpoint or Job file:
+Attach your observed UTC timestamps (`YYYY-MM-DDTHH:MM:SSZ`) to `metrics.json`:
 
 ```bash
 uv run python 01-consistent-media-generation-on-serverless-gpus/code/measure_job.py \
-  "$METRICS_PATH" --created-at "$CREATED_AT" --running-at "$RUNNING_AT" --finished-at "$FINISHED_AT"
-uv run python 01-consistent-media-generation-on-serverless-gpus/code/cost.py \
-  "$METRICS_PATH" --price-per-hour "$PRICE_PER_HOUR" --n 1 10 100 --api-price "$API_PRICE_PER_ASSET"
+  "$METRICS_PATH" \
+  --created-at "$CREATED_AT" \
+  --running-at "$RUNNING_AT" \
+  --finished-at "$FINISHED_AT"
 ```
 
-Use ISO timestamps with timezones (for example, the format `YYYY-MM-DDTHH:MM:SSZ`). Complete [run-report.md](../run-report.md) with sources and observation limits. The enrichment is manual timestamp processing, not an automated resource lifecycle controller. It cannot recover events you did not record.
+Then call `calculate_cost` directly from Python or a notebook cell:
 
-`trace.jsonl` uses the local draft event contract: `schema_version`, `timestamp` (UTC ISO), `run_id`, `event`, plus event details. Events include run start/finish/failure, model/API ready, asset saved, lifecycle recorded and cost calculated. No trace backend is required. A future shared course trace schema will need an explicit compatibility review.
+```python
+import json
+from pathlib import Path
+from common import calculate_cost
+
+m = json.loads(Path("runs/01-consistent-media-generation-on-serverless-gpus/<run-id>/metrics.json").read_text())
+ready_s = m["ready_wait_s"] if m["mode"] == "endpoint" else m["load_s"]
+report = calculate_cost(
+    startup_s=m["startup_s"],
+    ready_s=ready_s,
+    latency_s=m["latency_s"],
+    price_per_hour=1.5484,  # L40S 1gpu-8vcpu-32gb on-demand rate
+    counts=(1, 10, 100),
+    idle_s=0.0,
+    api_price=0.04,
+)
+print(json.dumps(report, indent=2))
+```
