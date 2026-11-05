@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-<b>Starts Mon 16 Nov 2026 · Apply by Mon 30 Nov · <a href="https://courses.datatalks.club/register/production-ai-agents-generative-media/">Apply here</a></b>
+<b>Starts Mon 16 Nov 2026 · <a href="https://courses.datatalks.club/register/production-ai-agents-generative-media/">Apply here</a></b>
 </p>
 
 > How do you build a production AI system when an agent can launch expensive, slow, failure-prone GPU workloads that produce large media artifacts?
@@ -34,14 +34,16 @@ All times are CET. Modules run Monday to Sunday. More on this cohort: [cohorts/2
 | Date | What | Due / live session |
 |---|---|---|
 | Tue 3 Nov 2026 | Workshop: "Build a Media Agent: CPU Agent, GPU Models as Tools" | Live, 16:30-18:00 · [Register](https://luma.com/tj2nbrl2) · [Code](https://github.com/DataTalksClub/build-media-agent-workshop) |
-| Tue 10 Nov 2026 | Module 0: Welcome session and pre-course Q&A | Live, 17:00-18:00 · [Register](https://luma.com/i4x6x2zy) |
+| Tue 10 Nov 2026 | Pre-Course Live Q&A | Live, 17:00-18:00 · [Register](https://luma.com/i4x6x2zy) |
 | Mon 16 Nov 2026 | Course launch | Live, 17:00-18:00 · [Register](https://luma.com/xey7h50c) |
 | Mon 16 - Sun 29 Nov 2026 | Module 1 (two weeks) | Homework 1 and capstone proposal |
-| **Mon 30 Nov 2026** | **Applications close** | [Apply](https://courses.datatalks.club/register/production-ai-agents-generative-media/) |
 | Mon 30 Nov - Sun 6 Dec 2026 | Module 2 | Homework 2, due Sun 6 Dec |
 | Mon 7 - Sun 13 Dec 2026 | Module 3 | Homework 3 (leaderboard), due Sun 13 Dec |
 | Mon 14 - Sun 20 Dec 2026 | Module 4 | Capstone brief |
-| Fri 15 Jan 2027 | Capstone due, then peer review | Capstone |
+| Fri 15 Jan 2027 | Capstone submission, Attempt 1 | Capstone |
+| Fri 22 Jan 2027 | Peer review, Attempt 1 | Capstone |
+| Fri 29 Jan 2027 | Capstone submission, Attempt 2 | Capstone |
+| Fri 5 Feb 2027 | Final peer review, Attempt 2 | Capstone |
 
 Materials and dates may change.
 
@@ -150,7 +152,7 @@ Prior LLM or MLOps course experience helps but isn't required.
 
 The course is free. Seats in the live cohort are limited, so it is application only.
 
-1. [Apply here](https://courses.datatalks.club/register/production-ai-agents-generative-media/) by **Mon 30 Nov 2026** and tell us what you are building.
+1. [Apply here](https://courses.datatalks.club/register/production-ai-agents-generative-media/) and tell us what you are building.
 2. We review every application, usually within 2 business days.
 3. Approved applicants join the live cohort: shared deadlines, peer-reviewed homework and the capstone.
 4. Get GPU credits through the [Nebius AI Builder Program](https://dev.nebius.com/builders).
@@ -213,10 +215,10 @@ People behind this course:
 No GPU or cluster to manage: the models run as Jobs and Endpoints on Nebius Serverless AI. Applicants get GPU credits through the [Nebius AI Builder Program](https://dev.nebius.com/builders); usage beyond the credits is billed to your account. If you follow along without applying, you need your own GPU access.
 
 **Can I join after the course starts?**
-Yes, until applications close on Mon 30 Nov 2026. Module 1 runs two weeks, so late joiners can catch up.
+Yes. Module 1 runs two weeks, so late joiners can catch up.
 
 **Do I have to attend live sessions?**
-No. Lectures are pre-recorded and live classes aren't mandatory. The Welcome session, the course launch and the weekly office hour are live.
+No. Lectures are pre-recorded and live classes aren't mandatory. The pre-course Live Q&A, the course launch and the weekly office hour are live.
 
 **What if I'm not approved?**
 All materials are public (MIT), so you can follow along on your own, with your own GPU access.
