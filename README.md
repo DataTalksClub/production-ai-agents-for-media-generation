@@ -85,21 +85,20 @@ Mon 30 Nov - Sun 6 Dec 2026
 
 Mon 7 - Sun 13 Dec 2026
 
-* Fan-out on spot GPUs
-* Per-item checkpoints
+* Fan-out with Jobs
+* Spot GPUs and design for interruption
+* Optimizing cost per asset: cold start, VRAM and speed
 * Breaking the pipeline on purpose
-* Budget-aware agents
-* Quality vs cost
-* **Homework 3: Factory Scale Challenge** (1,000 records, public leaderboard), due Sun 13 Dec
+* **Homework 3: Factory Scale Challenge** (200 records over 10 parallel Jobs, public leaderboard), due Sun 13 Dec
 
 ### [Module 4: Evals, Tracing and SLOs](/04-evaluation-observability-production)
 
 Mon 14 - Sun 20 Dec 2026
 
-* System, agent and media evals
-* Multimodal judges
-* Cost and time per step
-* SLO, dashboard and alert
+* Evaluating generative systems: system, agent and media
+* Multimodal judges and calibration
+* Observability and tracing
+* Designing for production: architecture, SLO, dashboard and alerts
 * No homework: you apply Module 4 in your capstone (**capstone brief**)
 
 ### [Capstone Project](/projects)
