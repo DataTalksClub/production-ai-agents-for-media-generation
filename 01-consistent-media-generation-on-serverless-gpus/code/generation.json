@@ -1,0 +1,15 @@
+{
+  "model": "Efficient-Large-Model/Sana_1600M_1024px_diffusers",
+  "model_revision": "ac0da2ff55fbe434795be0dce883042e4d49e2fc",
+  "variant": "fp16",
+  "prompt": "A friendly red fox looking through a brass telescope, paper-cut storybook illustration, deep blue sky, no text",
+  "seed": 7,
+  "params": {
+    "width": 1024,
+    "height": 1024,
+    "num_inference_steps": 20,
+    "guidance_scale": 4.5,
+    "negative_prompt": ""
+  },
+  "image": null
+}

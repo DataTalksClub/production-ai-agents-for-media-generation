@@ -67,32 +67,26 @@ Questions and submission: [homework.md](../cohorts/2026/homework/01-consistent-m
 
 Write a one-page proposal for your capstone: problem, records, two GPU media models and a budget estimate. Template: [projects](../projects).
 
-## Module structure (proposed)
+## Run the examples
 
-One page per lesson at the module root, all code flat in `code/`, images in `images/`.
+Start with the [code guide](code/README.md). The default path is Sana. Notebooks run real generation; automated Python checks need no GPU or credentials.
 
-```text
-01-consistent-media-generation-on-serverless-gpus/
-├── README.md                       # lessons index
-├── 01-landscape.md                 # one page per lesson
-├── 02-first-generation.md
-├── 03-containers.md                # bad vs production Dockerfile, line by line
-├── 04-serving-vs-batch.md
-├── 05-measuring-costs.md
-├── images/                         # NN-slug-MM-what.jpg
-└── code/
-    ├── README.md                   # how to run each file, env vars
-    ├── endpoint_quickstart.ipynb   # 1.2 A: laptop notebook → template Endpoint
-    ├── jupyterlab_models.ipynb     # 1.2 B: JupyterLab on GPU, several HF models
-    ├── Dockerfile.bad              # 1.3: what not to do
-    ├── Dockerfile                  # 1.3: production version
-    ├── generate.py                 # 1.4: one generation; same code in a Job and in JupyterLab
-    ├── call_endpoint.py            # 1.4: same prompt + seed through an Endpoint
-    ├── submit_job.sh               # 1.4: nebius ai job create … --timeout
-    ├── measure_endpoint.py         # 1.5: create → RUNNING → /v1/models ready → N generations
-    ├── measure_job.py              # 1.5: Job status transitions + generate.py timings
-    └── cost.py                     # 1.5: metrics.json + GPU $/h → cost per asset
+```bash
+# From the repository root:
+uv sync
+uv run python 01-consistent-media-generation-on-serverless-gpus/code/smoke_test.py --fake
 ```
+
+The lesson pages include Mermaid diagrams, exercises and completion criteria. Code is flat in `code/`; both notebooks run real generation on their configured GPU resource. This draft has no published instructor worker image or live GPU measurements. Read [validation status](VALIDATION.md) before a paid run.
+
+## Worksheets and supporting material
+
+* [Model choice](model-choice.md)
+* [Run report and cost comparison](run-report.md)
+* [Capstone proposal worksheet and example direction](proposal-template.md)
+* [Troubleshooting](TROUBLESHOOTING.md)
+* [Sources and workshop adaptation](SOURCES.md)
+* [Validation and release checklist](VALIDATION.md)
 
 # Community Notes
 
