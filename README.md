@@ -93,7 +93,7 @@ Mon 7 - Sun 13 Dec 2026
 * Breaking the pipeline on purpose
 * **Homework 3: Factory Scale Challenge** (200 records over 10 parallel Jobs, public leaderboard), due Sun 13 Dec
 
-### [Module 4: Evals, Tracing and SLOs](/04-evaluation-observability-production)
+### [Module 4: Evaluation, Observability and Production](/04-evaluation-observability-production)
 
 Mon 14 - Sun 20 Dec 2026
 
