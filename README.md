@@ -64,11 +64,11 @@ Tue 10 Nov 2026, live. Why media agents are an engineering problem, not a prompt
 Mon 16 - Sun 29 Nov 2026 (two weeks)
 
 * Media model landscape
-* Templates, containers and model cache
-* Seeds
-* Fitting VRAM
-* Measuring startup, load and generation time
-* **Homework 1: GPU Media Worker** (a spec in, an asset plus a cost breakdown out)
+* First media generation in a few minutes
+* Containers for generative AI
+* Serving vs batch inference
+* Measuring startup, load and generation costs
+* **Homework 1: GPU Media Worker** (your creative idea in, an asset plus cost per asset and self-host breakeven out)
 * **Capstone proposal**
 
 ### [Module 2: Multi-Agent Media Workflows](/02-agents-that-use-gpus)
