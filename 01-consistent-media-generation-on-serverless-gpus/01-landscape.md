@@ -175,14 +175,14 @@ One more trap for serverless: Black Forest Labs' standard commercial weights lic
 
 Watch the metrics too: a model that pastes the reference scores high on identity similarity while looking wrong. [OpenS2V-Eval paper](https://arxiv.org/abs/2505.20292)
 
-## Projects you can try
+## Projects for inspiration
 
-We picked projects you can try or reproduce in a few minutes: open source or a free tier, close to the workloads in this course, and on open-weights models where possible.
+Four projects that show this lesson's ideas at work:
 
-- **Edit an image or clone a voice in the browser.** Hugging Face Spaces run [Qwen-Image-Edit-2511](https://huggingface.co/spaces/Qwen/Qwen-Image-Edit-2511), [Kokoro](https://huggingface.co/spaces/hexgrad/Kokoro-TTS) and [Chatterbox](https://huggingface.co/spaces/ResembleAI/Chatterbox) for free, with GPU quotas. Try a product photo edit and a greeting in two voices. <!-- c:M1-187 -->
-- **Generate video with open weights.** ComfyUI's official [Wan2.2 workflows](https://docs.comfy.org/tutorials/video/wan/wan2_2) run locally or on Comfy Cloud; Wan2.2 is Apache-2.0. <!-- c:M1-186 -->
-- **Dub a video.** [pyVideoTrans](https://github.com/jianchang512/pyvideotrans) (GPL-3.0) transcribes, translates and re-voices a clip with open speech models, from a desktop app, a CLI or Docker. <!-- c:M1-188 -->
-- **Script to finished video, as a service.** [Crreo](https://www.crreo.ai/) turns a script into a video with generated visuals, voice and music, using its own Kine and Kalo models. The free plan makes watermarked clips up to 30 seconds. Compare its per-asset price with your own in Homework 1. <!-- c:M1-184 c:M1-185 -->
+- **Script to finished video.** [Crreo](https://www.crreo.ai/) turns a script into a video with generated visuals, voice and music: every modality from this lesson in one product. Its free plan makes watermarked clips up to 30 seconds. <!-- c:M1-184 c:M1-185 -->
+- **Personalized ads on open weights.** Bark.com and AWS built segment-level video ads on open Wan 2.1 with a cloned brand voice. Removing reference-image propagation dropped their engagement score from 6.5 to 4.8 out of 10: consistency is visible to viewers. [AWS blog](https://aws.amazon.com/blogs/machine-learning/how-bark-com-and-aws-collaborated-to-build-a-scalable-video-generation-solution) <!-- c:M1-151 c:M1-152 c:M1-154 -->
+- **Open video, step by step.** ComfyUI's official [Wan2.2 workflows](https://docs.comfy.org/tutorials/video/wan/wan2_2) show the text-to-video and image-to-video pipelines node by node; run them locally or on Comfy Cloud. <!-- c:M1-186 -->
+- **Identity and voice in your browser.** Edit one character into new scenes with [Qwen-Image-Edit-2511](https://huggingface.co/spaces/Qwen/Qwen-Image-Edit-2511), or clone a voice from a short clip with [Chatterbox](https://huggingface.co/spaces/ResembleAI/Chatterbox), on free Hugging Face Spaces. <!-- c:M1-187 -->
 
 ## Models used in this module
 
