@@ -243,3 +243,18 @@ Line 4 is an estimate from the measured table. We'll measure your real numbers i
 | Same seed, different character in a new scene | A seed only repeats one prompt | Use reference-image editing (1.2, Module 2) |
 
 Next, generate your first media asset in [1.2 First Media Generation in a Few Minutes](02-first-generation.md).
+
+## References
+
+Free resources to go deeper, picked for this lesson's topics:
+
+1. [Hugging Face Diffusion Models Course](https://huggingface.co/learn/diffusion-course/unit0/1) (free course): diffusion and latent diffusion with hands-on Diffusers notebooks, including audio.
+2. [Hugging Face Audio Course](https://huggingface.co/learn/audio-course/chapter0/introduction) (free course): audio data, transformer models and text-to-speech.
+3. [The Illustrated Stable Diffusion, Jay Alammar](https://jalammar.github.io/illustrated-stable-diffusion/) (blog post): the clearest picture of text encoder, latent denoising, decoder and steps.
+4. [Generative modelling in latent space, Sander Dieleman (2025)](https://sander.ai/2025/04/15/latents.html) (blog post): why generators work on compressed latents, the basis of the video cost gap.
+5. [Diffusion Models for Video Generation, Lilian Weng (2024)](https://lilianweng.github.io/posts/2024-04-12-diffusion-video/) (blog post): how video models extend image models in time, and temporal consistency.
+6. [Scalable Diffusion Models with Transformers (DiT)](https://arxiv.org/abs/2212.09748) (paper): the diffusion transformer behind most current image and video models.
+7. [Wan: Open and Advanced Large-Scale Video Generative Models](https://arxiv.org/abs/2503.20314) (paper): the technical report of a leading open video family: video VAE, transformer, training.
+8. [Artificial Analysis benchmarking methodology](https://artificialanalysis.ai/methodology) (report): how the leaderboards in this lesson are built, per modality.
+9. [Diffusers documentation](https://huggingface.co/docs/diffusers/index) (docs): running open image, video and audio models in Python.
+10. [Diffusers: reproducibility and seeds](https://huggingface.co/docs/diffusers/using-diffusers/reusing_seeds) (docs): what a seed does and doesn't guarantee.
