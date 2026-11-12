@@ -7,7 +7,7 @@ import time
 from common import (
     DEFAULT_CONFIG,
     asset_record,
-    config,
+    as_config,
     emit,
     metrics,
     output_dir,
@@ -35,10 +35,12 @@ def load_pipeline(cfg):
     return pipe
 
 
-def run(config_path=DEFAULT_CONFIG, n=1, out=None, mode="job"):
+def run(cfg=DEFAULT_CONFIG, n=1, out=None, mode="job"):
     import torch
 
-    cfg = config(config_path)
+    cfg = as_config(cfg)
+    if cfg.get("model_revision") is None:
+        raise ValueError("Pin model_revision to a Hub commit")
     cfg["image"] = os.environ.get("WORKER_IMAGE")
     folder = output_dir(out)
     m = metrics(cfg, mode)

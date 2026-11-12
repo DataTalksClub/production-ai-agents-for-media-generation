@@ -3,7 +3,7 @@ video_url: ""
 prev_url: README.md
 next_url: 02-first-generation.md
 ---
-# 1.1 Landscape: Modalities and Model Families
+# 01 - Landscape: Modalities and Model Families
 
 Say a toy store wants to send every child on its mailing list a personalized holiday card: an illustration, a spoken greeting, maybe a short animated clip. Take Emma, a fictional 7-year-old who wishes for a telescope. Before writing any code, we have to choose which models make each asset, what they cost to run, and what their licences allow.
 
@@ -52,13 +52,13 @@ Switching modality changes four numbers at once:
 - **Load time:** fetching the weights and moving them onto the GPU, once per deployment.
 - **Generation time** (`t_gen`): making one asset with the model already loaded.
 
-Image, video and audio models now share one recipe: compress the media into a latent, cut it into tokens, let a transformer remove noise from those tokens step by step, then decode the result back into pixels or sound. What differs is how many tokens each asset needs (conceptual diagram):
+Most image and video models, and some music models, follow one recipe: compress the media into a latent, cut it into tokens, let a transformer remove noise from those tokens step by step, then decode the result back into pixels or sound. What differs is how many tokens each asset needs (conceptual diagram). Speech models like Kokoro are different: a decoder turns the text's sounds straight into audio, with no denoising steps. [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) <!-- c:M1-070 c:M1-078 -->
 
 ```mermaid
 flowchart LR
-  I["Image<br/>1024x1024"] --> IL["2D latent<br/>~1,000 tokens (Sana)"]
-  V["Video<br/>5 s, 121 frames"] --> VL["3D latent<br/>~12,000 tokens (Wan2.2-5B)"]
-  A["Audio<br/>8 s track"] --> AL["latent over time"]
+  I["Image<br/>1024x1024"] --> IL["2D latent<br/>~1,000 tokens (Sana) [verify]"]
+  V["Video<br/>5 s, 121 frames"] --> VL["3D latent<br/>~12,000 tokens (Wan2.2-5B) [verify]"]
+  A["Music<br/>8 s track (e.g. ACE-Step)"] --> AL["latent over time"]
   IL --> T["Transformer removes noise,<br/>step by step"]
   VL --> T
   AL --> T
@@ -67,9 +67,9 @@ flowchart LR
 
 To see the real thing: the transformer backbone in [DiT, Figure 3](https://arxiv.org/abs/2212.09748); video turned into "spacetime patches" in [OpenAI's Sora report](https://openai.com/index/video-generation-models-as-world-simulators/); and a video autoencoder that compresses time as well as space in the [Wan report, Figure 5](https://arxiv.org/abs/2503.20314). <!-- c:M1-175 c:M1-176 c:M1-177 -->
 
-We measured one reference model per modality on a single NVIDIA L40S GPU (48 GB VRAM) `[measured: 2026-11-02, gpu-l40s-a, 1gpu-8vcpu-32gb, eu-north1]`. Generation time depends on the GPU, the resolution, the number of steps and other settings, so another GPU or setting gives different numbers:
+One reference model per modality on a single NVIDIA L40S GPU (48 GB VRAM), from a 2026-11-02 run `[verify: run files being re-measured; numbers may change]`. Generation time depends on the GPU, the resolution, the number of steps and other settings, so another GPU or setting gives different numbers:
 <!-- verify before release: link the 2026-11-02 run artifacts (metrics.json per row). -->
-<!-- TODO(1.2): embed the reference outputs per row (image, speech, music, video) produced in 1.2. -->
+<!-- TODO: embed one reference output per row (image, speech, music, video) with its metrics.json from the author re-run. -->
 
 | Modality | Model and settings | Peak VRAM | `t_gen` | Output |
 |---|---|---|---|---|
@@ -78,7 +78,7 @@ We measured one reference model per modality on a single NVIDIA L40S GPU (48 GB 
 | Text-to-music | `ACE-Step/acestep-v15-xl-turbo-diffusers` (8 s motif) | `11.86 GB` | `2.88 s` | 8 s of music, MP3 |
 | Text/image-to-video | `Wan-AI/Wan2.2-TI2V-5B-Diffusers` (`832x480`, 121 frames, 50 steps) | `27.89 GB` | `157.49 s` | 5 s clip, MP4 |
 
-You'll generate assets like these yourself in 1.2. If your model isn't in this table, use the row for its modality as your estimate.
+If your model isn't in this table, use the row for its modality as your estimate.
 
 ## Why video is expensive
 
@@ -165,7 +165,7 @@ One more trap for serverless: Black Forest Labs' standard commercial weights lic
 
 | Kind | What it means | What breaks it | See it | Where we handle it |
 |---|---|---|---|---|
-| **Reproducibility** | Same settings and seed give the same output, within a tolerance | Another PyTorch release, GPU or attention backend; reusing a seeded generator | [Diffusers guide](https://huggingface.co/docs/diffusers/using-diffusers/reusing_seeds) | 1.2: same seed, same image; 1.4: compare runs |
+| **Reproducibility** | Same settings and seed give the same output, within a tolerance | Another PyTorch release, GPU or attention backend; reusing a seeded generator | [Diffusers guide](https://huggingface.co/docs/diffusers/using-diffusers/reusing_seeds) | lesson 02: same seed, same image; lesson 04: compare runs |
 | **Identity** | The same character or product in a new scene | A seed doesn't carry identity; models paste the reference instead of re-rendering it | [ConsiStory comparison](https://research.nvidia.com/labs/par/projects/consistory/), [OpenS2V copy-paste](https://pku-yuangroup.github.io/OpenS2V-Nexus/) | Reference-image editing (Qwen-Image-Edit-2511); Module 2 judge loop |
 | **Temporal** | No flicker within a clip, no drift when a clip is extended | Unstable frames; errors that pile up as a clip is extended | [FramePack drift](https://lllyasviel.github.io/frame_pack_gitpage/), [VBench flicker](https://vchitect.github.io/VBench-project/) | Short clips; Module 4 evaluation |
 | **Cross-asset** | The card, the clip and the next shot show the same Emma | Each asset made in isolation | [HoloCine multi-shot](https://holo-cine.github.io/) | Image first, then image-to-video (Module 2) |
@@ -206,15 +206,15 @@ Templates deploy as **preemptible** by default: cheaper, but the GPU can be inte
 
 Our measured music run used the larger `ACE-Step/acestep-v15-xl-turbo-diffusers` checkpoint, also [MIT](https://huggingface.co/ACE-Step/acestep-v15-xl-turbo-diffusers).
 
-[deploy-sana]: https://console.nebius.com/serverless/endpoint/create?image=cr.eu-north1.nebius.cloud%2Fe00gw2b7v3pxetvpy7%2Fsana-serve%3A660347b&targetPort=8000&platform=gpu-l40s-a&preset=1gpu-8vcpu-32gb&diskSize=500GiB&preemptible=true&auth=true
-[deploy-qwen-image]: https://console.nebius.com/serverless/endpoint/create?image=vllm%2Fvllm-omni%3Av0.24.0&command=vllm%20serve%20Qwen%2FQwen-Image%20--omni%20--host%200.0.0.0%20--port%208000&targetPort=8000&platform=gpu-h100-sxm&preset=1gpu-16vcpu-200gb&diskSize=500GiB&preemptible=true&auth=true
-[deploy-z-image]: https://console.nebius.com/serverless/endpoint/create?image=vllm%2Fvllm-omni%3Av0.24.0&command=vllm%20serve%20Tongyi-MAI%2FZ-Image-Turbo%20--omni%20--host%200.0.0.0%20--port%208000&targetPort=8000&platform=gpu-h100-sxm&preset=1gpu-16vcpu-200gb&diskSize=500GiB&preemptible=true&auth=true
-[deploy-qwen-edit]: https://console.nebius.com/serverless/endpoint/create?image=vllm%2Fvllm-omni%3Av0.24.0&command=vllm%20serve%20Qwen%2FQwen-Image-Edit-2511%20--omni%20--host%200.0.0.0%20--port%208000&targetPort=8000&platform=gpu-h100-sxm&preset=1gpu-16vcpu-200gb&diskSize=500GiB&preemptible=true&auth=true
-[deploy-wan21]: https://console.nebius.com/serverless/endpoint/create?image=vllm%2Fvllm-omni%3Av0.24.0&command=vllm%20serve%20Wan-AI%2FWan2.1-T2V-1.3B-Diffusers%20--omni%20--host%200.0.0.0%20--port%208000&targetPort=8000&platform=gpu-h100-sxm&preset=1gpu-16vcpu-200gb&diskSize=500GiB&preemptible=true&auth=true
-[deploy-wan22]: https://console.nebius.com/serverless/endpoint/create?image=vllm%2Fvllm-omni%3Av0.24.0&command=vllm%20serve%20Wan-AI%2FWan2.2-I2V-A14B-Diffusers%20--omni%20--host%200.0.0.0%20--port%208000&targetPort=8000&platform=gpu-h100-sxm&preset=1gpu-16vcpu-200gb&diskSize=500GiB&preemptible=true&auth=true
-[deploy-kokoro]: https://console.nebius.com/serverless/endpoint/create?image=cr.eu-north1.nebius.cloud%2Fe00gw2b7v3pxetvpy7%2Fkokoro-serve%3A660347b&targetPort=8000&platform=gpu-l40s-a&preset=1gpu-8vcpu-32gb&diskSize=500GiB&preemptible=true&auth=true
-[deploy-chatterbox]: https://console.nebius.com/serverless/endpoint/create?image=cr.eu-north1.nebius.cloud%2Fe00gw2b7v3pxetvpy7%2Fchatterbox-serve%3A660347b&targetPort=8000&platform=gpu-h100-sxm&preset=1gpu-16vcpu-200gb&diskSize=500GiB&preemptible=true&auth=true
-[deploy-ace-step]: https://console.nebius.com/serverless/endpoint/create?image=cr.eu-north1.nebius.cloud%2Fe00gw2b7v3pxetvpy7%2Facestep-serve%3Ad315ae1&targetPort=8000&platform=gpu-h100-sxm&preset=1gpu-16vcpu-200gb&diskSize=500GiB&preemptible=true&auth=true
+[deploy-sana]: https://console.nebius.com/serverless/endpoint/create?template=sana
+[deploy-qwen-image]: https://console.nebius.com/serverless/endpoint/create?template=qwen-image
+[deploy-z-image]: https://console.nebius.com/serverless/endpoint/create?template=z-image-turbo
+[deploy-qwen-edit]: https://console.nebius.com/serverless/endpoint/create?template=qwen-image-edit-2511
+[deploy-wan21]: https://console.nebius.com/serverless/endpoint/create?template=wan21-t2v-1-3b
+[deploy-wan22]: https://console.nebius.com/serverless/endpoint/create?template=wan22-i2v-a14b
+[deploy-kokoro]: https://console.nebius.com/serverless/endpoint/create?template=kokoro-82m
+[deploy-chatterbox]: https://console.nebius.com/serverless/endpoint/create?template=chatterbox
+[deploy-ace-step]: https://console.nebius.com/serverless/endpoint/create?template=ace-step-1-5
 
 ## Your model decision record
 
@@ -230,7 +230,7 @@ For Emma's card:
                             https://artificialanalysis.ai/image/leaderboard/text-to-image
 ```
 
-Line 4 is an estimate from the measured table. We'll measure your real numbers in [1.5](05-measuring-costs.md) and check the estimate. If Emma's brief needed the clip, line 1 would become Wan2.2-I2V-A14B and line 2 an H100. That's the trade-off to defend. <!-- c:M1-126 -->
+Line 4 is an estimate from the measured table. We'll measure your real numbers in [lesson 05](05-measuring-costs.md) and check the estimate. If Emma's brief needed the clip, line 1 would become Wan2.2-I2V-A14B and line 2 an H100. That's the trade-off to defend. <!-- c:M1-126 -->
 
 ## Common failures and recovery
 
@@ -240,9 +240,9 @@ Line 4 is an estimate from the measured table. We'll measure your real numbers i
 | Out of memory | Model plus working memory exceed the GPU | Use the recommended GPU; lower resolution or frame count |
 | Your hosted model is retired | The provider deprecated it | Keep a self-hosted fallback |
 | A model repo is deleted, gated or relicensed | Hugging Face repos can change | Keep a copy of the weights in your own storage |
-| Same seed, different character in a new scene | A seed only repeats one prompt | Use reference-image editing (1.2, Module 2) |
+| Same seed, different character in a new scene | A seed only repeats one prompt | Use reference-image editing (lesson 02, Module 2) |
 
-Next, generate your first media asset in [1.2 First Media Generation in a Few Minutes](02-first-generation.md).
+Next, generate your first media asset in [02 - First Media Generation in a Few Minutes](02-first-generation.md).
 
 ## References
 

@@ -7,7 +7,7 @@
 Welcome to Module 1 of Production AI Agents for Generative Media! These two weeks we make it work: run image, video and audio models on serverless GPUs, for serving and for batch, and measure what one asset costs.
 
 > [!NOTE]
-> Get an account, a project and GPU credits through the [Nebius AI Builder Program](https://dev.nebius.com/builders) before you start.
+> Before you start: join the Builder Program and activate a Nebius AI Cloud account with its promo code. Steps: see [Setup](#setup) below.
 
 > [!WARNING]
 > Make sure you stop or delete your resources (Endpoints, Jobs, JupyterLab) when you finish the module to avoid charges. An Endpoint bills while it's RUNNING, even when it serves no requests.
@@ -31,27 +31,27 @@ By the end of this module, you will be able to:
 
 ## Lessons
 
-* [1.1 Landscape: Modalities and Model Families](01-landscape.md)
-* [1.2 First Media Generation in a Few Minutes](02-first-generation.md)
-* [1.3 Containers for Generative AI](03-containers.md)
-* [1.4 Serving vs Batch Inference: the Same Generation for Different Use Cases](04-serving-vs-batch.md)
-* [1.5 Measuring Startup, Load and Generation Costs](05-measuring-costs.md)
+* [01 - Landscape: Modalities and Model Families](01-landscape.md)
+* [02 - First Media Generation in a Few Minutes](02-first-generation.md)
+* [03 - Containers for Generative AI](03-containers.md)
+* [04 - Serving vs Batch Inference: the Same Generation for Different Use Cases](04-serving-vs-batch.md)
+* [05 - Measuring Startup, Load and Generation Costs](05-measuring-costs.md)
 
 ## Models used in this module
 
 All with 1-click templates in the [Serverless AI Cookbook](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/README.md). The default path is [Sana](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-sana/README.md) on L40S; the others are there to explore.
 
-| Task | Model | Template GPU |
-|---|---|---|
-| Text-to-image | [Sana](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-sana/README.md) | L40S |
-| Text-to-image | [Qwen-Image](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-qwen-image/README.md) | H100 |
-| Text-to-image | [Z-Image-Turbo](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-z-image-turbo/README.md) | H100 |
-| Image editing | [Qwen-Image-Edit-2511](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-qwen-image-edit-2511/README.md) | H100 |
-| Text-to-video | [Wan2.1-T2V-1.3B](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-wan21-t2v-1-3b/README.md) | H100 |
-| Image-to-video | [Wan2.2-I2V-A14B](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-wan22-i2v-a14b/README.md) | H100 |
-| Text-to-speech | [Kokoro-82M](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-kokoro-82m/README.md) | L40S |
-| Text-to-speech | [Chatterbox](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-chatterbox/README.md) | H100 |
-| Text-to-music | [ACE-Step 1.5](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-ace-step-1-5/README.md) | H100 |
+| Task | Model | Template GPU | Deploy |
+|---|---|---|---|
+| Text-to-image | [Sana](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-sana/README.md) | L40S | [Create Endpoint](https://console.nebius.com/serverless/endpoint/create?template=sana) |
+| Text-to-image | [Qwen-Image](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-qwen-image/README.md) | H100 | [Create Endpoint](https://console.nebius.com/serverless/endpoint/create?template=qwen-image) |
+| Text-to-image | [Z-Image-Turbo](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-z-image-turbo/README.md) | H100 | [Create Endpoint](https://console.nebius.com/serverless/endpoint/create?template=z-image-turbo) |
+| Image editing | [Qwen-Image-Edit-2511](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-qwen-image-edit-2511/README.md) | H100 | [Create Endpoint](https://console.nebius.com/serverless/endpoint/create?template=qwen-image-edit-2511) |
+| Text-to-video | [Wan2.1-T2V-1.3B](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-wan21-t2v-1-3b/README.md) | H100 | [Create Endpoint](https://console.nebius.com/serverless/endpoint/create?template=wan21-t2v-1-3b) |
+| Image-to-video | [Wan2.2-I2V-A14B](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-wan22-i2v-a14b/README.md) | H100 | [Create Endpoint](https://console.nebius.com/serverless/endpoint/create?template=wan22-i2v-a14b) |
+| Text-to-speech | [Kokoro-82M](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-kokoro-82m/README.md) | L40S | [Create Endpoint](https://console.nebius.com/serverless/endpoint/create?template=kokoro-82m) |
+| Text-to-speech | [Chatterbox](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-chatterbox/README.md) | H100 | [Create Endpoint](https://console.nebius.com/serverless/endpoint/create?template=chatterbox) |
+| Text-to-music | [ACE-Step 1.5](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-ace-step-1-5/README.md) | H100 | [Create Endpoint](https://console.nebius.com/serverless/endpoint/create?template=ace-step-1-5) |
 
 ## Homework 1: GPU Media Worker
 
@@ -69,29 +69,51 @@ Write a one-page proposal for your capstone: problem, records, two GPU media mod
 
 ## Module structure
 
-One page per lesson at the module root, all code flat in [code/](code/README.md):
+One page per lesson at the module root, all code flat in `code/` (files import each other), guide images in `images/`.
 
 ```text
 01-consistent-media-generation-on-serverless-gpus/
-├── README.md                       # module overview and lessons index
-├── 01-landscape.md                 # 1.1: modalities, model families, licences
-├── 02-first-generation.md          # 1.2: Option A (Endpoint) & Option B (GPU DevLab)
-├── 03-containers.md                # 1.3: bad vs production Dockerfile, line by line
-├── 04-serving-vs-batch.md          # 1.4: Endpoint vs Job + Object Storage
-├── 05-measuring-costs.md           # 1.5: startup, load, latency, calculate_cost()
+├── README.md                       # lessons index, models, setup
+├── 01-landscape.md
+├── 02-first-generation.md
+├── 03-containers.md
+├── 04-serving-vs-batch.md
+├── 05-measuring-costs.md
+├── images/                         # guide images: NN-slug-MM-what.png
 └── code/
-    ├── README.md                   # how to run each file, env vars
-    ├── generation.json             # shared prompt, seed, pinned model commit, params
-    ├── common.py                   # config, metrics.json, trace.jsonl, calculate_cost()
-    ├── endpoint_quickstart.ipynb   # 1.2 Option A (default): laptop notebook → Endpoint
-    ├── jupyterlab_models.ipynb     # 1.2 Option B (optional): GPU DevLab with Diffusers
-    ├── Dockerfile.bad              # 1.3: what not to do
-    ├── Dockerfile                  # 1.3: production worker container
-    ├── generate.py                 # 1.4: sequential Diffusers worker for Job & DevLab
-    ├── call_endpoint.py            # 1.2 & 1.4: ImageGenerator client for an Endpoint
-    ├── measure_endpoint.py         # 1.5: record Endpoint startup, readiness & latency
-    └── measure_job.py              # 1.5: enrich metrics.json with Job lifecycle timestamps
+    ├── .env                        # you create it: Endpoint URL + token (notebooks write it; git-ignored)
+    ├── first_image_endpoint.ipynb  # 02: laptop → Endpoint: connect, wait until ready, generate, compare, stop
+    ├── first_image_devlab.ipynb    # 02 (optional): JupyterLab on a GPU: load Sana once, time it, watch VRAM
+    ├── image.py                    # 02: ImageGenerator client (generate_image), comparison strip, request_id
+    ├── batch_inference.py          # 04, 05: n images through an Endpoint with one config → assets, metrics.json, trace.jsonl; CLI --n 3
+    ├── common.py                   # 02–05: setup_endpoint(), request(), wait_ready(), .env helpers, config checks, metrics/trace writers, calculate_cost()
+    ├── generation.json             # 03, 04: pinned config for the Job worker (prompt, seed, Hub commit, params)
+    ├── generate.py                 # 02 (optional), 04: Diffusers worker, loads once, --n sequential generations
+    ├── Dockerfile.bad              # 03: what not to put in a GPU container
+    ├── Dockerfile                  # 03: the fixed worker container (linux/amd64)
+    ├── measure_endpoint.py         # 05: runs batch_inference.py, adds Endpoint create → RUNNING times
+    └── measure_job.py              # 05: adds Job lifecycle times to metrics.json
 ```
+
+## Setup
+
+Do this once, before any lesson in this module. Every lesson needs steps 1–3, whether you call an Endpoint from your laptop or work in JupyterLab on a GPU.
+
+1. **Join the [Nebius AI Builder Program](https://dev.nebius.com/builders)** and get your promo code. It's free.
+2. **Create a Nebius AI Cloud account** at [console.nebius.com](https://console.nebius.com/). [Sign up](https://docs.nebius.com/signup-billing/sign-up)
+3. **Activate the account with your promo code:** enter the Builder Program code in the console by hand.
+   - Don't add a bank card. Nebius charges $25 when you add a card, and the promo code then only tops up that balance. [Promo codes](https://docs.nebius.com/signup-billing/payments/promo-codes)
+4. **Clone this repository** and install [uv](https://docs.astral.sh/uv/getting-started/installation/) (`uv` installs Python 3.12 for you).
+5. **Start Jupyter** from the repository root:
+
+   ```bash
+   uv sync --extra notebooks
+   uv run jupyter lab
+   ```
+
+Endpoint URL and token: the notebooks ask for them and save them to `code/.env`, which only you can read and Git ignores. Never commit tokens or paste them into chats or screenshots.
+
+Stop or delete every Endpoint, Job and JupyterLab when you finish: an Endpoint bills while it's `RUNNING`, even when it serves no requests.
 
 # Community Notes
 

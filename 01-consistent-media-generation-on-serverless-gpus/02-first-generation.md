@@ -1,270 +1,207 @@
 ---
 video_url: ""
 code:
-  - label: Option A notebook (Endpoint from laptop)
-    path: code/endpoint_quickstart.ipynb
-  - label: Option B notebook (Optional GPU DevLab)
-    path: code/jupyterlab_models.ipynb
-  - label: Endpoint client script
-    path: code/call_endpoint.py
+  - label: Notebook (Endpoint from your laptop)
+    path: code/first_image_endpoint.ipynb
+  - label: Notebook (optional, JupyterLab on a GPU)
+    path: code/first_image_devlab.ipynb
+  - label: Image client
+    path: code/image.py
 prev_url: 01-landscape.md
 next_url: 03-containers.md
 ---
-# 1.2 First Media Generation in a Few Minutes
+# 02 - First Media Generation in a Few Minutes
 
-In this lesson we generate a first image, video or audio asset in minutes: through an Endpoint deployed from a cookbook template (Option A, default with Sana on L40S), or in JupyterLab on a GPU (Option B). You're done when the asset is on your laptop and the Endpoint or JupyterLab is stopped.
+Say you want a holiday card illustration: a brass telescope glowing on snow under a starry sky. An open text-to-image model can draw it, but it needs a GPU, and you don't want to set one up. In this lesson we rent one by the second: we deploy the open model Sana as an Endpoint on Nebius Serverless AI from a ready-made template, call it from a notebook on your laptop, save the image, and stop the Endpoint. You're done when the image, four small consistency experiments and your notes are on your laptop, and the Endpoint is stopped (on the GPU path: the DevLab is deleted).
 
-Choose **one** option to get your first asset:
+Time and cost, as an estimate: our run took `[measure: min]` from **Create** to the first image, with the account already activated, Jupyter already running and the Sana template defaults (one GPU, preemptible) `[measured: date, GPU]`. The lesson is planned to fit the course's $0.50 per-lesson credit budget. The notebook doesn't limit your spending: stopping the Endpoint does.
 
-- **Option A (Recommended default):** Deploy a 1-click Endpoint template on Nebius Serverless AI and call it from a Jupyter notebook on your laptop. You don't need a local GPU or CUDA installation.
-- **Option B (Optional alternative):** Launch a GPU DevLab (JupyterLab on a GPU VM) if you want to load Diffusers pipelines directly in GPU memory and inspect VRAM interactively.
+## Before you start
 
-## Option A: Endpoint and Jupyter on your laptop
+Serverless AI runs a container on a GPU without you managing VMs. The service is in Preview and has no SLA. [Serverless AI terms](https://docs.nebius.com/legal/specific-terms/serverless-ai) <!-- c:M1-209 -->
 
-Install the local notebook dependencies with `uv` from the repository root:
+Pick one way to run this lesson:
 
-```bash
-uv sync --extra notebooks
-```
+- **Option A (default): Jupyter on your laptop + an Endpoint.** You deploy Sana as an **Endpoint**, a container that serves HTTP requests at a public URL, and call it from [code/first_image_endpoint.ipynb](code/first_image_endpoint.ipynb). No local GPU needed.
+- **Option B: JupyterLab on a GPU.** You run the model inside a [GPU DevLab](https://docs.nebius.com/serverless/quickstart/devlabs), JupyterLab on a GPU VM, with [code/first_image_devlab.ipynb](code/first_image_devlab.ipynb). Pick it if you want the model in your own Python process.
 
-### Deploy an Endpoint from a template
+Complete the **Setup** section of the [module README](../01-consistent-media-generation-on-serverless-gpus/README.md) once: steps 1–3 (account and credits) for both options, steps 4–5 (clone, `uv`, Jupyter) for Option A.
 
-Open the [Sana Endpoint template](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-sana/README.md) in the Serverless AI Cookbook and click **Create Endpoint**.
+**What bills, in short:** an Endpoint bills while it's `RUNNING`, idle or not; a DevLab bills its GPU while it runs and its disk until you delete it. The docs describe no idle auto-stop, so the last step of every run, including a failed one, is to stop the Endpoint or delete the DevLab. [Details at the end](#what-bills). <!-- c:M1-193 c:M1-207 c:M1-209 -->
 
-The form pre-fills the container image, port `8000`, and the default L40S preset (`gpu-l40s-a`, `1gpu-8vcpu-32gb`). Leave **Token authentication** enabled, generate or enter a bearer token, and copy both the token and the container image string before clicking **Create**.
+## Option A: Endpoint and notebook on your laptop
 
-Once the Endpoint is created, copy its public HTTPS URL from the console and export `BASE_URL` and `TOKEN` in your terminal:
+### Create the Endpoint
 
-```bash
-export BASE_URL="https://<your-endpoint-host>"
-read -rs TOKEN
-export TOKEN
-```
+Each model has a template in the [Serverless AI Cookbook](https://github.com/nebius/serverless-ai-cookbook/tree/main/templates). A template's console link opens the Endpoint form with the container, GPU and settings already filled in. For a walkthrough of the form, see [Getting started with Serverless AI endpoints](https://docs.nebius.com/serverless/quickstart/endpoints). <!-- c:M1-174 -->
 
-### Endpoint lifecycle: RUNNING is not ready
+1. Open the [Sana template in the console](https://console.nebius.com/serverless/endpoint/create?template=sana). It sets one L40S GPU, a preemptible VM (cheaper, but Nebius can take the GPU back) and token authentication. <!-- c:M1-199 -->
+2. Generate the token in the form and **copy it before you click Create**. It's shown once; if you lose it, you create a new Endpoint. Treat it like a password. [Sana template](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-sana/README.md) <!-- c:M1-201 -->
+3. Click **Create**, then copy the Endpoint's HTTPS URL from its page.
 
-When you watch the Endpoint in the console, its state moves from `PROVISIONING` to `IMAGE_PULLING` to `RUNNING`. However, **`RUNNING` only means the container process has started — it does not mean the model weights are loaded in GPU memory.**
+### Connect from the notebook
 
-While the container is downloading the ~9 GB Sana checkpoint and moving it onto the GPU, calling the Endpoint returns `502 Bad Gateway` (`failed to connect to local service`) because Uvicorn only binds port `8000` after `load_pipeline()` completes.
+Open [code/first_image_endpoint.ipynb](code/first_image_endpoint.ipynb) and run step 1 (*Connect to your Endpoint*). Paste the URL and the token when it asks. The notebook saves them to `code/.env`, a file only you can read and Git ignores, so re-runs don't ask again. To enter them again, delete those lines and restart the kernel. The token is typed with `getpass` and never printed.
+
+### Wait until it's ready
+
+The console shows the Endpoint moving through `PROVISIONING → STARTING → IMAGE_PULLING → RUNNING`. [Lifecycle](https://docs.nebius.com/serverless/lifecycle) <!-- c:M1-189 c:M1-190 -->
+
+`RUNNING` means the container is up, not that the model is loaded. On first start the server downloads about 9.7 GB of weights `[calc: sum of the fp16 file sizes on the Hub]` and loads them onto the GPU. Until then, calls may return `502 failed to connect to local service`. [Sana template](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-sana/README.md) <!-- c:M1-215 c:M1-226 -->
 
 ```mermaid
 sequenceDiagram
-    participant Laptop as Laptop Notebook
-    participant Gateway as Nebius Edge Proxy
-    participant Container as GPU Container (Sana)
-    Laptop->>Gateway: Create Endpoint (L40S)
-    Gateway-->>Laptop: Status: RUNNING (container started)
-    Container->>Container: Download & load weights into VRAM
-    Laptop->>Gateway: GET /v1/models
-    Gateway-->>Laptop: 502 Bad Gateway (port 8000 not bound yet)
-    Container->>Container: FastAPI binds :8000 ("ready in ...s")
-    Laptop->>Gateway: GET /v1/models
-    Gateway-->>Laptop: 200 OK ({"data": [{"id": "...Sana..."}]})
-    Laptop->>Gateway: POST /v1/images/generations
-    Gateway-->>Laptop: 200 OK (base64 PNG)
-    Laptop->>Gateway: Stop / Delete Endpoint
+    participant NB as Notebook (laptop)
+    participant EP as Endpoint (Nebius)
+    NB->>EP: Create (console)
+    EP-->>NB: PROVISIONING → STARTING → IMAGE_PULLING → RUNNING
+    Note over EP: Downloads and loads the model
+    NB->>EP: GET /v1/models
+    EP-->>NB: 502 (still loading)
+    NB->>EP: GET /v1/models
+    EP-->>NB: 200, model list
+    NB->>EP: POST /v1/images/generations
+    EP-->>NB: 200, image
+    NB->>EP: Stop (console)
 ```
 
-To handle this cleanly in code, `call_endpoint.py` polls `/v1/models` with a bounded timeout, retrying on `502`/`503`/`504` while failing immediately on authentication errors (`401`/`403`):
+<!-- visual: id=V1 | teaches=RUNNING isn't ready | shape=sequence | must-be-accurate=status names, 502 | claims=M1-189,M1-190,M1-215 -->
+
+Step 2 of the notebook waits for you: it asks `/v1/models` every 2 seconds until the model answers, and gives up after 10 minutes. Re-running it is safe. On our first deploy the wait took `[measure: s, date]`.
+
+### Generate the image
+
+Step 3 posts one JSON body to `/v1/images/generations`. The token goes in the `Authorization` header. The response is a PNG, base64-encoded in `data[0].b64_json`. Change the prompt if you like; keep it free of real people, brands and known characters. Each side of `size` must be a multiple of 32.
+
+If `REQUESTS_CA_BUNDLE` is set, `requests` uses that file instead of the public CAs. The call passes `verify=certifi.where()` so it uses the public bundle. The next cell, `ImageGenerator`, uses `urllib` and is not affected by that variable.
 
 ```python
-def wait_ready(base, token, deadline_s=600):
-    deadline = time.monotonic() + deadline_s
-    while True:
-        remaining = deadline - time.monotonic()
-        if remaining <= 0:
-            raise TimeoutError("Readiness deadline reached; inspect logs and stop the Endpoint")
-        try:
-            data = request(base, token, "/v1/models", timeout=min(30, remaining))
-            if isinstance(data, dict) and isinstance(data.get("data"), list) and data["data"]:
-                return data
-        except urllib.error.HTTPError as exc:
-            if exc.code not in (429, 502, 503, 504):
-                raise
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
-            pass
-        time.sleep(min(2, max(0, deadline - time.monotonic())))
+request_data = {
+    "model": "Efficient-Large-Model/Sana_1600M_1024px_diffusers",
+    "prompt": prompt,
+    "size": "512x512",
+    "seed": 7,
+    "response_format": "b64_json",
+    "num_inference_steps": 20,
+}
+response = requests.post(
+    f"{BASE_URL}/v1/images/generations",
+    headers={"Authorization": f"Bearer {TOKEN}"},
+    json=request_data,
+    timeout=300,
+    verify=certifi.where(),
+)
 ```
 
-### Call the Endpoint from a notebook
+The cell saves `runs/first-image.png` and shows it. Our first request took 5.5 s `[measured: 2026-11-12]`. <!-- c:M1-211 c:M1-212 -->
 
-In the [Build a Media Agent workshop](https://github.com/DataTalksClub/build-media-agent-workshop), we wrapped the image Endpoint in a small `ImageGenerator` class that posts the prompt to `/v1/images/generations`, decodes the `b64_json` response, and writes the PNG to disk.
+`ImageGenerator` ([code/image.py](code/image.py)) posts this same body, saves the PNG, and returns the path. The cells after step 3 use it so the request stays in one place. Seed, size and steps are the defaults in `generate_image`.
 
-We use that exact pattern in [code/call_endpoint.py](code/call_endpoint.py) and [code/endpoint_quickstart.ipynb](code/endpoint_quickstart.ipynb), adding Bearer token authentication and explicit generation parameters (`seed`, `size`, `num_inference_steps`, `guidance_scale`):
+<!-- visual: id=V4 | teaches=the first asset and its record | shape=before-after | must-be-accurate=image and metrics from the same run, measured tag | claims=measured -->
 
-```python
-class ImageGenerator:
-    def __init__(self, endpoint: str, token: str | None, model: str):
-        self.endpoint = endpoint.rstrip("/")
-        self.token = token
-        self.model = model
+### Same settings, same image
 
-    def generate_image(
-        self,
-        prompt: str,
-        *,
-        seed: int = 7,
-        size: str = "1024x1024",
-        num_inference_steps: int = 20,
-        guidance_scale: float = 4.5,
-        negative_prompt: str = "",
-        timeout: int = 300,
-    ) -> bytes:
-        request_data = {
-            "model": self.model,
-            "prompt": prompt,
-            "size": size,
-            "seed": seed,
-            "n": 1,
-            "response_format": "b64_json",
-            "num_inference_steps": num_inference_steps,
-            "guidance_scale": guidance_scale,
-            "negative_prompt": negative_prompt,
-        }
-        payload = request(
-            self.endpoint,
-            self.token,
-            "/v1/images/generations",
-            request_data,
-            timeout=timeout,
-        )
-        return base64.b64decode(payload["data"][0]["b64_json"], validate=True)
-```
+Step 4 generates the same image three times, then compares the three hashes.
 
-Our shared configuration file [code/generation.json](code/generation.json) holds Emma's holiday gift-card prompt (a glowing brass telescope on snow under a starry night sky, `seed=7`, `1024x1024`, `20` steps).
+On one of our runs each image took about 1.7 s, measured from the notebook, network included `[measured: 2026-11-12, H100, eu-north1]`. The very first request took 5.5 s.
 
-Launch Jupyter Lab on your laptop and open [code/endpoint_quickstart.ipynb](code/endpoint_quickstart.ipynb):
+Then the cell compares the three hashes. Same prompt, seed and settings on the same Endpoint gave the same bytes in every run we did: 4 runs, 12 images, one hash `[measured: 2026-11-12, H100, eu-north1]`. That holds for one setup only. PyTorch doesn't promise identical results across releases or platforms, even with the same seed, so a different GPU or template image can change the bytes. [PyTorch: Reproducibility](https://docs.pytorch.org/docs/2.15/notes/randomness.html) <!-- c:M1-101 c:M1-218 -->
 
-```bash
-uv run jupyter lab
-```
+<!-- visual: id=V5a | teaches=same settings give the same image | shape=before-after | must-be-accurate=three images, one hash, run date | claims=measured -->
 
-Or run the Endpoint client directly from the terminal to generate 3 samples and record `metrics.json`:
+### What a prompt and a seed can't fix
 
-```bash
-uv run python 01-consistent-media-generation-on-serverless-gpus/code/call_endpoint.py --n 3
-```
+Step 4 was the first of four experiments. Three more on the same Endpoint, five more images in total. Each one shows the images side by side.
 
-Each run creates a fresh directory under `runs/01-consistent-media-generation-on-serverless-gpus/<run_id>/` containing `asset-000.png` through `asset-002.png`, `metrics.json`, and `trace.jsonl`. If you also deploy the `Qwen-Image` cookbook template, the notebook includes an optional comparison cell to run `ImageGenerator` against `Qwen/Qwen-Image` with the exact same prompt and seed.
+1. **Leave out the seed** (step 5). Same prompt and settings, no seed: the server picks a random one, so two calls give two different images. A seed you didn't record is a setting you can't repeat. <!-- c:M1-211 c:M1-218 -->
+2. **The seed is a setting** (step 6). The notebook describes a character, a small red fox with spectacles and a green scarf, and draws the same snowy scene with seed 7 and seed 8. The picture changes as much as it would for any other setting. Check the seed-7 image: if Sana skips the scarf or the spectacles even here, don't count that trait in the next experiment.
+3. **Same character, new scene** (step 7). Same description, same seed, snow vs beach. Compare the two foxes and write one line in the notebook: which traits survived, which changed. On our first try with a shorter description, the fox's build, the telescope and even the art style changed between the two scenes `[measured: 2026-11-12, H100, eu-north1]`. A prompt describes a character; it doesn't hold one fixed.
 
-### Save the asset and stop the Endpoint
+Then answer four questions in the notebook's *Your notes* cell, one line each: the identity note above, plus these three.
 
-Open `asset-000.png` to inspect your generated illustration and verify that `metrics.json` has `"status": "completed"` and three latency values in `"latency_s"`.
+1. What must stay fixed to get the same image again?
+2. Why didn't the seed keep the fox the same?
+3. What would you try for a product that needs the same character in every scene?
 
-Then **immediately stop or delete the Endpoint in the Nebius console**. An Endpoint bills per second while it is `RUNNING` (`$1.5484/h` on-demand for `gpu-l40s-a` / `1gpu-8vcpu-32gb`), even when no requests are arriving. Confirm in the console that its state is no longer `RUNNING`.
+<details>
+<summary>Sample answers</summary>
+
+1. The model and its version, the server image, the GPU and library versions, and every setting: prompt, seed, size, steps, guidance, negative prompt.
+2. The seed fixes the starting noise. A different prompt steers that noise to a different picture, so nothing ties the second fox to the first.
+3. Give the model the character itself, not only a description: reference-image editing, image-conditioned generation, or a small fine-tuned adapter (LoRA) trained on the character.
+
+</details>
+
+<!-- visual: id=V5 | teaches=no seed, seed as a setting, identity across scenes | shape=before-after | must-be-accurate=strips from one run; prompts and seeds in captions | claims=measured -->
+
+### Stop the Endpoint
+
+Do it now. In the console, open the Endpoint and click **Stop** or **Delete**, then check the status:
+
+- **Stop** keeps the Endpoint and its URL. Compute stops billing; start it again later.
+- **Delete** removes it. A new Endpoint gets a new URL and token.
+
+[Stop and start](https://docs.nebius.com/serverless/maintenance/stop-start), [manage endpoints](https://docs.nebius.com/serverless/endpoints/manage) <!-- c:M1-194 c:M1-196 -->
+
+You're done when:
+
+- [ ] `runs/first-image.png` shows your image.
+- [ ] You've answered the four questions in the notebook's *Your notes* cell.
+- [ ] The Endpoint is `STOPPED` or deleted.
 
 ## Option B: JupyterLab on a GPU
 
-> [!NOTE]
-> **Option B is optional.** Only follow this section if you want to spin up a GPU DevLab (JupyterLab on a GPU VM) and run Diffusers pipelines directly in GPU memory. If you completed Option A on your laptop, you can jump straight to [Seeds and reproducibility](#seeds-and-reproducibility).
+Use this path if you want the model in your own Python process: load it once, change seeds, steps and size, and watch GPU memory. The GPU bills the whole time the DevLab runs, including while you read and type.
 
-### Start JupyterLab
+1. Create a JupyterLab DevLab on a GPU: [DevLabs quickstart](https://docs.nebius.com/serverless/quickstart/devlabs). Pick an L40S if it's offered `[verify: L40S available for DevLabs]`; from the CLI, always pass `--platform`, since the default is an H100. <!-- c:M1-208 -->
+2. Clone this repo in a JupyterLab terminal and open [code/first_image_devlab.ipynb](code/first_image_devlab.ipynb).
+3. Run it top to bottom. It loads Sana with Diffusers in fp16, with the text encoder and VAE in bf16: the model card and the Diffusers docs say they must stay in bf16 or fp32. [SanaPipeline](https://huggingface.co/docs/diffusers/api/pipelines/sana) <!-- c:M1-224 c:M1-225 -->
+4. Download your images and `metrics.json`, then **delete** the DevLab: a stopped DevLab still bills its disk. [Stop and start](https://docs.nebius.com/serverless/maintenance/stop-start) <!-- c:M1-207 -->
 
-In the Nebius console, create a [DevLab](https://docs.nebius.com/serverless/quickstart/devlabs) on an L40S GPU (`gpu-l40s-a`, `1gpu-8vcpu-32gb`) with a CUDA-enabled PyTorch image. Open a terminal inside JupyterLab, clone this repository, and open [code/jupyterlab_models.ipynb](code/jupyterlab_models.ipynb).
+On our L40S, Sana peaked at `[measure]` GB of GPU memory and took `[measure]` s per image.
 
-Set `HF_HOME` to a local directory in your home folder (`export HF_HOME=$HOME/hf`) so downloaded weights persist across runs within that DevLab session.
+You're done when your images and `metrics.json` are on your laptop and the DevLab is deleted.
 
-### Load models with Diffusers
+## Common failures and recovery
 
-Inside the GPU notebook (and in [code/generate.py](code/generate.py)), we load `SanaPipeline` from the pinned Hugging Face commit `ac0da2ff55fbe434795be0dce883042e4d49e2fc`:
+| Symptom | Cause | Fix |
+|---|---|---|
+| `502` for several minutes | The server is still downloading or loading the model | Let the wait cell run. Past 10 minutes, open the Endpoint's logs in the console |
+| `401` or `403` | Token missing or wrong | Delete `TOKEN` from `code/.env`, restart the kernel, and run step 1 again. Lost it? Create a new Endpoint |
+| Stuck before `RUNNING`, then `ERROR` with `NotEnoughResources` | No free GPU; the platform retries for up to 30 minutes | Try again later |
+| `STOPPED` with code `Preempted` | The preemptible GPU was taken back | Start the Endpoint again; it won't restart on its own |
+| A charge you didn't expect | An Endpoint left `RUNNING`, or a DevLab stopped but not deleted | Stop the Endpoint; delete the DevLab |
 
-```python
-def load_pipeline(cfg):
-    import torch
-    from diffusers import SanaPipeline
+<!-- c:M1-191 c:M1-197 c:M1-200 c:M1-201 c:M1-215 c:M1-207 -->
 
-    pipe = SanaPipeline.from_pretrained(
-        cfg["model"],
-        revision=cfg["model_revision"],
-        variant=cfg["variant"],
-        torch_dtype=torch.float16,
-    ).to("cuda")
-    # Sana recipe: fp16 transformer, bf16 text encoder and VAE to prevent black images.
-    pipe.text_encoder.to(torch.bfloat16)
-    pipe.vae.to(torch.bfloat16)
-    pipe.set_progress_bar_config(disable=True)
-    return pipe
-```
+## What bills
 
-Notice the mixed-precision setup: the diffusion transformer runs in `float16`, while `text_encoder` and `vae` are cast to `bfloat16` (the wider exponent range prevents numerical overflow that otherwise produces black images on Sana).
+A Serverless VM bills from the moment it starts until it's completely stopped; stopped time isn't charged. [Serverless AI terms](https://docs.nebius.com/legal/specific-terms/serverless-ai) <!-- c:M1-193 -->
 
-### Watch VRAM and time per asset
+| State | Compute | Disk | Mounted volumes, buckets |
+|---|---|---|---|
+| Endpoint `RUNNING`, idle or not | billed | billed | billed |
+| Endpoint `STOPPED` | not billed | released | billed |
+| DevLab stopped | not billed | billed | billed |
 
-Because GPU operations execute asynchronously, we call `torch.cuda.synchronize()` before starting and stopping the timer, and we track peak GPU memory with `torch.cuda.max_memory_allocated()`:
+<!-- c:M1-090 c:M1-195 c:M1-207 -->
+<!-- visual: id=V6 | teaches=what bills in each state, and that the meter runs from create to stop | shape=states | must-be-accurate=billed / not billed per state; no prices | claims=M1-090,M1-193,M1-195,M1-207 -->
 
-```python
-torch.cuda.reset_peak_memory_stats()
-torch.cuda.synchronize()
-start = time.perf_counter()
+Rates change often, so we don't print them here. Look up today's rate for your GPU and preset on [Nebius pricing](https://nebius.com/prices); the template preset is `gpu-l40s-a`, `1gpu-8vcpu-32gb`. Our own run cost about `[measure: USD, compute only, from metrics.json and the rate on <date>]`. Lesson 05 turns your `metrics.json` into a cost per image. <!-- c:M1-199 -->
 
-image = pipe(
-    prompt=cfg["prompt"],
-    **cfg["params"],
-    generator=torch.Generator(device="cuda").manual_seed(cfg["seed"]),
-).images[0]
+Next: [03 - Containers for Generative AI](03-containers.md).
 
-torch.cuda.synchronize()
-gen_s = time.perf_counter() - start
-peak_vram_gb = round(torch.cuda.max_memory_allocated() / 1e9, 3)
-```
+## References
 
-On an L40S (`gpu-l40s-a`), Sana peaks at `10.91 GB` of the card's `48 GB` VRAM and generates a `1024x1024` image in `4.42 s` `[measured: 2026-11-02, gpu-l40s-a, 1gpu-8vcpu-32gb, eu-north1]`.
+Free resources to go deeper:
 
-Two practical tips when iterating in a GPU DevLab:
-
-1. **Keep the kernel alive while exploring:** Restarting the Jupyter kernel drops the pipeline from VRAM and forces you to re-pay the model load time (`~13 s` from local cache). Re-run only the generation cell when testing new prompts, seeds, or step counts.
-2. **Free VRAM is not total VRAM:** If you open a second notebook without shutting down the first kernel, the first kernel still holds its `10.91 GB` allocation. Check `nvidia-smi` or shut down unused kernels if you hit `CUDA out of memory`.
-
-### Write down the run configuration
-
-Running `generate.run(CODE / "generation.json", n=3, mode="jupyterlab")` writes the three generated images alongside `metrics.json`, capturing both the input `config` and the hardware `env`:
-
-```json
-{
-  "config": {
-    "model": "Efficient-Large-Model/Sana_1600M_1024px_diffusers",
-    "model_revision": "ac0da2ff55fbe434795be0dce883042e4d49e2fc",
-    "variant": "fp16",
-    "seed": 7,
-    "params": {
-      "width": 1024,
-      "height": 1024,
-      "num_inference_steps": 20,
-      "guidance_scale": 4.5,
-      "negative_prompt": ""
-    }
-  },
-  "env": {
-    "gpu": "NVIDIA L40S",
-    "preset": "1gpu-8vcpu-32gb",
-    "cuda": "13.0",
-    "torch": "2.13.0",
-    "diffusers": "0.39.0",
-    "peak_vram_gb": 10.908
-  }
-}
-```
-
-Download your PNGs and `metrics.json` to your laptop, then **stop or delete the DevLab** in the console.
-
-## Seeds and reproducibility
-
-In `metrics.json`, every asset entry records its SHA-256 hash:
-
-```json
-"assets": [
-  {
-    "file": "asset-000.png",
-    "bytes": 1781554,
-    "sha256": "c4c308141fbb9a107a1faea13a72da7e4b2d5d51b653f3b9e6bdd4f46889b9af"
-  }
-]
-```
-
-What does fixing `"seed": 7` actually guarantee?
-
-- **Same container, same GPU, same parameters → byte-identical output:** When we ran `Sana_1600M` (`seed=7`, `1024x1024`, 20 steps) three times on `gpu-l40s-a` with the same container image, all three runs produced the exact same `1,781,554` bytes (`sha256: c4c30814...`) `[measured: 2026-11-02, gpu-l40s-a, 1gpu-8vcpu-32gb, eu-north1]`.
-- **Different GPU, driver, PyTorch/Diffusers build, or server wrapper → repeatable configuration, not guaranteed identical bytes:** As documented in [PyTorch's reproducibility guide](https://docs.pytorch.org/docs/stable/notes/randomness.html), floating-point kernel order can differ across hardware architectures or library versions even when initialized with the same seed.
-- **Seed ≠ character consistency across different prompts:** Fixing the seed makes a given prompt repeatable; it does not keep the same character across brand-new scene prompts (which requires image conditioning or editing models like `Qwen-Image-Edit-2511`).
-
-That is why `metrics.json` records both `config` (prompt, seed, model revision, steps) and `env` (GPU, CUDA, PyTorch, Diffusers, container image). Next, let's look inside the container image that packages this runtime in [1.3 Containers for Generative AI](03-containers.md).
+1. [Sana template README](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-sana/README.md) (template docs): what the template deploys, the readiness warning and a request example.
+2. [Getting started with Serverless AI endpoints](https://docs.nebius.com/serverless/quickstart/endpoints) (docs): create, wait, token auth, logs, delete.
+3. [Getting started with Serverless AI DevLabs](https://docs.nebius.com/serverless/quickstart/devlabs) (docs): JupyterLab on a GPU from a template.
+4. [Diffusers: Reproducibility](https://huggingface.co/docs/diffusers/using-diffusers/reusing_seeds) (framework guide): seeds, generators and the limits of determinism.
+5. [SanaPipeline](https://huggingface.co/docs/diffusers/api/pipelines/sana) (API reference): running Sana in Diffusers.
+6. [PyTorch CUDA semantics: asynchronous execution](https://docs.pytorch.org/docs/2.15/notes/cuda.html) (framework guide): why GPU timers need `torch.cuda.synchronize()`.
+7. [OpenAI Images API reference](https://developers.openai.com/api/reference/resources/images/methods/generate) (API reference): the OpenAI-style request and `b64_json` response shape the template's server also uses.
+8. [SANA: Efficient High-Resolution Image Synthesis with Linear Diffusion Transformers](https://arxiv.org/abs/2410.10629) (paper): why Sana is fast on one GPU.
+9. [Kubernetes: liveness, readiness and startup probes](https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/) (concept docs): "started" vs "ready for traffic".
+10. [Hugging Face Diffusion Models Course](https://huggingface.co/learn/diffusion-course/unit0/1) (free course): Diffusers basics in notebooks.
