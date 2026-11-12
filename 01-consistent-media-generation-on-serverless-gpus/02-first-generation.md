@@ -80,9 +80,7 @@ request_data = {
     "model": "Efficient-Large-Model/Sana_1600M_1024px_diffusers",
     "prompt": prompt,
     "size": "512x512",
-    "seed": 7,
     "response_format": "b64_json",
-    "num_inference_steps": 20,
 }
 response = requests.post(
     f"{BASE_URL}/v1/images/generations",
@@ -93,7 +91,7 @@ response = requests.post(
 )
 ```
 
-The cell saves `runs/first-image.png` and shows it. Our first request took 5.5 s `[measured: 2026-11-12]`. <!-- c:M1-211 c:M1-212 -->
+There is no seed in this request. The server picks one, so every run generates a new image. Our first request took 5.5 s `[measured: 2026-11-12]`. <!-- c:M1-211 c:M1-212 -->
 
 `ImageGenerator` ([code/image.py](code/image.py)) posts this same body, saves the PNG, and returns the path. The cells after step 3 use it so the request stays in one place. Seed, size and steps are the defaults in `generate_image`.
 
@@ -117,17 +115,19 @@ Step 4 was the first of four experiments. Three more on the same Endpoint, five 
 2. **The seed is a setting** (step 6). The notebook describes a character, a small red fox with spectacles and a green scarf, and draws the same snowy scene with seed 7 and seed 8. The picture changes as much as it would for any other setting. Check the seed-7 image: if Sana skips the scarf or the spectacles even here, don't count that trait in the next experiment.
 3. **Same character, new scene** (step 7). Same description, same seed, snow vs beach. Compare the two foxes and write one line in the notebook: which traits survived, which changed. On our first try with a shorter description, the fox's build, the telescope and even the art style changed between the two scenes `[measured: 2026-11-12, H100, eu-north1]`. A prompt describes a character; it doesn't hold one fixed.
 
+The *Inspiration* cells repeat those two comparisons on four other subjects. Then *Practice* is the same three moves on a subject you choose: one scene, a new seed, a new scene. The share card uses those three images.
+
 Then answer four questions in the notebook's *Your notes* cell, one line each: the identity note above, plus these three.
 
 1. What must stay fixed to get the same image again?
-2. Why didn't the seed keep the fox the same?
+2. Why didn't the seed keep the character the same?
 3. What would you try for a product that needs the same character in every scene?
 
 <details>
 <summary>Sample answers</summary>
 
 1. The model and its version, the server image, the GPU and library versions, and every setting: prompt, seed, size, steps, guidance, negative prompt.
-2. The seed fixes the starting noise. A different prompt steers that noise to a different picture, so nothing ties the second fox to the first.
+2. The seed fixes the starting noise. A different prompt steers that noise to a different picture, so nothing ties the second image to the first.
 3. Give the model the character itself, not only a description: reference-image editing, image-conditioned generation, or a small fine-tuned adapter (LoRA) trained on the character.
 
 </details>
@@ -147,6 +147,7 @@ You're done when:
 
 - [ ] `runs/first-image.png` shows your image.
 - [ ] You've answered the four questions in the notebook's *Your notes* cell.
+- [ ] Your run folder has `share-card.png`.
 - [ ] The Endpoint is `STOPPED` or deleted.
 
 ## Option B: JupyterLab on a GPU
