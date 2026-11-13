@@ -1,5 +1,5 @@
 *
-!Dockerfile
 !common.py
 !generate.py
 !generation.json
+!video.py
