@@ -7,6 +7,25 @@ next_url: 02-first-generation.md
 
 Say a toy store wants to send every child on its mailing list a personalized holiday card: an illustration, a spoken greeting, maybe a short animated clip. Take Emma, a fictional 7-year-old who wishes for a telescope. Before writing any code, we have to choose which models make each asset, what they cost to run, and what their licences allow.
 
+Here is Emma's card made with five open models on Nebius Serverless AI, one request per asset:
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/1_dream_illustration.webp" alt="Watercolor storybook illustration: a girl with curly red hair, a yellow winter coat and a blue scarf stands on a snowy hill and watches a starry night sky" width="100%"></td>
+    <td width="50%"><a href="assets/5_watching_stars.mp4"><img src="assets/2b_gift_under_stars.webp" alt="First frame of the clip: the same girl on the snowy hill looks at the stars through a brass telescope" width="100%"></a></td>
+  </tr>
+  <tr>
+    <td><b>Illustration.</b> Sana, 512x512, 20 steps, seed 7, <code>1.2 s</code></td>
+    <td><b>Clip.</b> Wan2.2-I2V-A14B, animated from this frame (made <a href="#what-consistent-means-in-this-module">below</a>), 640x480, 81 frames at 16 fps (5 s), 20 steps, <code>40.7 s</code>. <a href="assets/5_watching_stars.mp4">Watch (MP4)</a></td>
+  </tr>
+  <tr>
+    <td><b>Greeting.</b> Kokoro-82M, voice af_bella, <code>0.4 s</code>: "Happy holidays, Emma! We heard you wished for a telescope. May all your nights be full of stars." <a href="assets/3_greeting.mp3">Listen (MP3)</a><br><audio src="assets/3_greeting.mp3" controls></audio></td>
+    <td><b>Jingle.</b> ACE-Step 1.5, 8 s, 8 steps, <code>2.3 s</code>. <a href="assets/4_jingle.mp3">Listen (MP3)</a><br><audio src="assets/4_jingle.mp3" controls></audio></td>
+  </tr>
+</table>
+
+Times are one request each, measured from a laptop, network included `[measured: 2026-11-13, Sana and Kokoro on L40S; Qwen-Image-Edit-2511, ACE-Step and Wan2.2 on H100]`. These samples use other models, GPUs and settings than the measured table further down, so don't compare their times with it.
+
 In this lesson we map the generative media modalities, see why video costs the most, compare open and closed models, and check what a licence really allows. You're done when you have written a five-line **model decision record** for your [Homework 1](../cohorts/2026/homework/01-consistent-media-generation-on-serverless-gpus/homework.md) idea: one asset you want to create (a card, a product shot, a voice greeting, a jingle). No idea yet? Use Emma's card.
 
 Keep this template open while you read:
@@ -172,6 +191,21 @@ One more trap for serverless: Black Forest Labs' standard commercial weights lic
 | **Voice** | The same voice in every clip | A changed voice; a reference clip in another language | [Chatterbox demos](https://resemble-ai.github.io/chatterbox_demopage/) | Kokoro preset voices; one fixed reference clip for Chatterbox |
 
 <!-- c:M1-096 c:M1-098 c:M1-099 c:M1-101 c:M1-102 c:M1-106 c:M1-107 c:M1-113 c:M1-117 c:M1-121 c:M1-122 c:M1-178 c:M1-179 c:M1-180 c:M1-181 c:M1-182 c:M1-183 -->
+
+Here is identity with reference-image editing. Qwen-Image-Edit-2511 moves Emma indoors from the first image, then puts her back on the hill from two references: Emma and the telescope from the gift scene, the sky and snow from the first image.
+
+<table>
+  <tr>
+    <td width="33%"><img src="assets/1_dream_illustration.webp" alt="The reference: the girl in the yellow coat and blue scarf on a snowy hill under the stars" width="100%"></td>
+    <td width="33%"><img src="assets/2_christmas_gift.webp" alt="The same girl indoors in an armchair beside a decorated Christmas tree, holding a brass telescope from an open gift box" width="100%"></td>
+    <td width="33%"><img src="assets/2b_gift_under_stars.webp" alt="The same girl back on the snowy hill, looking at the stars through the brass telescope" width="100%"></td>
+  </tr>
+  <tr>
+    <td><b>Reference.</b> Sana, seed 7</td>
+    <td><b>New scene.</b> One reference: indoors by the tree, same face, hair, coat and scarf. 20 steps, seed 7, <code>8.3 s</code></td>
+    <td><b>Two references.</b> Emma and telescope from image 2, sky and snow from image 1. 20 steps, seed 6, <code>8.8 s</code></td>
+  </tr>
+</table>
 
 Watch the metrics too: a model that pastes the reference scores high on identity similarity while looking wrong. [OpenS2V-Eval paper](https://arxiv.org/abs/2505.20292)
 
