@@ -207,8 +207,6 @@ Here is identity with reference-image editing. Qwen-Image-Edit-2511 moves Emma i
   </tr>
 </table>
 
-Watch the metrics too: a model that pastes the reference scores high on identity similarity while looking wrong. [OpenS2V-Eval paper](https://arxiv.org/abs/2505.20292)
-
 ## Projects for inspiration
 
 Four projects that show this lesson's ideas at work:
