@@ -12,7 +12,7 @@ Here is Emma's card made with five open models on Nebius Serverless AI, one requ
 <table>
   <tr>
     <td width="50%"><img src="assets/1_dream_illustration.webp" alt="Watercolor storybook illustration: a girl with curly red hair, a yellow winter coat and a blue scarf stands on a snowy hill and watches a starry night sky" width="100%"></td>
-    <td width="50%"><a href="https://drive.google.com/file/d/1UmhniMAGMvvpEsSNNmyGTsS9mDvxFgle/view"><img src="assets/5_watching_stars.webp" alt="Animated clip: the same girl on the snowy hill looks at the stars through a brass telescope while the stars twinkle" width="100%"></a></td>
+    <td width="50%"><a href="https://drive.google.com/file/d/1UmhniMAGMvvpEsSNNmyGTsS9mDvxFgle/view"><img src="assets/5_watching_stars.gif" alt="Animated clip: the same girl on the snowy hill looks at the stars through a brass telescope while the stars twinkle" width="100%"></a></td>
   </tr>
   <tr>
     <td><b>Illustration.</b> Sana, 512x512, 20 steps, seed 7, <code>1.2 s</code></td>
