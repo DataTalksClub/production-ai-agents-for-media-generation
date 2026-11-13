@@ -24,8 +24,8 @@ def load_pipeline(cfg):
         raise RuntimeError("CUDA unavailable; select a GPU runtime with CUDA-enabled PyTorch")
     pipe = SanaPipeline.from_pretrained(
         cfg["model"],
-        revision=cfg["model_revision"],
-        variant=cfg["variant"],
+        revision=cfg.get("model_revision"),
+        variant=cfg.get("variant", "fp16"),
         torch_dtype=torch.float16,
     ).to("cuda")
     # Sana recipe: fp16 transformer, bf16 text encoder and VAE to prevent black images.

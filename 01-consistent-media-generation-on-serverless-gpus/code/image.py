@@ -1,4 +1,4 @@
-"""Generate images through an OpenAI-style image Endpoint (such as the Sana template) from your laptop."""
+"""Generate images through an OpenAI-style image Endpoint or locally on a GPU (such as in a DevLab)."""
 from __future__ import annotations
 
 import base64
@@ -11,16 +11,77 @@ import common
 
 
 DEFAULT_MODEL = "Efficient-Large-Model/Sana_1600M_1024px_diffusers"
+DEFAULT_REVISION = "ac0da2ff55fbe434795be0dce883042e4d49e2fc"
+
+
+def _parse_size(size: str) -> tuple[int, int]:
+    try:
+        width, height = (int(part) for part in size.lower().split("x", 1))
+    except ValueError as exc:
+        raise ValueError(f"size must look like 1024x1024, got {size!r}") from exc
+    for side in (width, height):
+        if not 256 <= side <= 2048 or side % 32:
+            raise ValueError(
+                f"size sides must be multiples of 32 between 256 and 2048, got {size!r}"
+            )
+    return width, height
 
 
 class ImageGenerator:
-    """Client for an OpenAI-style image Endpoint: POST /v1/images/generations, save the PNG."""
+    """Generate images via an OpenAI-style Endpoint (POST /v1/images/generations) or an in-process GPU pipeline."""
 
-    def __init__(self, endpoint: str, token: str | None, model: str = DEFAULT_MODEL):
-        self.endpoint = endpoint.rstrip("/")
+    def __init__(
+        self,
+        endpoint: str | None = None,
+        token: str | None = None,
+        model: str = DEFAULT_MODEL,
+        *,
+        pipe: object | None = None,
+    ):
+        if pipe is None and not endpoint:
+            raise ValueError("Provide an Endpoint URL or use ImageGenerator.local()")
+        self.endpoint = endpoint.rstrip("/") if endpoint else None
         self.token = token
         self.model = model
+        self.model_revision: str | None = None
+        self.variant: str | None = None
+        self._pipe = pipe
         self.last_s: float | None = None
+        self.load_s: float | None = None
+        self.load_vram_gb: float | None = None
+        self.peak_vram_gb: float | None = None
+
+    @classmethod
+    def local(
+        cls,
+        model: str = DEFAULT_MODEL,
+        *,
+        model_revision: str | None = DEFAULT_REVISION,
+        variant: str = "fp16",
+    ) -> ImageGenerator:
+        """Load the Diffusers pipeline onto the local CUDA GPU once and return a ready ImageGenerator."""
+        import torch
+
+        from generate import load_pipeline
+
+        torch.cuda.reset_peak_memory_stats()
+        torch.cuda.synchronize()
+        start = time.perf_counter()
+        pipe = load_pipeline(
+            {"model": model, "model_revision": model_revision, "variant": variant}
+        )
+        torch.cuda.synchronize()
+        load_s = time.perf_counter() - start
+        load_vram_gb = torch.cuda.max_memory_allocated() / 1e9
+
+        gen = cls(None, None, model, pipe=pipe)
+        gen.model_revision = model_revision
+        gen.variant = variant
+        gen.load_s = load_s
+        gen.load_vram_gb = load_vram_gb
+        gen.peak_vram_gb = load_vram_gb
+        print(f"Loaded {model} in {load_s:.1f} s | VRAM: {load_vram_gb:.2f} GB")
+        return gen
 
     def generate_image(
         self,
@@ -34,6 +95,32 @@ class ImageGenerator:
         negative_prompt: str = "",
         timeout: int = 300,
     ) -> Path:
+        if self._pipe is not None:
+            import torch
+
+            width, height = _parse_size(size)
+            torch.cuda.reset_peak_memory_stats()
+            torch.cuda.synchronize()
+            start = time.perf_counter()
+            rng = torch.Generator(device="cuda").manual_seed(seed) if seed is not None else None
+            image = self._pipe(
+                prompt=prompt,
+                negative_prompt=negative_prompt,
+                width=width,
+                height=height,
+                num_inference_steps=num_inference_steps,
+                guidance_scale=guidance_scale,
+                generator=rng,
+            ).images[0]
+            torch.cuda.synchronize()
+            self.last_s = time.perf_counter() - start
+            self.peak_vram_gb = torch.cuda.max_memory_allocated() / 1e9
+            print(f"Generated in {self.last_s:.1f} s | Peak VRAM: {self.peak_vram_gb:.2f} GB")
+            path = Path(out)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            image.save(path, format="PNG")
+            return path.resolve()
+
         request_data = {
             "model": self.model,
             "prompt": prompt,
