@@ -155,7 +155,7 @@ You're done when:
 Use this path if you want to run the same experiments, practice scenes and share card directly on a GPU without creating an Endpoint: `ImageGenerator.local()` loads Sana once into your notebook's GPU memory and watches peak VRAM. The GPU bills the whole time the DevLab runs, including while you read and type.
 
 1. Create a DevLab from the **JupyterLab** template in the web console: [DevLabs quickstart](https://docs.nebius.com/serverless/quickstart/devlabs#web-console). Pick an L40S if it's offered `[verify: L40S available for DevLabs]`; from the CLI, always pass `--platform`, since the default is an H100. <!-- c:M1-208 -->
-2. Open the DevLab's HTTPS URL, sign in with your Jupyter token, open a **Terminal**, and clone this repo into `/workspace`.
+2. Open the DevLab's HTTPS URL, sign in with your Jupyter token, open a **Terminal**, and clone this repo.
 3. Open [code/first_image_devlab.ipynb](code/first_image_devlab.ipynb) and run it top to bottom. It loads Sana with Diffusers in fp16, with the text encoder and VAE in bf16: the model card and the Diffusers docs say they must stay in bf16 or fp32. [SanaPipeline](https://huggingface.co/docs/diffusers/api/pipelines/sana) <!-- c:M1-224 c:M1-225 -->
 4. Download the `.zip` archive from the last step (`first-image.png`, `metrics.json`, comparison images, and `share-card.png`), then **delete** the DevLab: a stopped DevLab still bills its disk. [Stop and start](https://docs.nebius.com/serverless/maintenance/stop-start) <!-- c:M1-207 -->
 
