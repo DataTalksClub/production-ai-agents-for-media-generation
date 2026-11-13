@@ -1,8 +1,8 @@
 ---
 video_url: ""
 code:
-  - label: Notebook (Endpoint from your laptop)
-    path: code/first_image_endpoint.ipynb
+  - label: Notebook (on your laptop)
+    path: code/first_image_local.ipynb
   - label: Notebook (optional, JupyterLab on a GPU)
     path: code/first_image_devlab.ipynb
   - label: Image client
@@ -22,7 +22,7 @@ Serverless AI runs a container on a GPU without you managing VMs. The service is
 
 Pick one way to run this lesson:
 
-- **Option A (default): Jupyter on your laptop + an Endpoint.** You deploy Sana as an **Endpoint**, a container that serves HTTP requests at a public URL, and call it from [code/first_image_endpoint.ipynb](code/first_image_endpoint.ipynb). No local GPU needed.
+- **Option A (default): Jupyter on your laptop + an Endpoint.** You deploy Sana as an **Endpoint**, a container that serves HTTP requests at a public URL, and call it from [code/first_image_local.ipynb](code/first_image_local.ipynb). No local GPU needed.
 - **Option B: JupyterLab on a GPU.** You run the model inside a [GPU DevLab](https://docs.nebius.com/serverless/quickstart/devlabs), JupyterLab on a GPU VM, with [code/first_image_devlab.ipynb](code/first_image_devlab.ipynb). Pick it if you want the model in your own Python process.
 
 Complete the **Setup** section of the [module README](../01-consistent-media-generation-on-serverless-gpus/README.md) once: steps 1–3 (account and credits) for both options, steps 4–5 (clone, `uv`, Jupyter) for Option A.
@@ -41,7 +41,7 @@ Each model has a template in the [Serverless AI Cookbook](https://github.com/neb
 
 ### Connect from the notebook
 
-Open [code/first_image_endpoint.ipynb](code/first_image_endpoint.ipynb) and run step 1 (*Connect to your Endpoint*). Paste the URL and the token when it asks. The notebook saves them to `code/.env`, a file only you can read and Git ignores, so re-runs don't ask again. To enter them again, delete those lines and restart the kernel. The token is typed with `getpass` and never printed.
+Open [code/first_image_local.ipynb](code/first_image_local.ipynb) and run step 1 (*Connect to your Endpoint*). Paste the URL and the token when it asks. The notebook saves them to `code/.env`, a file only you can read and Git ignores, so re-runs don't ask again. To enter them again, delete those lines and restart the kernel. The token is typed with `getpass` and never printed.
 
 ### Wait until it's ready
 

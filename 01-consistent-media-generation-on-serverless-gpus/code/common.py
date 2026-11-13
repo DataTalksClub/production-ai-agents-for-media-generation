@@ -17,6 +17,7 @@ from pathlib import Path
 
 DEFAULT_CONFIG = Path(__file__).with_name("generation.json")
 MODULE = "01-consistent-media-generation-on-serverless-gpus"
+SPOT_PRICE_API = "https://api.nebius.cloud/billing/v1alpha1/spot-price"  # public, no auth
 
 
 def positive(value):
@@ -250,3 +251,4 @@ def calculate_cost(
         "projected_compute_usd_per_asset": {str(n): fixed / n + marginal for n in counts},
         "breakeven_assets": breakeven,
     }
+

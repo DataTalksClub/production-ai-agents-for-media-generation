@@ -7,7 +7,7 @@
 Welcome to Module 1 of Production AI Agents for Generative Media! These two weeks we make it work: run image, video and audio models on serverless GPUs, for serving and for batch, and measure what one asset costs.
 
 > [!NOTE]
-> Before you start: join the Builder Program and activate a Nebius AI Cloud account with its promo code. Steps: see [Setup](#setup) below.
+> Before you start: join the Builder Program, create a Nebius AI Cloud account with payment details and apply your promo code. Steps: see [Setup](#setup) below.
 
 > [!WARNING]
 > Make sure you stop or delete your resources (Endpoints, Jobs, JupyterLab) when you finish the module to avoid charges. An Endpoint bills while it's RUNNING, even when it serves no requests.
@@ -82,17 +82,12 @@ One page per lesson at the module root, all code flat in `code/` (files import e
 ├── images/                         # guide images: NN-slug-MM-what.png
 └── code/
     ├── .env                        # you create it: Endpoint URL + token (notebooks write it; git-ignored)
-    ├── first_image_endpoint.ipynb  # 02: laptop → Endpoint: connect, wait until ready, generate, compare, stop
-    ├── first_image_devlab.ipynb    # 02 (optional): JupyterLab on a GPU: load Sana once, time it, watch VRAM
+    ├── first_image_local.ipynb     # 02: your laptop → Endpoint
+    ├── first_image_devlab.ipynb    # 02: JupyterLab on a GPU
     ├── image.py                    # 02: ImageGenerator client (generate_image), comparison strip, request_id
     ├── batch_inference.py          # 04, 05: n images through an Endpoint with one config → assets, metrics.json, trace.jsonl; CLI --n 3
     ├── common.py                   # 02–05: setup_endpoint(), request(), wait_ready(), .env helpers, config checks, metrics/trace writers, calculate_cost()
-    ├── generation.json             # 03, 04: pinned config for the Job worker (prompt, seed, Hub commit, params)
-    ├── generate.py                 # 02 (optional), 04: Diffusers worker, loads once, --n sequential generations
-    ├── Dockerfile.bad              # 03: what not to put in a GPU container
-    ├── Dockerfile                  # 03: the fixed worker container (linux/amd64)
-    ├── measure_endpoint.py         # 05: runs batch_inference.py, adds Endpoint create → RUNNING times
-    └── measure_job.py              # 05: adds Job lifecycle times to metrics.json
+    └── docker/                     # 03, 04: Dockerfiles
 ```
 
 ## Setup
@@ -100,9 +95,8 @@ One page per lesson at the module root, all code flat in `code/` (files import e
 Do this once, before any lesson in this module. Every lesson needs steps 1–3, whether you call an Endpoint from your laptop or work in JupyterLab on a GPU.
 
 1. **Join the [Nebius AI Builder Program](https://dev.nebius.com/builders)** and get your promo code. It's free.
-2. **Create a Nebius AI Cloud account** at [console.nebius.com](https://console.nebius.com/). [Sign up](https://docs.nebius.com/signup-billing/sign-up)
-3. **Activate the account with your promo code:** enter the Builder Program code in the console by hand.
-   - Don't add a bank card. Nebius charges $25 when you add a card, and the promo code then only tops up that balance. [Promo codes](https://docs.nebius.com/signup-billing/payments/promo-codes)
+2. **Create a Nebius AI Cloud account and add payment details** at [console.nebius.com](https://console.nebius.com/). When you add a bank card, Nebius charges $25 and adds this amount to your account balance. You need payment details before you can apply a promo code. [Sign up](https://docs.nebius.com/signup-billing/sign-up)
+3. **Apply your Builder Program promo code:** in the console, go to [Billing](https://console.nebius.com/billing/), click **Apply promo code**, enter the code and click **Apply promo code**. Your balance increases by the code's amount; check it in the [transactions list](https://console.nebius.com/billing/transactions). If you don't see the button, check that you added payment details. Apply the code before its expiration date. [How to use a promo code](https://docs.nebius.com/signup-billing/payments/promo-codes#how-to-use-a-promo-code)
 4. **Clone this repository** and install [uv](https://docs.astral.sh/uv/getting-started/installation/) (`uv` installs Python 3.12 for you).
 5. **Start Jupyter** from the repository root:
 
