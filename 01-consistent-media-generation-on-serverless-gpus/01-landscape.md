@@ -12,11 +12,11 @@ Here is Emma's card made with five open models on Nebius Serverless AI, one requ
 <table>
   <tr>
     <td width="50%"><img src="assets/1_dream_illustration.webp" alt="Watercolor storybook illustration: a girl with curly red hair, a yellow winter coat and a blue scarf stands on a snowy hill and watches a starry night sky" width="100%"></td>
-    <td width="50%"><a href="assets/5_watching_stars.mp4"><img src="assets/2b_gift_under_stars.webp" alt="First frame of the clip: the same girl on the snowy hill looks at the stars through a brass telescope" width="100%"></a></td>
+    <td width="50%"><a href="https://drive.google.com/file/d/1UmhniMAGMvvpEsSNNmyGTsS9mDvxFgle/view"><img src="assets/2b_gift_under_stars.webp" alt="First frame of the clip: the same girl on the snowy hill looks at the stars through a brass telescope" width="100%"></a></td>
   </tr>
   <tr>
     <td><b>Illustration.</b> Sana, 512x512, 20 steps, seed 7, <code>1.2 s</code></td>
-    <td><b>Clip.</b> Wan2.2-I2V-A14B, animated from this frame (made <a href="#what-consistent-means-in-this-module">below</a>), 640x480, 81 frames at 16 fps (5 s), 20 steps, <code>40.7 s</code>. <a href="assets/5_watching_stars.mp4">Watch (MP4)</a></td>
+    <td><b>Clip.</b> Wan2.2-I2V-A14B, animated from this frame (made <a href="#what-consistent-means-in-this-module">below</a>), 640x480, 81 frames at 16 fps (5 s), 20 steps, <code>40.7 s</code>. <a href="https://drive.google.com/file/d/1UmhniMAGMvvpEsSNNmyGTsS9mDvxFgle/view">Watch the clip</a></td>
   </tr>
   <tr>
     <td><b>Greeting.</b> Kokoro-82M, voice af_bella, <code>0.4 s</code>: "Happy holidays, Emma! We heard you wished for a telescope. May all your nights be full of stars." <a href="assets/3_greeting.mp3">Listen (MP3)</a><br><audio src="assets/3_greeting.mp3" controls></audio></td>
