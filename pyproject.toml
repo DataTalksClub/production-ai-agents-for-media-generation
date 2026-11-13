@@ -1,7 +1,7 @@
 [project]
 name = "production-ai-agents-for-media-generation"
 version = "0.1.0"
-requires-python = ">=3.12,<3.13"
+requires-python = ">=3.12,<3.14"
 dependencies = [
     "pydantic>=2.7,<3",
     "pyyaml>=6.0,<7",
