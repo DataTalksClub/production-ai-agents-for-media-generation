@@ -98,5 +98,5 @@ My code: <LINK>
 
 ## Submit the results
 
-* Submit your results and your `summary.json` here: [placeholder]
+* Submit your results and your `summary.json` here: https://courses.datatalks.club/production-ai-agents-generative-media/homework/module3
 * All questions are about your own run. Any honest answer counts.
