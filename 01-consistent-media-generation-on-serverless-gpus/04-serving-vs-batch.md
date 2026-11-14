@@ -12,7 +12,7 @@ next_url: 05-measuring-costs.md
 
 <!-- Draft v7, 2026-11-13: patterns, then the task, then one worker (code/batch_inference.py: six steps, the clip from Wan2.2 image-to-video, so an H100) run as a Job or in a DevLab. Sizing, Endpoint comparison, video Job and scenarios removed; what's left for Modules 2-4 is one closing section. Not run on a GPU yet: [measure] values come from the author run; [verify] items are checked on the first run. -->
 
-Say Santa wants a personalized animated gift card for each of the 200,000 children on his list: an illustrated card with a wish, animated into a short clip with a spoken greeting and music. Nobody waits for any single card; all of them have to be ready before the holidays. That's a different way of running a model from a chat agent, where a person waits for one image. Keeping a model loaded to answer requests one by one is **serving**. Running a model over a whole dataset and stopping when it's done is **batch inference**. In this lesson we compare the two patterns, then build Santa's pipeline as a batch: one Job on one H100 GPU makes the cards for ten kids, step by step, and writes them to a storage bucket. Then we raise it to 200.
+Say Santa wants a personalized animated gift card for each of the 200,000 children on his list: an illustrated card with a wish, animated into a short clip with a spoken greeting and music. Nobody waits for any single card; all of them have to be ready before the holidays. That's a different way of running a model from a chat agent, where a person waits for one image. Keeping a model loaded to answer requests one by one is **serving**. Running a model over a whole dataset and stopping when it's done is **batch inference**. In this lesson we compare the two patterns, then build Santa's pipeline as a batch: one Job on one H100 GPU makes the cards for ten kids, step by step, and writes them to a storage bucket.
 
 <!-- visual: id=V1 | teaches=serving answers a waiting request; batch inference works through a dataset and stops | shape=flow | must-be-accurate=who waits, where results go, when the model stops | claims=M1-383 -->
 
@@ -277,9 +277,7 @@ nebius ai job create --dry-run --name "$RUN_ID" --image "$WORKER_IMAGE" \
 
 Then run the same command without `--dry-run`. It prints the Job's ID.
 
-Ten kids is the default. For a larger batch in the same Job, change `--n 10` to `--n 200` (the most in this lesson) and `--timeout 2h` to `--timeout 4h`, with a new `RUN_ID`, for example `job-200`.
-
-The models load once per Job, however long the list is: the fixed part of the run stays the same, and only the per-card part grows `[measure]`. The clips are most of it: at the 40.66 s per clip we measured for this model through an Endpoint, 200 clips are about 2.3 hours of H100 time `[calc: 200 × 40.66 s; one request from a laptop, 2026-11-13]`, so decide on 200 after you have seen what ten cost. <!-- c:M1-382 -->
+Ten kids is the default (`--n 10` in the command above, `--timeout 2h` is enough `[measure]`). The CSV has more rows if you want to experiment on your own; this lesson does not ask you to raise `--n`. After your run, open `metrics_batch.json` in the bucket: fixed model loads pay once per Job, and clip time grows with each kid `[measure]`.
 
 **From a notebook.** The same command works in a Jupyter cell on your laptop: set the variables with `%env WORKER_IMAGE=...`, `%env BUCKET=...`, `%env RUN_ID=...`, and put `!` in front of `nebius ai job create`. `[verify on first run]`
 
@@ -427,7 +425,7 @@ Leave out the `--exclude` and `--include` flags to get every intermediate file t
 
 ## Clean up
 
-A Job stops by itself; a DevLab doesn't, so delete it if you used path B. Then delete what's left in the bucket, once for each `RUN_ID` you created (`job-001`, `job-200`, `devlab-001`):
+A Job stops by itself; a DevLab doesn't, so delete it if you used path B. Then delete what's left in the bucket, once for each `RUN_ID` you created (`job-001`, `devlab-001`):
 
 ```bash
 aws s3 rm --recursive s3://$BUCKET/runs/batch_inference/$RUN_ID \
