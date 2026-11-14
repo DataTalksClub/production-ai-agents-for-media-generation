@@ -49,7 +49,7 @@ You're done when:
 - every kid in the run has a folder in your bucket with the card (`card.png`) and the animated card (`card.mp4`), and you've watched Emma's;
 - nothing you created is still `RUNNING`.
 
-Time and cost: `[measure]` with the prebuilt worker image. The Job runs on an H100 and starts by downloading about 126 GB of video-model weights, so it is the most expensive run of this module: `[measure]` for ten kids on a preemptible H100. Rates: [Nebius pricing](https://docs.nebius.com/compute/resources/pricing).
+Time and cost: `[measure]` with the prebuilt worker image. The Job runs on an H100 and starts by downloading 127 GB of weights for Sana, Wan2.2 and Kokoro `[measured: 2026-11-14, DevLab]`, so it is the most expensive run of this module: `[measure]` for ten kids on a preemptible H100. Rates: [Nebius pricing](https://docs.nebius.com/compute/resources/pricing).
 
 ## Serving vs batch inference
 
@@ -155,7 +155,7 @@ So we run Santa's pipeline as a Job.
 
 ## Before you start
 
-You need the Nebius CLI, an Object Storage bucket, and an S3 access key to look at the results from your laptop. Do this once.
+You need the Nebius CLI, an Object Storage bucket, and an S3 access key to put the kids' list in the bucket and look at the results from your laptop. Do this once.
 
 1. Install and log in to the [Nebius CLI](https://docs.nebius.com/cli/install).
 2. Create a bucket: `nebius storage bucket create --name <your-bucket>`. [Buckets](https://docs.nebius.com/object-storage/buckets/manage) <!-- c:M1-310 -->
@@ -167,6 +167,15 @@ export WORKER_IMAGE=<course santa worker>   # [placeholder: published reference]
 export BUCKET=<your-bucket>
 export RUN_ID=job-001
 ```
+
+5. Upload the kids' list to the bucket. The Job reads it from there, so you can change the list without rebuilding the image:
+
+```bash
+aws s3 cp assets/kids.csv s3://$BUCKET/inputs/kids.csv \
+  --endpoint-url https://storage.eu-north1.nebius.cloud
+```
+
+Run the commands in this lesson from the module folder, `01-consistent-media-generation-on-serverless-gpus/`.
 
 ## The worker
 
@@ -212,7 +221,7 @@ flowchart LR
 Three things to know before you run it:
 
 - **Every file is written once and never changed.** That's what lets `--out` be a bucket mounted into the container, with no upload code. "How the results are stored" below shows how.
-- **The clip step decides the GPU.** Wan2.2 image-to-video is the largest model in the pipeline: it needs an H100 and about 126 GB of weights, downloaded when the step starts. <!-- c:M1-063 c:M1-328 c:M1-390 --> `--step text --step illustration --step card --step greeting` leaves it out; that part fits an L40S.
+- **The clip step decides the GPU.** Wan2.2 image-to-video is the largest model in the pipeline: it needs an H100. The three models together are 127 GB, downloaded when the run starts `[measured: 2026-11-14, DevLab]`. <!-- c:M1-063 c:M1-328 c:M1-390 --> `--step text --step illustration --step card --step greeting` leaves the clip out; that part fits an L40S.
 - **The text step copies the row.** The wish, the greeting and the illustration prompt come from [assets/kids.csv](assets/kids.csv). Nothing calls a language model. The music is one track from the module's shared media, [assets/4_jingle.mp3](assets/4_jingle.mp3); add `<mood>.mp3` files next to it to get a track per mood.
 
 It logs a line for every model load and every finished asset, so the Job's logs show where it is. `--help` lists the options: `--n`, `--out` and `--step`.
@@ -227,7 +236,7 @@ There are two ways to run the worker, and both end with the results in your S3 b
 | --- | --- | --- |
 | What you run | `nebius ai job create`, in a terminal or a notebook cell | [code/nb-santa-cards.ipynb](code/nb-santa-cards.ipynb) cell by cell, then `python code/batch_inference.py` in the DevLab's terminal |
 | Where the script runs | In a container on a GPU VM that Nebius starts for the Job | In your DevLab's Python environment |
-| How results reach S3 | The script writes to the bucket mounted at `/outputs` | The same: the bucket is mounted into the DevLab |
+| Where the kids and the results are | In the bucket mounted at `/data`: the script reads `inputs/kids.csv` and writes the cards | The same: the bucket is mounted into the DevLab |
 | When the GPU stops billing | When the Job ends <!-- c:M1-290 --> | When you stop or delete the DevLab; its disk bills until you delete it <!-- c:M1-207 --> |
 | Price | Preemptible or regular, your choice | Regular only: a DevLab can't be preemptible <!-- c:M1-207 --> |
 | Use it for | The batch run | Developing and debugging the worker before it goes into a Job |
@@ -250,15 +259,17 @@ One command creates the Job. Check the request first: `--dry-run` validates it w
 ```bash
 nebius ai job create --dry-run --name "$RUN_ID" --image "$WORKER_IMAGE" \
   --platform gpu-h100-sxm --preset 1gpu-16vcpu-200gb \
+  --disk-size 500Gi \
   --preemptible --follows-spot-price \
   --timeout 2h --restart-policy never \
-  --volume "$BUCKET:/outputs:rw" \
-  --container-command bash --args "-c 'python /app/batch_inference.py --n 10 --out /outputs/runs/01-consistent-media-generation-on-serverless-gpus/$RUN_ID'"
+  --volume "$BUCKET:/data:rw" \
+  --container-command bash --args "-c 'python /app/batch_inference.py --kids /data/inputs/kids.csv --n 10 --out /data/runs/batch_inference/$RUN_ID'"
 ```
 
-- **`--volume "$BUCKET:/outputs:rw"`** mounts your bucket into the container at `/outputs`. Whatever the script saves under `/outputs` is in S3. <!-- c:M1-281 c:M1-282 -->
+- **`--volume "$BUCKET:/data:rw"`** mounts your bucket into the container at `/data`, for reading and writing. The script reads the kids from `/data/inputs/kids.csv`, the file you uploaded, and whatever it saves under `/data` is in S3. <!-- c:M1-281 c:M1-282 -->
 - **Preemptible by default.** Jobs run on a regular VM unless you ask for preemptible; preemptible is cheaper, and Nebius can take the GPU back. If that happens the Job ends in `ERROR` and isn't retried: run it again. [Jobs: manage](https://docs.nebius.com/serverless/jobs/manage), [auto-restarts](https://docs.nebius.com/serverless/jobs/auto-restarts) <!-- c:M1-295 c:M1-296 -->
-- **`--timeout 2h`** is the hard stop if anything hangs; the shortest allowed is `1h`. <!-- c:M1-293 --> The first thing the clip step does is download about 126 GB of weights onto the Job's disk (250 GiB by default), so leave room. <!-- c:M1-063 c:M1-301 --> Downloading on every run is wasteful on purpose here; Module 3 fixes it. `--timeout 4h` raises the limit for a longer run.
+- **`--disk-size 500Gi`** is the container disk. The weights are 127 GB, and a larger disk writes faster, so 500 GB finishes that download sooner than the 250 GiB default. [Disk performance](https://docs.nebius.com/compute/storage/types) <!-- c:M1-301 -->
+- **`--timeout 2h`** is the hard stop if anything hangs; the shortest allowed is `1h`. <!-- c:M1-293 --> The run starts by writing those 127 GB onto the disk. <!-- c:M1-063 --> Downloading on every run is wasteful on purpose here; Module 3 fixes it. `--timeout 4h` raises the limit for a longer run.
 - **`--restart-policy never`**: a failed run fails once, it doesn't loop. <!-- c:M1-294 -->
 - **`--platform` and `--preset` always**, so you know which GPU you pay for. <!-- c:M1-301 -->
 
@@ -272,47 +283,7 @@ The models load once per Job, however long the list is: the fixed part of the ru
 
 **From a notebook.** The same command works in a Jupyter cell on your laptop: set the variables with `%env WORKER_IMAGE=...`, `%env BUCKET=...`, `%env RUN_ID=...`, and put `!` in front of `nebius ai job create`. `[verify on first run]`
 
-### Path B: the notebook and the script in a DevLab
-
-A DevLab is JupyterLab on a GPU VM. Here nothing is submitted: you call the pipeline's functions yourself, look at each result, and only then run the script. `[verify on first run: the commands in this path haven't been executed yet]`
-
-1. Create a DevLab on an H100 with your bucket mounted at `/outputs`, the same way the Job has it. A DevLab bills at the regular price for as long as it runs, so plan the session. On an L40S (`--platform gpu-l40s-a --preset 1gpu-8vcpu-32gb`) you can do everything except the clip and the mix:
-
-   ```bash
-   nebius ai devlab create --name santa-dev --template jupyter \
-     --platform gpu-h100-sxm --preset 1gpu-16vcpu-200gb \
-     --volume "$BUCKET:/outputs:rw"
-   ```
-
-   `[verify on first run: --volume with a bucket name on a DevLab; the s3:// form needs a secret]` [`nebius ai devlab create`](https://docs.nebius.com/cli/reference/ai/devlab/create) <!-- c:M1-392 -->
-
-2. Open the DevLab's URL, open a **Terminal**, and prepare the environment once per DevLab. The template already has this repo and `uv`:
-
-   ```bash
-   cd ~/work/production-ai-agents-for-media-generation
-   git pull
-   uv sync --extra gpu --extra notebooks
-   uv pip install "kokoro>=0.9.2" ftfy imageio imageio-ffmpeg
-   uv run python -m ipykernel install --user --name course-gpu --display-name "course (GPU)"
-   ```
-
-3. Open [code/nb-santa-cards.ipynb](code/nb-santa-cards.ipynb), choose the **course (GPU)** kernel and run it top to bottom. It makes Emma's card one step at a time and shows the text, the illustration, the card, the clip, the greeting and the final video. Its last cell runs the batch for three kids.
-
-4. Run the script, the same way a Job will, with the output on the bucket mount:
-
-   ```bash
-   cd 01-consistent-media-generation-on-serverless-gpus
-   uv run --no-sync python code/batch_inference.py --n 10 \
-     --out /outputs/runs/01-consistent-media-generation-on-serverless-gpus/devlab-001
-   ```
-
-   It prints a line per asset and the path of the `cards` folder at the end. The files are in your bucket as soon as they are written: no upload step.
-
-5. Delete the DevLab when you're done. It bills its GPU while it runs, including while you read and type, and a stopped DevLab still bills its disk. <!-- c:M1-207 -->
-
-## Watch it
-
-For a Job (path A):
+**Watch it.** Follow the run with the ID the create command printed:
 
 ```bash
 nebius ai job get <job_ID>
@@ -338,7 +309,7 @@ stateDiagram-v2
 The logs show the script's progress: one line when a model has loaded, one for every finished asset `[measure: times from the author run]`:
 
 ```text
-12:00:01 10 kids, steps: text, illustration, card, clip, greeting, mix, out: /outputs/runs/.../job-001/cards
+12:00:01 10 kids from /data/inputs/kids.csv, steps: text, illustration, card, clip, greeting, mix, out: /data/runs/batch_inference/job-001/cards
 12:00:01 text: written by the template
 12:00:01 text 1/10 k01 0.0 s
 ...
@@ -349,21 +320,61 @@ The logs show the script's progress: one line when a model has loaded, one for e
 12:…:… clip 1/10 k01 … s
 ...
 12:…:… mix 10/10 k10 … s
-12:…:… finished: /outputs/runs/.../job-001/cards
+12:…:… finished: /data/runs/batch_inference/job-001/cards
 ```
+
+### Path B: the notebook and the script in a DevLab
+
+A DevLab is JupyterLab on a GPU VM. Here nothing is submitted: you call the pipeline's functions yourself, look at each result, and only then run the script.
+
+1. Create a DevLab from the **JupyterLab** template in the web console: [DevLabs quickstart](https://docs.nebius.com/serverless/quickstart/devlabs#web-console). In **Platform**, pick an H100, and a preset with one GPU, 16 vCPU and 200 GB of memory. Under **Container disk size**, set **500 GB**: the models are 127 GB, and a larger disk writes faster, so the download finishes sooner than on the default disk. [Disk performance](https://docs.nebius.com/compute/storage/types) Under **Mounted volumes**, click **Attach volume**, choose your bucket, and mount it at `/data` for reading and writing, the same place the Job uses ([Managing DevLabs](https://docs.nebius.com/serverless/devlabs/manage)). A DevLab bills at the regular price for as long as it runs, so plan the session. On an L40S you can do everything except the clip and the mix. Copy and keep the **Jupyter token**: that is what you type to open Jupyter. Leave **Bearer token authentication** off. That switch sits in front of Jupyter; with it on, the browser shows `Unauthorized` and the Jupyter token never gets a chance to sign you in. <!-- c:M1-208 -->
+
+2. Open the DevLab's HTTPS URL, sign in with your Jupyter token, and open a **Terminal**. The template has neither this repo nor `uv`. Install `uv`, clone the repo, and create the GPU environment once per DevLab. [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
+
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   source "$HOME/.local/bin/env"
+
+   git clone --branch 04-draft https://github.com/mnrozhkov/production-ai-agents-for-media-generation.git
+   cd production-ai-agents-for-media-generation
+
+   uv sync --extra gpu --extra notebooks
+   uv pip install "kokoro>=0.9.2" ftfy imageio imageio-ffmpeg pip
+   uv run spacy download en_core_web_sm
+   uv run python -m ipykernel install --user --name course-gpu --display-name "course (GPU)"
+   ```
+
+   `source` puts `uv` on the path in this terminal. Kokoro's English voice needs the spaCy model `en_core_web_sm`. Install `pip` into the environment first: the notebook kernel cannot see the `uv` command, and spaCy uses `pip` to fetch the model. Unknown words fall back to `espeakng-loader`, which comes with Kokoro. The DevLab account cannot install system packages.
+
+3. Open [code/nb-santa-cards.ipynb](code/nb-santa-cards.ipynb), choose the **course (GPU)** kernel and run it top to bottom. It makes Emma's card one step at a time and shows the text, the illustration, the card, the clip, the greeting and the final video. Its last cell runs the batch for three kids.
+
+4. Run the script, the same way a Job will, with the output on the bucket mount. `[verify on first run: this command hasn't been executed yet]`
+
+   ```bash
+   cd 01-consistent-media-generation-on-serverless-gpus
+   uv run --no-sync python code/batch_inference.py --kids /data/inputs/kids.csv --n 10 \
+     --out /data/runs/batch_inference/devlab-001
+   ```
+
+   It prints a line per asset and the path of the `cards` folder at the end. The files are in your bucket as soon as they are written: no upload step.
+
+5. Delete the DevLab when you're done. It bills its GPU while it runs, including while you read and type, and a stopped DevLab still bills its disk. <!-- c:M1-207 -->
 
 ## How the results are stored
 
-How the files get to the bucket:
+How the kids get in and the files get out:
 
-1. The Job command mounts the bucket: `--volume "$BUCKET:/outputs:rw"`. <!-- c:M1-281 c:M1-282 -->
-2. The worker runs with `--out /outputs/runs/01-consistent-media-generation-on-serverless-gpus/$RUN_ID`.
-3. `run()` creates `cards/<kid id>/` under that path, and each step saves its file there with ordinary Python and ffmpeg writes.
+1. The Job command mounts the bucket: `--volume "$BUCKET:/data:rw"`. <!-- c:M1-281 c:M1-282 -->
+2. The worker runs with `--kids /data/inputs/kids.csv`: it reads the list you uploaded, as an ordinary file.
+3. It runs with `--out /data/runs/batch_inference/$RUN_ID`: `run()` creates `cards/<kid id>/` under that path, and each step saves its file there with ordinary Python and ffmpeg writes.
 
-What ends up in the bucket (one run, `RUN_ID=job-001`):
+What's in the bucket after one run, `RUN_ID=job-001`:
 
 ```text
-runs/01-consistent-media-generation-on-serverless-gpus/job-001/
+inputs/
+└── kids.csv                   you upload it once; every run reads it
+runs/batch_inference/job-001/
+├── metrics_batch.json         model load times and per-kid latencies for every step
 └── cards/
     ├── k01/
     │   ├── card.json          1. text: the kid's profile, gifts, wish, mood, greeting, image prompt
@@ -379,21 +390,22 @@ runs/01-consistent-media-generation-on-serverless-gpus/job-001/
 - **Two finals per kid:** `card.png` and `card.mp4`. The other four files are intermediates, kept so the next step can read its inputs and so you can inspect each step.
 - **Handover between steps is only through these files.** The illustration step reads the image prompt from `card.json`, the clip step reads `illustration.png`, and so on.
 - **Each file is written once and never edited,** which is what makes writing straight to a bucket mount reasonable. MP4 and WAV writers jump back inside a file to finish its header; whether the mount allows that is checked on the first run `[verify on first run]`. If it doesn't, the worker writes to local disk and copies each finished file over.
-- **No manifest or summary file.** The Job's logs hold the timings, and the folders are the record of what was made.
+- **`metrics_batch.json` records the run's times** (`started_at`, `finished_at`, `runtime_s`, and each step's `load_s` and per-kid `latency_s`) so lesson 05 can compute the cost per card without parsing the Job's logs.
+- **Each card keeps its input.** `card.json` holds the kid's full row from `kids.csv`, so you can tell which profile made each card even after you change the list.
 
 ## See the results in the bucket
 
 The files stay in the bucket after the Job's VM is deleted. <!-- c:M1-290 --> List the run:
 
 ```bash
-aws s3 ls --recursive s3://$BUCKET/runs/01-consistent-media-generation-on-serverless-gpus/$RUN_ID/ \
+aws s3 ls --recursive s3://$BUCKET/runs/batch_inference/$RUN_ID/ \
   --endpoint-url https://storage.eu-north1.nebius.cloud
 ```
 
 You should see the six files for every kid from the tree above `[verify on first run]`. Get Emma's animated card and play it:
 
 ```bash
-aws s3 cp s3://$BUCKET/runs/01-consistent-media-generation-on-serverless-gpus/$RUN_ID/cards/k01/card.mp4 emma.mp4 \
+aws s3 cp s3://$BUCKET/runs/batch_inference/$RUN_ID/cards/k01/card.mp4 emma.mp4 \
   --endpoint-url https://storage.eu-north1.nebius.cloud
 ```
 
@@ -405,8 +417,8 @@ To look at all the cards, download the two finished files per kid, the card and 
 
 ```bash
 aws s3 cp --recursive \
-  s3://$BUCKET/runs/01-consistent-media-generation-on-serverless-gpus/$RUN_ID \
-  runs/01-consistent-media-generation-on-serverless-gpus/$RUN_ID \
+  s3://$BUCKET/runs/batch_inference/$RUN_ID \
+  runs/batch_inference/$RUN_ID \
   --exclude "*" --include "*/card.png" --include "*/card.mp4" \
   --endpoint-url https://storage.eu-north1.nebius.cloud
 ```
@@ -418,7 +430,7 @@ Leave out the `--exclude` and `--include` flags to get every intermediate file t
 A Job stops by itself; a DevLab doesn't, so delete it if you used path B. Then delete what's left in the bucket, once for each `RUN_ID` you created (`job-001`, `job-200`, `devlab-001`):
 
 ```bash
-aws s3 rm --recursive s3://$BUCKET/runs/01-consistent-media-generation-on-serverless-gpus/$RUN_ID \
+aws s3 rm --recursive s3://$BUCKET/runs/batch_inference/$RUN_ID \
   --endpoint-url https://storage.eu-north1.nebius.cloud
 ```
 
@@ -441,7 +453,9 @@ nebius ai devlab list
 | `ERROR` after running a while | Preempted <!-- c:M1-296 --> | Run the Job again |
 | `--timeout` rejected | Below the 1h minimum <!-- c:M1-293 --> | Use `1h` or more |
 | `FAILED` right after `IMAGE_PULLING` | Wrong architecture or a private image <!-- c:M1-258 c:M1-314 --> | `linux/amd64`; a public image or your project's registry |
-| `COMPLETED` but the bucket is empty | Output written outside `/outputs` | Check `--out` and the `--volume` mount |
+| `COMPLETED` but the bucket is empty | Output written outside `/data` | Check `--out` and the `--volume` mount |
+| `FAILED` at once: `Invalid value for '--kids'` in the logs | `kids.csv` isn't at that path in the bucket | Upload it to `inputs/kids.csv` ("Before you start", step 5) and check the `--kids` path |
+| `FAILED` at once with a validation error | A row in your `kids.csv` is missing a column or has an age outside 1–18 | Fix the row; the error names it |
 | `CUDA out of memory` in the clip step | The video model on a GPU smaller than an H100 <!-- c:M1-328 --> | Use an H100; on an L40S run `--step text --step illustration --step card --step greeting` |
 | The Job ends before the cards are done | The weights download and the clips took longer than `--timeout` | Raise `--timeout` |
 
@@ -465,7 +479,7 @@ One Job on one GPU is the simplest batch that works. Santa's list has 200,000 ki
 | --- | --- | --- |
 | Parallel workers | One GPU makes one card after another: `[measure: time per card × 200,000]` | Module 3 |
 | Hardware per step | The CPU steps hold a GPU, and the GPU is sized for the largest model | Module 3 |
-| Weights downloaded on every run | Each Job starts by downloading about 126 GB for the video model before it makes anything, and pays GPU time for the wait <!-- c:M1-063 --> | Module 3 (keeping weights close to the GPU) |
+| Weights downloaded on every run | Each Job starts by downloading 127 GB for Sana, Wan2.2 and Kokoro before it makes anything, and pays GPU time for the wait `[measured: 2026-11-14, DevLab]` <!-- c:M1-063 --> | Module 3 (keeping weights close to the GPU) |
 | Surviving an interruption | A preempted Job starts again from the first kid | Module 3 |
 | Cost and limits | You want the price before the run, and a stop when it goes over | Lesson 05, then Module 3 |
 | Checking the cards | The pipeline never looks at what it made, and nobody can look at 200,000 cards | Module 2 (a judge that retries), Module 4 (evaluation and tracing) |

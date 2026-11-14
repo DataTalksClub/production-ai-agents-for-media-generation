@@ -7,7 +7,10 @@ run() works step by step, not kid by kid: it loads one model, makes that step's 
 kid, saves it to <out>/cards/<id>/, frees the GPU and moves on. Steps hand over through these
 files only, and each file is written once, so <out> can be a mounted bucket.
 
-    python code/batch_inference.py --n 10 --out /outputs/runs/santa-001
+    python code/batch_inference.py --n 10 --out runs/batch_inference/job-001
+    python code/batch_inference.py --kids /data/inputs/kids.csv --n 10 --out /data/runs/batch_inference/job-001
+
+In a Job, /data is your bucket: the kids' profiles come from it and the cards go to it.
 
 The clip step runs Wan2.2 image-to-video, the largest model here: the full pipeline needs an H100.
 The pipeline is deterministic: nothing judges or retries. Resuming after a preempted GPU is
@@ -18,18 +21,22 @@ from __future__ import annotations
 
 import csv
 import gc
+import shutil
+import statistics
 import subprocess
+import tempfile
 import time
 import wave
 from collections.abc import Callable, Iterator, Sequence
 from contextlib import contextmanager
+from datetime import datetime, timezone
 from enum import StrEnum
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any, Literal
 
 import typer
 from PIL import Image, ImageDraw, ImageFont, ImageOps
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 from rich.console import Console
 
 from common import load_pipeline
@@ -98,6 +105,35 @@ class CardText(BaseModel):
     mood: Mood = "warm"
     greeting: str
     image_prompt: str
+
+
+class StepMetrics(BaseModel):
+    """Timings for one pipeline step across the batch."""
+
+    load_s: float | None = None
+    latency_s: dict[str, float] = Field(default_factory=dict)
+
+    @computed_field
+    @property
+    def median_s(self) -> float | None:
+        return round(statistics.median(self.latency_s.values()), 3) if self.latency_s else None
+
+    @computed_field
+    @property
+    def total_s(self) -> float:
+        return round((self.load_s or 0.0) + sum(self.latency_s.values()), 3)
+
+
+class RunMetrics(BaseModel):
+    """Whole-run timings written to <out>/metrics_batch.json."""
+
+    n: int
+    kids_csv: str
+    gpu: str | None = None
+    started_at: str
+    finished_at: str
+    runtime_s: float
+    steps: dict[Step, StepMetrics]
 
 
 def load_kids(n: int, path: Path = KIDS_CSV) -> list[KidProfile]:
@@ -171,6 +207,15 @@ def render_card(illustration: Image.Image, card: CardText) -> Image.Image:
     return image
 
 
+@contextmanager
+def staged(out: Path) -> Iterator[Path]:
+    """Write to local disk first, then copy once to `out` (bucket mounts reject random-write seeks)."""
+    with tempfile.NamedTemporaryFile(suffix=out.suffix) as tmp:
+        path = Path(tmp.name)
+        yield path
+        shutil.copyfile(path, out)
+
+
 # --- 4. clip: Wan2.2 image-to-video -------------------------------------------------------------
 
 
@@ -192,7 +237,8 @@ def animate(pipe: WanImageToVideoPipeline, illustration: Path, out: Path) -> Non
         first_frame = ImageOps.fit(still.convert("RGB"), WAN_I2V.size)
     generator = torch.Generator(device="cuda").manual_seed(WAN_I2V.seed)
     frames = pipe(image=first_frame, prompt=MOTION, **WAN_I2V.params, generator=generator).frames[0]
-    export_to_video(frames, str(out), fps=WAN_I2V.fps)  # fps must be explicit: the default is 10
+    with staged(out) as tmp:
+        export_to_video(frames, str(tmp), fps=WAN_I2V.fps)  # fps must be explicit: the default is 10
 
 
 # --- 5. greeting: Kokoro text-to-speech ---------------------------------------------------------
@@ -202,7 +248,7 @@ def load_voice() -> KPipeline:
     """Kokoro text-to-speech for American English (models.KOKORO)."""
     from kokoro import KPipeline  # installed in the worker image and the DevLab, not on a laptop
 
-    return KPipeline(lang_code=KOKORO.lang_code)
+    return KPipeline(lang_code=KOKORO.lang_code, repo_id=KOKORO.model)
 
 
 def speak(voice: KPipeline, text: str, out: Path) -> float:
@@ -210,7 +256,7 @@ def speak(voice: KPipeline, text: str, out: Path) -> float:
     import numpy as np  # comes with the GPU stack
 
     audio = np.concatenate([np.asarray(chunk) for _, _, chunk in voice(text, voice=KOKORO.voice)])
-    with wave.open(str(out), "wb") as f:
+    with staged(out) as tmp, wave.open(str(tmp), "wb") as f:
         f.setnchannels(1)
         f.setsampwidth(2)
         f.setframerate(KOKORO.sample_rate)
@@ -242,16 +288,17 @@ def mix(clip: Path, greeting: Path, music: Path, out: Path, seconds: float) -> N
     import imageio_ffmpeg  # its own ffmpeg binary, the one export_to_video uses
 
     audio = f"[2:a]volume={MUSIC_VOLUME}[m];[1:a][m]amix=inputs=2:duration=longest:normalize=0[a]"
-    command = [
-        imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-loglevel", "error",
-        "-stream_loop", "-1", "-i", str(clip),
-        "-i", str(greeting),
-        "-stream_loop", "-1", "-i", str(music),
-        "-filter_complex", audio,
-        "-map", "0:v", "-map", "[a]", "-t", f"{seconds:.2f}",
-        "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", str(out),
-    ]
-    subprocess.run(command, check=True)
+    with staged(out) as tmp:
+        command = [
+            imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-loglevel", "error",
+            "-stream_loop", "-1", "-i", str(clip),
+            "-i", str(greeting),
+            "-stream_loop", "-1", "-i", str(music),
+            "-filter_complex", audio,
+            "-map", "0:v", "-map", "[a]", "-t", f"{seconds:.2f}",
+            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", str(tmp),
+        ]
+        subprocess.run(command, check=True)
 
 
 # --- the batch run ------------------------------------------------------------------------------
@@ -265,77 +312,120 @@ def free_gpu() -> None:
     torch.cuda.empty_cache()
 
 
-def load_model(step: Step, loader: Callable[[], Any]) -> Any:
-    """Load a step's model once and log how long it took."""
+def gpu_name() -> str | None:
+    """The CUDA device name when a GPU is present, otherwise None."""
+    try:
+        import torch
+
+        return torch.cuda.get_device_name(0) if torch.cuda.is_available() else None
+    except ImportError:
+        return None
+
+
+def load_model(step: Step, loader: Callable[[], Any], stats: StepMetrics) -> Any:
+    """Load a step's model once, record load_s, and log how long it took."""
     start = time.perf_counter()
     model = loader()
-    log(f"{step} model loaded in {time.perf_counter() - start:.1f} s")
+    elapsed = time.perf_counter() - start
+    stats.load_s = round(elapsed, 3)
+    log(f"{step} model loaded in {elapsed:.1f} s")
     return model
 
 
 @contextmanager
-def progress(step: Step, i: int, total: int, kid_id: str) -> Iterator[None]:
-    """Log one line per finished asset with its time: it shows up in `nebius ai job logs`."""
+def progress(step: Step, i: int, total: int, kid_id: str, stats: StepMetrics) -> Iterator[None]:
+    """Record the step's latency for this kid and log one line for `nebius ai job logs`."""
     start = time.perf_counter()
     yield
-    log(f"{step} {i}/{total} {kid_id} {time.perf_counter() - start:.1f} s")
+    elapsed = time.perf_counter() - start
+    stats.latency_s[kid_id] = round(elapsed, 3)
+    log(f"{step} {i}/{total} {kid_id} {elapsed:.1f} s")
 
 
-def run(n: int = 10, out: Path = Path("runs/santa"), steps: Sequence[Step] = tuple(Step)) -> Path:
-    """Make cards for the first n kids, one step at a time. Returns the folder with cards/<id>/."""
-    kids = load_kids(n)
-    cards = Path(out) / "cards"
+def run(
+    n: int = 10,
+    out: Path = Path("runs/santa"),
+    steps: Sequence[Step] = tuple(Step),
+    kids_csv: Path = KIDS_CSV,
+) -> Path:
+    """Make cards for the first n kids in kids_csv, one step at a time.
+
+    Writes <out>/metrics_batch.json and returns the folder that holds cards/<id>/.
+    """
+    started_at = datetime.now(timezone.utc).isoformat()
+    run_start = time.perf_counter()
+    out = Path(out)
+    kids = load_kids(n, kids_csv)
+    cards = out / "cards"
     folders = [cards / kid.id for kid in kids]
     for folder in folders:
         folder.mkdir(parents=True, exist_ok=True)
-    log(f"{len(kids)} kids, steps: {', '.join(steps)}, out: {cards}")
+    steps_metrics: dict[Step, StepMetrics] = {Step(s): StepMetrics() for s in steps}
+    log(f"{len(kids)} kids from {kids_csv}, steps: {', '.join(steps)}, out: {cards}")
 
     if Step.TEXT in steps:
+        stats = steps_metrics[Step.TEXT]
         for i, (kid, folder) in enumerate(zip(kids, folders), 1):
-            with progress(Step.TEXT, i, len(kids), kid.id):
+            with progress(Step.TEXT, i, len(kids), kid.id, stats):
                 card = write_text(kid)
                 (folder / "card.json").write_text(card.model_dump_json(indent=2))
 
     if Step.ILLUSTRATION in steps:
-        pipe = load_model(Step.ILLUSTRATION, load_image_model)
+        stats = steps_metrics[Step.ILLUSTRATION]
+        pipe = load_model(Step.ILLUSTRATION, load_image_model, stats)
         for i, folder in enumerate(folders, 1):
-            with progress(Step.ILLUSTRATION, i, len(folders), folder.name):
+            with progress(Step.ILLUSTRATION, i, len(folders), folder.name, stats):
                 illustration = draw_illustration(pipe, read_card(folder).image_prompt)
                 illustration.save(folder / "illustration.png")
         del pipe
         free_gpu()
 
     if Step.CARD in steps:
+        stats = steps_metrics[Step.CARD]
         for i, folder in enumerate(folders, 1):
-            with progress(Step.CARD, i, len(folders), folder.name):
+            with progress(Step.CARD, i, len(folders), folder.name, stats):
                 with Image.open(folder / "illustration.png") as illustration:
                     render_card(illustration, read_card(folder)).save(folder / "card.png")
 
     if Step.CLIP in steps:
-        pipe = load_model(Step.CLIP, load_video_model)
+        stats = steps_metrics[Step.CLIP]
+        pipe = load_model(Step.CLIP, load_video_model, stats)
         for i, folder in enumerate(folders, 1):
-            with progress(Step.CLIP, i, len(folders), folder.name):
+            with progress(Step.CLIP, i, len(folders), folder.name, stats):
                 animate(pipe, folder / "illustration.png", folder / "clip.mp4")
         del pipe
         free_gpu()
 
     if Step.GREETING in steps:
-        voice = load_model(Step.GREETING, load_voice)
+        stats = steps_metrics[Step.GREETING]
+        voice = load_model(Step.GREETING, load_voice, stats)
         for i, folder in enumerate(folders, 1):
-            with progress(Step.GREETING, i, len(folders), folder.name):
+            with progress(Step.GREETING, i, len(folders), folder.name, stats):
                 speak(voice, read_card(folder).greeting, folder / "greeting.wav")
         del voice
         free_gpu()
 
     if Step.MIX in steps:
+        stats = steps_metrics[Step.MIX]
         for i, folder in enumerate(folders, 1):
-            with progress(Step.MIX, i, len(folders), folder.name):
+            with progress(Step.MIX, i, len(folders), folder.name, stats):
                 greeting = folder / "greeting.wav"
                 music = pick_music(read_card(folder).mood)
                 seconds = card_seconds(greeting)
                 mix(folder / "clip.mp4", greeting, music, folder / "card.mp4", seconds)
 
-    log(f"finished: {cards}")
+    metrics = RunMetrics(
+        n=len(kids),
+        kids_csv=str(kids_csv),
+        gpu=gpu_name(),
+        started_at=started_at,
+        finished_at=datetime.now(timezone.utc).isoformat(),
+        runtime_s=round(time.perf_counter() - run_start, 3),
+        steps=steps_metrics,
+    )
+    metrics_path = out / "metrics_batch.json"
+    metrics_path.write_text(metrics.model_dump_json(indent=2) + "\n")
+    log(f"finished: {cards} (metrics: {metrics_path})")
     return cards
 
 
@@ -346,9 +436,16 @@ app = typer.Typer(add_completion=False)
 
 @app.command()
 def main(
-    n: Annotated[int, typer.Option(min=1, max=200, help="How many kids from kids.csv.")] = 10,
+    kids: Annotated[
+        Path,
+        typer.Option(
+            exists=True, dir_okay=False,
+            help="The kids' profiles (CSV). In a Job, a path on the bucket mount.",
+        ),
+    ] = KIDS_CSV,
+    n: Annotated[int, typer.Option(min=1, max=200, help="How many kids from the CSV.")] = 10,
     out: Annotated[
-        Path, typer.Option(help="Output folder; in a Job, a path on the bucket mount.")
+        Path, typer.Option(help="Output folder. In a Job, a path on the bucket mount.")
     ] = Path("runs/santa"),
     step: Annotated[
         list[Step] | None,
@@ -356,7 +453,7 @@ def main(
     ] = None,
 ) -> None:
     """Make Santa's gift cards for the first N kids, one step at a time."""
-    run(n, out, step or tuple(Step))
+    run(n, out, step or tuple(Step), kids)
 
 
 if __name__ == "__main__":

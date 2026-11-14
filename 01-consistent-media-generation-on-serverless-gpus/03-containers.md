@@ -35,8 +35,8 @@ You can also build on a template's image, not only use it as is. The Sana templa
 FROM cr.eu-north1.nebius.cloud/e00gw2b7v3pxetvpy7/sana-serve:660347b
 ENV HF_HOME=/cache/huggingface
 COPY worker.py /app/
-RUN mkdir -p /cache /outputs
-CMD ["python", "/app/worker.py", "--out", "/outputs/run"]
+RUN mkdir -p /cache /data
+CMD ["python", "/app/worker.py", "--out", "/data/run"]
 ```
 
 `worker.py` stands for your own script that uses the Sana stack.
@@ -45,7 +45,7 @@ CMD ["python", "/app/worker.py", "--out", "/outputs/run"]
 | --- | --- |
 | CUDA runtime, PyTorch, pinned `diffusers`, `transformers`, `accelerate` | Your code and config |
 | `serve.py`, `fastapi`, `uvicorn` (unused by the worker) | `CMD`: without it the container starts the template's server |
-| The template's choices: you get its pins, not yours | The weights cache path and `/outputs` |
+| The template's choices: you get its pins, not yours | The weights cache path and `/data` |
 
 The example uses a tag to stay short; [section 1](#1-base-image-and-platform) explains pinning by digest. The rest of this lesson builds our worker from the PyTorch base, so you see every line a template image hides.
 
@@ -84,7 +84,7 @@ flowchart LR
         subgraph container["Running container · temporary"]
             app["Worker process<br/>/app/batch_inference.py"]
             cache["Local model cache<br/>/cache/huggingface"]
-            out["/outputs<br/>Mounted bucket"]
+            out["/data<br/>Mounted bucket"]
         end
         driver["NVIDIA driver"]
         gpu["GPU"]
@@ -111,9 +111,9 @@ flowchart LR
     class driver,gpu hardware
 ```
 
-*The image supplies the CUDA runtime; the host supplies the NVIDIA driver and GPU. Amber marks the worker and its temporary cache. Green follows the output path to persistent storage:* `/outputs` *is a mount point, not a second copy of the bucket.*
+*The image supplies the CUDA runtime; the host supplies the NVIDIA driver and GPU. Amber marks the worker and its temporary cache. Green follows the output path to persistent storage:* `/data` *is a mount point, not a second copy of the bucket.*
 
-**Outside the image does not mean outside the running container.** Downloaded weights sit in the container's local cache, injected secrets are available to the process, and the bucket appears at `/outputs`. None of them is baked into the image. When the container is removed, its local cache is lost, but bucket outputs remain. Creating an `/outputs` directory alone does not make it persistent: whoever starts the container must mount the bucket there.
+**Outside the image does not mean outside the running container.** Downloaded weights sit in the container's local cache, injected secrets are available to the process, and the bucket appears at `/data`. None of them is baked into the image. When the container is removed, its local cache is lost, but bucket outputs remain. Creating an `/data` directory alone does not make it persistent: whoever starts the container must mount the bucket there.
 
 ## Common failures and recovery
 
@@ -280,19 +280,19 @@ docker build --secret id=hf_token,env=HF_TOKEN .
 CMD ["python", "batch_inference.py", "--out", "/tmp/results"]
 
 # fixed
-RUN mkdir -p /outputs
-CMD ["python", "/app/batch_inference.py", "--n", "1", "--out", "/outputs/run"]
+RUN mkdir -p /data
+CMD ["python", "/app/batch_inference.py", "--n", "1", "--out", "/data/run"]
 ```
 
 | Bad line | What goes wrong | Fix |
 | --- | --- | --- |
-| `--out /tmp/results` | Outputs vanish when the container exits | Write to a bucket mounted at `/outputs` |
+| `--out /tmp/results` | Outputs vanish when the container exits | Write to a bucket mounted at `/data` |
 
-Creating an `/outputs` directory alone does not make it persistent. Whoever starts the container must mount a bucket there. Files written to the mounted bucket remain after the container is removed.
+Creating a `/data` directory alone does not make it persistent. Whoever starts the container must mount a bucket there. Files written to the mounted bucket remain after the container is removed. The mount works both ways: the worker can also read its inputs from it, such as a list of records you uploaded. Lesson 04 reads the kids' profiles from `/data` and writes the cards to it.
 
 This matters for a container that runs once and exits. A server that returns its result in the HTTP response doesn't need this.
 
->💡 **On Nebius Serverless AI:** mount a bucket or a shared filesystem at `/outputs` with `--volume`: `--volume <bucket>:/outputs:rw` for a bucket, `--volume <filesystem-id>:/outputs:rw` for a shared filesystem. Choose a shared filesystem if you need symlinks, which the bucket mount doesn't fully support. [`nebius ai endpoint create`](https://docs.nebius.com/cli/reference/ai/endpoint/create)
+>💡 **On Nebius Serverless AI:** mount a bucket or a shared filesystem at `/data` with `--volume`: `--volume <bucket>:/data:rw` for a bucket, `--volume <filesystem-id>:/data:rw` for a shared filesystem. Choose a shared filesystem if you need symlinks, which the bucket mount doesn't fully support. [`nebius ai endpoint create`](https://docs.nebius.com/cli/reference/ai/endpoint/create)
 
 ## The fixed Dockerfile
 
@@ -303,16 +303,15 @@ FROM pytorch/pytorch:2.13.0-cuda13.0-cudnn9-runtime@sha256:db80a41f8428644cebcb3
 ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 PIP_BREAK_SYSTEM_PACKAGES=1 HF_HOME=/cache/huggingface
 RUN apt-get update && apt-get install -y --no-install-recommends espeak-ng && rm -rf /var/lib/apt/lists/*
 RUN pip install diffusers==0.39.0 transformers==5.13.1 accelerate==1.14.0 sentencepiece==0.2.1 protobuf==6.33.0
-RUN pip install "kokoro>=0.9.2" ftfy imageio imageio-ffmpeg openai pillow pydantic typer rich
+RUN pip install kokoro==0.9.4 ftfy==6.3.1 imageio==2.38.1 imageio-ffmpeg==0.8.1 openai==3.51.0 pillow==12.2.0 pydantic==2.14.3 typer==0.29.1 rich==15.0.0 \
+    && pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
 WORKDIR /app
 COPY code/common.py code/models.py code/batch_inference.py /app/
 COPY assets/kids.csv assets/4_jingle.mp3 /assets/
 COPY assets/fonts /assets/fonts
-RUN mkdir -p /cache /outputs
-CMD ["python", "/app/batch_inference.py", "--n", "1", "--out", "/outputs/run"]
+RUN mkdir -p /cache /data
+CMD ["python", "/app/batch_inference.py", "--n", "1", "--out", "/data/run"]
 ```
-
-`[placeholder: the second pip install line gets exact versions after the first build; until then it breaks fix 2]`
 
 
 ## References

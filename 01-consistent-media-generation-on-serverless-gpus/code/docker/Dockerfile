@@ -11,11 +11,14 @@ ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 PIP_BREAK_SYSTEM_PACKAGES=1 HF_HOME=/c
 RUN apt-get update && apt-get install -y --no-install-recommends espeak-ng && rm -rf /var/lib/apt/lists/*
 RUN pip install diffusers==0.39.0 transformers==5.13.1 accelerate==1.14.0 sentencepiece==0.2.1 protobuf==6.33.0
 # ftfy: Wan prompt cleaning. imageio-ffmpeg: MP4 export and the mix step.
-RUN pip install kokoro==0.9.4 ftfy==6.3.1 imageio==2.38.1 imageio-ffmpeg==0.8.1 openai==3.51.0 pillow==12.2.0 pydantic==2.14.3 typer==0.29.1 rich==15.0.0
-# Same layout as the repo: the script in /app reads data and music from ../assets.
+# en_core_web_sm: Kokoro's English pipeline. Installed here so a Job does not pip-install it at runtime.
+RUN pip install kokoro==0.9.4 ftfy==6.3.1 imageio==2.38.1 imageio-ffmpeg==0.8.1 openai==3.51.0 pillow==12.2.0 pydantic==2.14.3 typer==0.29.1 rich==15.0.0 \
+    && pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+# Same layout as the repo: the script in /app reads the default kids list, fonts and music from
+# ../assets. /data is where the Job mounts your bucket: inputs you upload, outputs it writes.
 WORKDIR /app
 COPY code/common.py code/models.py code/batch_inference.py /app/
 COPY assets/kids.csv assets/4_jingle.mp3 /assets/
 COPY assets/fonts /assets/fonts
-RUN mkdir -p /cache /outputs
-CMD ["python", "/app/batch_inference.py", "--n", "1", "--out", "/outputs/run"]
+RUN mkdir -p /cache /data
+CMD ["python", "/app/batch_inference.py", "--n", "1", "--out", "/data/run"]

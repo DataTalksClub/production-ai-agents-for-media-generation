@@ -154,7 +154,7 @@ You're done when:
 
 Use this path if you want to run the same experiments, practice scenes and share card directly on a GPU without creating an Endpoint: `ImageGenerator.local()` loads Sana once into your notebook's GPU memory and watches peak VRAM. The GPU bills the whole time the DevLab runs, including while you read and type.
 
-1. Create a DevLab from the **JupyterLab** template in the web console: [DevLabs quickstart](https://docs.nebius.com/serverless/quickstart/devlabs#web-console). Pick an L40S if it's offered `[verify: L40S available for DevLabs]`; from the CLI, always pass `--platform`, since the default is an H100. <!-- c:M1-208 -->
+1. Create a DevLab from the **JupyterLab** template in the web console: [DevLabs quickstart](https://docs.nebius.com/serverless/quickstart/devlabs#web-console). Pick an L40S if it's offered `[verify: L40S available for DevLabs]`; from the CLI, always pass `--platform`, since the default is an H100. <!-- c:M1-208 --> Copy and keep the **Jupyter token**: that is what you type to open Jupyter. Leave **Bearer token authentication** off. That switch sits in front of Jupyter; with it on, the browser shows `Unauthorized` and the Jupyter token never gets a chance to sign you in.
 2. Open the DevLab's HTTPS URL, sign in with your Jupyter token, and open a **Terminal**. The JupyterLab template already has this repo at `~/work/production-ai-agents-for-media-generation` and `uv` installed. Update the repo and create the GPU environment once per DevLab:
 
    ```bash
