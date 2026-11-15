@@ -4,17 +4,6 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict
 
 
-class LLMSpec(BaseModel):
-    model_config = ConfigDict(frozen=True)
-
-    model: str
-    base_url: str = "https://api.tokenfactory.nebius.com/v1"
-    temperature: float = 0.8
-
-    def with_overrides(self, **overrides: object) -> LLMSpec:
-        return self.model_copy(update=overrides)
-
-
 class ImageSpec(BaseModel):
     model_config = ConfigDict(frozen=True)
 
@@ -130,8 +119,6 @@ class MusicSpec(BaseModel):
     def with_overrides(self, **overrides: object) -> MusicSpec:
         return self.model_copy(update=overrides)
 
-
-GPT_OSS = LLMSpec(model="openai/gpt-oss-120b")
 
 SANA = ImageSpec(
     model="Efficient-Large-Model/Sana_1600M_1024px_diffusers",

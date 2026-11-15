@@ -263,7 +263,7 @@ nebius ai job create --dry-run --name "$RUN_ID" --image "$WORKER_IMAGE" \
   --preemptible --follows-spot-price \
   --timeout 2h --restart-policy never \
   --volume "$BUCKET:/data:rw" \
-  --container-command bash --args "-c 'python /app/batch_inference.py --kids /data/inputs/kids.csv --n 10 --out /data/runs/batch_inference/$RUN_ID'"
+  --container-command bash --args "-c 'python /app/batch_inference.py --kids /data/inputs/kids.csv --n 10 --out /data/runs/batch_inference/$RUN_ID --region eu-north1 --platform gpu-h100-sxm --preset 1gpu-16vcpu-200gb --billing preemptible'"
 ```
 
 - **`--volume "$BUCKET:/data:rw"`** mounts your bucket into the container at `/data`, for reading and writing. The script reads the kids from `/data/inputs/kids.csv`, the file you uploaded, and whatever it saves under `/data` is in S3. <!-- c:M1-281 c:M1-282 -->
@@ -388,7 +388,7 @@ runs/batch_inference/job-001/
 - **Two finals per kid:** `card.png` and `card.mp4`. The other four files are intermediates, kept so the next step can read its inputs and so you can inspect each step.
 - **Handover between steps is only through these files.** The illustration step reads the image prompt from `card.json`, the clip step reads `illustration.png`, and so on.
 - **Each file is written once and never edited,** which is what makes writing straight to a bucket mount reasonable. MP4 and WAV writers jump back inside a file to finish its header; whether the mount allows that is checked on the first run `[verify on first run]`. If it doesn't, the worker writes to local disk and copies each finished file over.
-- **`metrics_batch.json` records the run's times** (`started_at`, `finished_at`, `runtime_s`, and each step's `load_s` and per-kid `latency_s`) so lesson 05 can compute the cost per card without parsing the Job's logs.
+- **`metrics_batch.json` records the run's times** (`started_at`, `finished_at`, `runtime_s`, and each step's `load_s` and per-kid `latency_s`) so lesson 05 can compute the cost per card without parsing the Job's logs. It also records `region`, `platform` (the GPU type), `preset` and `billing` (`regular` or `preemptible`) from the flags in the command above. The container cannot see the Job, and `nebius ai job get` does not return an hourly price, so the file has none. Lesson 05 reads the rate from the pricing page and the spot-price API.
 - **Each card keeps its input.** `card.json` holds the kid's full row from `kids.csv`, so you can tell which profile made each card even after you change the list.
 
 ## See the results in the bucket

@@ -124,12 +124,28 @@ class StepMetrics(BaseModel):
         return round((self.load_s or 0.0) + sum(self.latency_s.values()), 3)
 
 
+class Billing(StrEnum):
+    """How the Job is billed. The worker cannot see this; the Job command passes it."""
+
+    REGULAR = "regular"
+    PREEMPTIBLE = "preemptible"
+
+
 class RunMetrics(BaseModel):
-    """Whole-run timings written to <out>/metrics_batch.json."""
+    """Whole-run timings written to <out>/metrics_batch.json.
+
+    gpu is the CUDA device name. region, platform, preset and billing are the Job's
+    choices, passed in on the command line: a Job does not return them to the container,
+    and it does not return the hourly price.
+    """
 
     n: int
     kids_csv: str
     gpu: str | None = None
+    region: str | None = None
+    platform: str | None = None
+    preset: str | None = None
+    billing: Billing | None = None
     started_at: str
     finished_at: str
     runtime_s: float
@@ -347,6 +363,10 @@ def run(
     out: Path = Path("runs/santa"),
     steps: Sequence[Step] = tuple(Step),
     kids_csv: Path = KIDS_CSV,
+    region: str | None = None,
+    platform: str | None = None,
+    preset: str | None = None,
+    billing: Billing | None = None,
 ) -> Path:
     """Make cards for the first n kids in kids_csv, one step at a time.
 
@@ -418,6 +438,10 @@ def run(
         n=len(kids),
         kids_csv=str(kids_csv),
         gpu=gpu_name(),
+        region=region,
+        platform=platform,
+        preset=preset,
+        billing=billing,
         started_at=started_at,
         finished_at=datetime.now(timezone.utc).isoformat(),
         runtime_s=round(time.perf_counter() - run_start, 3),
@@ -451,9 +475,25 @@ def main(
         list[Step] | None,
         typer.Option(help="Run only these steps (repeat the option). Default: all six."),
     ] = None,
+    region: Annotated[
+        str | None,
+        typer.Option(help="Region of the project, e.g. eu-north1. The Job does not tell the worker."),
+    ] = None,
+    platform: Annotated[
+        str | None,
+        typer.Option(help="GPU type, the Job's --platform, e.g. gpu-h100-sxm."),
+    ] = None,
+    preset: Annotated[
+        str | None,
+        typer.Option(help="The Job's --preset, e.g. 1gpu-16vcpu-200gb."),
+    ] = None,
+    billing: Annotated[
+        Billing | None,
+        typer.Option(help="regular or preemptible, matching the Job."),
+    ] = None,
 ) -> None:
     """Make Santa's gift cards for the first N kids, one step at a time."""
-    run(n, out, step or tuple(Step), kids)
+    run(n, out, step or tuple(Step), kids, region, platform, preset, billing)
 
 
 if __name__ == "__main__":
