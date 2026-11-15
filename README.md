@@ -43,8 +43,8 @@ All times are CET. Modules run Monday to Sunday. More on this cohort: [cohorts/2
 | Tue 10 Nov 2026 | Pre-Course Live Q&A | Live, 17:00-18:00 · [Register](https://luma.com/i4x6x2zy) |
 | Mon 16 Nov 2026 | Course launch | Live, 17:00-18:00 · [Register](https://luma.com/xey7h50c) |
 | Mon 16 - Sun 29 Nov 2026 | [**Module 1: Consistent Media Generation on Serverless GPUs**](01-consistent-media-generation-on-serverless-gpus/README.md) (two weeks) | Homework 1 and capstone proposal |
-| Mon 30 Nov - Sun 6 Dec 2026 | [**Module 2: Multi-Agent Media Workflows**](02-multi-agent-media-workflows/README.md) | Homework 2, due Sun 6 Dec |
-| Mon 7 - Sun 13 Dec 2026 | [**Module 3: Batch Media Generation at Scale**](03-batch-media-generation-at-scale/README.md) | Homework 3 (leaderboard), due Sun 13 Dec |
+| Mon 30 Nov - Sun 6 Dec 2026 | [**Module 2: Multi-Agent Media Workflows**](02-multi-agent-media-workflows/README.md) | Homework 2, due Mon 7 Dec |
+| Mon 7 - Sun 13 Dec 2026 | [**Module 3: Batch Media Generation at Scale**](03-batch-media-generation-at-scale/README.md) | Homework 3 (leaderboard), due Mon 14 Dec |
 | Mon 14 - Sun 20 Dec 2026 | [**Module 4: Evaluation, Observability and Production**](04-evaluation-observability-production/README.md) | Capstone brief |
 | Fri 15 Jan 2027 | Capstone submission, Attempt 1 | Capstone |
 | Fri 22 Jan 2027 | Peer review, Attempt 1 | Capstone |
@@ -89,7 +89,7 @@ Mon 30 Nov - Sun 6 Dec 2026
 * GPU models as typed tools over MCP
 * Long-running tools
 * Planner / generator / reviewer
-* **Homework 2: Media Agent** (a 10-second ad plus an execution trace), due Sun 6 Dec
+* **Homework 2: Media Agent** (a 10-second ad plus an execution trace), due Mon 7 Dec
 
 ### [Module 3: Batch Media Generation at Scale](/03-batch-media-generation-at-scale)
 
@@ -99,7 +99,7 @@ Mon 7 - Sun 13 Dec 2026
 * Spot GPUs and design for interruption
 * Optimizing cost per asset: cold start, VRAM and speed
 * Breaking the pipeline on purpose
-* **Homework 3: Factory Scale Challenge** (200 records over 10 parallel Jobs, public leaderboard), due Sun 13 Dec
+* **Homework 3: Factory Scale Challenge** (200 records over 10 parallel Jobs, public leaderboard), due Mon 14 Dec
 
 ### [Module 4: Evaluation, Observability and Production](/04-evaluation-observability-production)
 
