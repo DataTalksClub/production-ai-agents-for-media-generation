@@ -136,7 +136,7 @@ Link to your repository with the code, `brief.yaml`, `fixture_keyframe.png`, `ev
 
 ## Learning in Public
 
-Share your video and one thing your agent's trace taught you in a short post. Use `#[placeholder]`, tag DataTalksClub and Nebius, and submit the post link with your homework. Don't share credentials, Endpoint tokens or bucket keys.
+Share your video and one thing your agent's trace taught you in a short post. Tag DataTalksClub and Nebius, and submit the post link with your homework. Don't share credentials, Endpoint tokens or bucket keys.
 
 See the [learning in public guide](https://datatalks.club/docs/courses/zoomcamp-logistics/learning-in-public/) for more ideas.
 
@@ -153,7 +153,7 @@ What surprised me: <one thing from the trace>.
 
 My code: <LINK>
 
-#[placeholder] @DataTalksClub @Nebius
+@DataTalksClub @Nebius
 ```
 
 ## Submit the results
