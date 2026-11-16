@@ -8,6 +8,12 @@ next_url: ../02-multi-agent-media-workflows/01-agent-loop.md
 ---
 # 05 - Measuring Startup, Load and Generation Costs
 
+> ⚠️ **Read this first**
+>
+> 💸 **Prices here are examples only.** They come from our runs and price checks on the dates shown, and what you pay can differ: prices change, and spot prices can change every 15 minutes. For real prices, see [Compute pricing](https://docs.nebius.com/compute/resources/pricing) and [spot prices](https://docs.nebius.com/signup-billing/spot-prices).
+>
+> 🧹 **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
+
 <!-- Draft v5, 2026-11-16. Numbers: assets/example_runs/*.json (20 kids each, 2026-11-14), copied unchanged from the runs. Startup 157.7 s: one H100 Job on 2026-11-14 (not in metrics_batch.json). Prices: the notebook's "Prices and assumptions" (read 2026-11-15; spot snapshot 2026-11-14T15:05Z; fal checked 2026-11-15). Figures: .DEV/scripts/make_05_figures.py reads the example runs and that notebook cell. When prices change: update "Prices and assumptions", rerun the notebook and the figure script, then recheck every [calc] below. -->
 
 Say Santa's elves ran one batch Job that made animated gift cards for 20 kids: an illustration, a card, a short video clip, a spoken greeting and the final video with music, for each kid. On one H100 GPU, the worker ran for about 45 minutes `[measured]`, after a few minutes for the machine to start. So what does one card cost? And what would Santa's list of 200,000 kids cost?
@@ -23,7 +29,7 @@ You're done when you have:
 
 Time and cost: about 30 minutes, on your laptop. The notebook needs no GPU and no credits: it reads our example runs. You don't run anything new for this lesson:
 
-- **One run is enough.** Use our H100 run, or the `metrics_batch.json` from your own 10-kid batch Job. One run gives the fixed part `F` and the per-card part `c`, and `F / N + c` extrapolates to any N.
+- **One run is enough.** Use our H100 run, or the `metrics_batch.json` from your own 10-kid batch Job, downloaded before lesson 04's clean-up. One run gives the fixed part `F` and the per-card part `c`, and `F / N + c` extrapolates to any N.
 - **No other GPUs.** The comparison across H100, H200, RTX PRO 6000 and L40S reads our runs.
 
 ## The example runs
@@ -50,7 +56,7 @@ A step's entry in `metrics_batch.json` looks like this (shortened to three of th
 
 The file starts when the worker starts. The time before that, from **Create** until the container runs, is the startup: the machine starts and the worker image downloads. It isn't in the file. One H100 Job measured it at 157.7 s on 2026-11-14 `[measured]`, from the Job's `created_at` and `started_at`, and the notebook uses that for every run.
 
-**Assumed:** we count the startup as billed time. The docs say a Job bills its compute and storage "while running" ([Pricing and quotas](https://docs.nebius.com/serverless/pricing-quotas)) and don't say whether the minutes before the container starts count. So every projection below is an upper bound by about $0.20 per run on an H100 at the regular price `[calc]`.
+**Assumed:** we count the startup as billed time. The docs say a Job bills its compute and storage "while running" ([Pricing and quotas](https://docs.nebius.com/serverless/pricing-quotas)) and don't say whether the minutes before the container starts count. Counting it is conservative for that one part: if the startup doesn't bill, every projection below is about $0.20 per run too high on an H100 at the regular price `[calc: 157.7 s × $4.50/h]`. That doesn't make the projection an upper bound: it leaves out the disk, the first-asset warm-up and retries (see "Left out of the projection"), and those push the real cost up.
 
 ## Where the time goes
 
@@ -73,9 +79,10 @@ Three things the figure doesn't show:
 There are two different calculations, and they answer different questions:
 
 - **Projected cost**, before a run: the fixed part plus N × the typical time per card, times a price. Use it to plan and to compare options.
-- **Observed cost**, after a run: the billed duration of that run, times the rate it actually paid, plus the other resources it used, checked against **Billing → Usage**.
+- **Reconstructed cost**, after a run: the run's duration, times the rate it paid, plus the other resources it used. An estimate from what the run did.
+- **Verified spend**: what **Billing → Usage** shows for the run. Only this is what you paid.
 
-Everything from here to "What spot prices change" is a projection. The observed cost is in "Observed cost: check what a run cost" below.
+Everything from here to "What spot prices change" is a projection. The other two are in "After a run: reconstructed cost and verified spend" below.
 
 Billing is per second while the machine runs, priced per hour: half an hour costs half the hourly price. <!-- c:M1-337 c:M1-338 --> A Job stops billing when it ends; an Endpoint bills while it's `RUNNING`, idle or not. <!-- c:M1-290 c:M1-291 --> So the projection splits into a part paid once per run and a part paid once per card:
 
@@ -135,7 +142,7 @@ Prices change, so the notebook keeps them all in one place, **"Prices and assump
 
 *Regular: [Compute pricing](https://docs.nebius.com/compute/resources/pricing), read 2026-11-15. Spot: the public [spot-price API](https://docs.nebius.com/signup-billing/spot-prices), read 2026-11-15, snapshot 2026-11-14 15:05 UTC. L40S lists GPU, vCPU and RAM separately; the preset's price is GPU + 8 × vCPU + 32 × RAM.* <!-- c:M1-345 c:M1-346 -->
 
-The **regular** (on-demand) price is fixed. The **spot** price is what preemptible GPUs pay, and our example runs were preemptible. Spot prices can change as often as every 15 minutes and differ by region. They're capped at one cent below the regular price, so the regular price is the most a preemptible GPU can cost per hour ([Compute pricing](https://docs.nebius.com/compute/resources/pricing)). <!-- c:M1-344 --> Read today's spot prices yourself, no login needed:
+The **regular** (on-demand) price is fixed. The **spot** price is what preemptible GPUs pay, and our example runs were preemptible. Spot prices can change as often as every 15 minutes and differ by region. They aren't capped: a spot price can rise above the regular price ([Compute pricing](https://docs.nebius.com/compute/resources/pricing)). To limit it, set a max price in a [pricing policy](https://docs.nebius.com/signup-billing/pricing-policy); `--follows-spot-price`, which lesson 04 uses by default, sets none. <!-- c:M1-344 --> Read today's spot prices yourself, no login needed:
 
 ```bash
 curl -s https://api.nebius.cloud/billing/v1alpha1/spot-price
@@ -239,7 +246,7 @@ Our runs were preemptible, so they paid spot prices. The notebook's "What spot p
 
 ![Paired-dot chart of marginal USD per card for three GPUs. H100: $0.098 at the regular price, $0.045 at the spot snapshot. H200: $0.115 regular, $0.053 spot. RTX PRO 6000: $0.063 regular, $0.048 spot. At the regular price the RTX PRO 6000 is lowest; at the spot snapshot the H100 is.](assets/05-measuring-costs-04-spot.png)
 
-*Projected `[calc]` using the recorded price snapshot, not the observed cost of the runs: marginal cost per card `c` from the measured median per-card time in each run, at the regular and spot [GPU prices](#gpu-prices-for-the-calculations). The snapshot was taken before the runs started.*
+*Projected `[calc]` using the recorded price snapshot, not what the runs paid: marginal cost per card `c` from the measured median per-card time in each run, at the regular and spot [GPU prices](#gpu-prices-for-the-calculations). The snapshot was taken before the runs started.*
 
 **Takeaway:** GPU rankings depend on both execution time and the applicable price.
 
@@ -249,15 +256,15 @@ Our runs were preemptible, so they paid spot prices. The notebook's "What spot p
 
 **What spot prices cost you instead**
 
-- **The price can move during a run,** up to one cent below the regular price. Set a lower maximum in a pricing policy if you need one. [Compute pricing](https://docs.nebius.com/compute/resources/pricing)
+- **The price can move during a run,** and it can go above the regular price. A pricing policy sets a max price; if spot goes above it, the Job is stopped. [Compute pricing](https://docs.nebius.com/compute/resources/pricing), [pricing policies](https://docs.nebius.com/signup-billing/pricing-policy)
 - **Nebius can take the GPU back.** A preempted Job ends in `ERROR` and isn't retried; the rerun pays the startup and the 1,046 s clip load again, and this worker starts again from the first kid. <!-- c:M1-296 --> Resuming where a run stopped is Module 3.
-- **Our spot prices are a snapshot.** A snapshot estimates a run's cost; it can't tell you what the run paid if the price changed during it. That's the observed cost below.
+- **Our spot prices are a snapshot.** A snapshot projects a run's cost; it can't tell you what the run paid if the price changed during it. Only Billing → Usage can (below).
 
-Use regular prices to compare and plan: they're fixed, and they're also the most a preemptible run can cost. Use the observed cost to know what a run actually cost.
+Use regular prices to compare and plan: they're fixed. They aren't a ceiling for a preemptible run unless you set a max price in a pricing policy. Use Billing → Usage to know what a run actually cost.
 
-## Observed cost: check what a run cost
+## After a run: reconstructed cost and verified spend
 
-The projection used typical times and a price you chose. The observed cost uses what the run actually did:
+The projection used typical times and a price you chose. The reconstructed cost uses what the run actually did:
 
 - **GPU time:** the billed duration × the rate the run paid. For a Job, the billed duration lies between `started_at` → `finished_at` and `created_at` → `finished_at` from `nebius ai job get <job_ID> --format json`: the docs don't say whether the startup bills (see "The example runs"). For an Endpoint, **Create** → **Stop**, idle time included.
 - **The rate:** the regular price, or for a preemptible run the spot price during the run. The spot price can change every 15 minutes, so a single snapshot is an estimate; Billing → Usage is what you paid.
@@ -284,11 +291,25 @@ Then check it against the console. It shows your balance under **Billing** and t
 
 To apply the same three values to a run of your own, use the notebook's optional practice section.
 
+## Measure a run of your own (homework)
+
+The homework needs a new run: one model, ten assets, one startup, one model load. Our example runs and lesson 02's three-image runs don't count. Measure three things:
+
+| You run | Startup + readiness | Generation, per asset |
+| --- | --- | --- |
+| Endpoint | One interval: from clicking **Create** to the first answer from `/v1/models`. Lesson 02's notebook computes it as `create_to_ready_s` if you type in the time you clicked **Create** | `latency_s` per request, from your laptop |
+| Job | `created_at` → `started_at` from `nebius ai job get <job_ID> --format json`, plus the model's `load_s` | `latency_s` in `metrics_batch.json` |
+| DevLab | **Create** → `RUNNING`, plus the model's `load_s` | The notebook's time per asset |
+
+For an Endpoint, don't add up the console's `RUNNING` time and the notebook's polling time: the polling starts when you run the cell, so any gap before that is lost. One interval from **Create** has no gap.
+
+The lesson 02 notebooks save these fields in `metrics.json`. To get ten assets, change their step 4 loop from `range(3)` to `range(10)`, then load the file in this notebook's section 5. What you report is a projection; section 6 checks it against Billing → Usage.
+
 ## Common failures and recovery
 
 **Measurements**
 
-- [ ] No missing time treated as 0. `calculate_cost` refuses `None`: measure it, or leave the run out.
+- [ ] No missing time treated as 0. `calculate_cost` refuses `None`, and the notebook's `model_loads()` raises on a GPU step with no `load_s`. Only the CPU steps (text, card, mix) have no load time, because they load no model.
 - [ ] The weights download is in `F`. It's inside the clip step's `load_s`; keep it.
 - [ ] The startup is in `F`. It isn't in `metrics_batch.json`; add it from the Job's `created_at` → `started_at`.
 - [ ] The CPU steps are in the card's time. They run on the GPU machine and bill at the GPU price; the notebook sums all six steps.
@@ -306,7 +327,7 @@ To apply the same three values to a run of your own, use the notebook's optional
 - [ ] `c` is called the marginal cost, never "the cost per card"; the total per card is `F / N + c`.
 - [ ] No Endpoint was left running. Idle adds `price per second × idle time`.
 - [ ] A breakeven is quoted with the "left out" list next to it.
-- [ ] A projection isn't quoted as what a run cost. What you spent is the observed cost, checked in Billing → Usage.
+- [ ] A projection isn't quoted as what a run cost, and neither is a reconstruction. What you spent is the verified spend in Billing → Usage.
 - [ ] The container disk is either counted or said to be left out: about 1% of an H100 run here.
 
 Next: Module 2 puts an agent in front of these models.

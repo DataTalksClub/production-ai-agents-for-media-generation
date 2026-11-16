@@ -1,18 +1,21 @@
 ---
-
 video_url: ""
 code:
-
-- label: Santa cards pipeline (all steps, runs inside the Job)
-path: code/batch_inference.py
-- label: Santa cards, one step at a time (notebook)
-path: code/nb-santa-cards.ipynb
+  - label: Santa cards pipeline (all steps, runs inside the Job)
+    path: code/batch_inference.py
+  - label: Santa cards, one step at a time (notebook)
+    path: code/nb-santa-cards.ipynb
 prev_url: 03-containers.md
 next_url: 05-measuring-costs.md
-
 ---
 
 # 04 - Serving vs Batch Inference: the Same Generation for Different Use Cases
+
+> ⚠️ **Read this first**
+>
+> 💸 **Prices here are examples only.** They come from our runs and price checks on the dates shown, and what you pay can differ: prices change, and spot prices can change every 15 minutes. For real prices, see [Compute pricing](https://docs.nebius.com/compute/resources/pricing) and [spot prices](https://docs.nebius.com/signup-billing/spot-prices).
+>
+> 🧹 **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
 
 
 
@@ -40,12 +43,12 @@ How long the image step takes each way: Sana at 512×512, 20 steps, on one H100,
 
 | Images | Endpoint: one request at a time | Job: model loaded once |
 | --- | --- | --- |
-| 1 | 1.21 s, network included | 0.78 s, no network |
+| 1 | 1.17 s, network included | 0.78 s, no network |
 | 10 | 12 s | 7.8 s |
-| 200 | 4.0 min | 2.6 min |
-| 200,000 | 67 h | 44 h |
+| 200 | 3.9 min | 2.6 min |
+| 200,000 | 65 h | 44 h |
 
-Generation time only `[calc: images × the time for one image]`. Endpoint: requests from a laptop to the default Sana template `[measure: H100, median of 10 requests]`. Job: median of 20 illustrations in our worker `[measured: 2026-11-14, H100; assets/example_runs/h100.json]`. Startup and model load come on top of both; lesson 05 splits a run into those parts.
+Generation time only `[calc: images × the time for one image]`. Endpoint: median of 3 requests from a laptop to the Sana template on an H100, the same 512×512, 20-step settings, in lesson 02's notebook `[measured: 2026-11-16, H100; [assets/example_runs/lesson02/endpoint-h100-2026-11-16.json](assets/example_runs/lesson02/endpoint-h100-2026-11-16.json)]`. Job: median of 20 illustrations in our worker `[measured: 2026-11-14, H100; assets/example_runs/h100.json]`. Startup and model load come on top of both; lesson 05 splits a run into those parts.
 
 In this setup the Endpoint pays about 0.4 s more per image: the network round trip, packing the image into the response, and the template's server. That's a property of the default settings with one request at a time, not of serving. An Endpoint that groups requests on the GPU, or takes requests from several clients at once, can close the gap; Module 3 covers that.
 
@@ -53,9 +56,19 @@ You're done when:
 
 - your Job is `COMPLETED` and stopped by itself;
 - every kid in the run has a folder in your bucket with the card (`card.png`) and the animated card (`card.mp4`), and you've watched Emma's;
+- you've downloaded the run's `metrics_batch.json` for lesson 05;
 - nothing you created is still `RUNNING`.
 
-Time and cost: `[measure]` with the prebuilt worker image. The Job runs on an H100 and starts by downloading 127 GB of weights for Sana, Wan2.2 and Kokoro `[measured: 2026-11-14, DevLab]`, so it is the most expensive run of this module: `[measure]` for ten kids on a preemptible H100. Rates: [Nebius pricing](https://docs.nebius.com/compute/resources/pricing).
+Time and cost: this is the most expensive run of the module. The Job runs on an H100 and starts by downloading 127 GB of weights for Sana, Wan2.2 and Kokoro `[measured: 2026-11-14, DevLab]`. For ten kids, expect about 35 minutes from **Create** to `COMPLETED`: 158 s startup, 1,143 s of model loads (mostly that download) and 10 × 79 s per card `[calc: from our 20-kid H100 run, assets/example_runs/h100.json]`. What that cost at the prices we read:
+
+| Ten kids, one H100 (`gpu-h100-sxm`, `1gpu-16vcpu-200gb`, eu-north1), times from our 2026-11-14 run | Price per hour | Projected compute |
+| --- | --- | --- |
+| Regular price, read 2026-11-15 | $4.50 | about $2.60 |
+| Spot price snapshot, 2026-11-14 15:05 UTC | $2.07 | about $1.20 |
+
+*Projected `[calc]`: 2,088 s × the price; the 500 GB disk adds about $0.03. Not a bill.*
+
+Spot prices change every 15 minutes and aren't capped (see "Pick the price"), so check [today's spot price](https://docs.nebius.com/signup-billing/spot-prices) and [Compute pricing](https://docs.nebius.com/compute/resources/pricing) before you run. The DevLab in path A bills on top of that, at the regular price, for as long as it runs.
 
 ## Serving vs batch inference
 
@@ -112,7 +125,8 @@ We build it as a deterministic pipeline: every kid goes through the same steps i
 
 *Emma's illustration and clip from our run for 20 kids. Times are the median per kid across the run `[measured: 2026-11-14, H100 gpu-h100-sxm 1gpu-16vcpu-200gb, preemptible, eu-north1; assets/example_runs/h100.json]`.*
 
-`[placeholder: Emma's card.png and card.mp4 from the author run]`
+<!-- v1.1: embed Emma's card.png and card.mp4 from a santa-worker:v0.1.0 run (the 2026-11-14 run used the older 1024x1400 card layout). -->
+
 
 ## Pick the tool: Endpoint or Job?
 
@@ -131,7 +145,7 @@ On Nebius Serverless AI each pattern has a tool built for it. An **Endpoint** is
 
 The pattern doesn't force the tool. You can run a batch through an Endpoint: a client loops over the list and sends one request per image. The difference is in how the two tools behave over a long run:
 
-- **Endpoint:** for 200,000 images the client sends 200,000 requests, receives 200,000 responses and stays online for the whole run, about 67 hours at 1.21 s per request `[calc: 200,000 × 1.21 s]`. If the client stops, the run stops. The Endpoint bills until you stop it, whether requests are arriving or not.
+- **Endpoint:** for 200,000 images the client sends 200,000 requests, receives 200,000 responses and stays online for the whole run, about 65 hours at 1.17 s per request `[calc: 200,000 × 1.17 s]`. If the client stops, the run stops. The Endpoint bills until you stop it, whether requests are arriving or not.
 - **Job:** no client. The worker generates the images, writes them to the bucket, and the Job ends by itself. 
 
 So we run Santa's pipeline as a Job.
@@ -146,10 +160,13 @@ You need the Nebius CLI and an Object Storage bucket. An S3 access key is option
 4. Set three variables in your shell:
 
 ```bash
-export WORKER_IMAGE=<course santa worker>   # [placeholder: published reference]
+# the course's prebuilt worker, pinned by digest: the tag is for reading, the digest is what runs
+export WORKER_IMAGE=docker.io/mnrozhkov/santa-worker:v0.1.0@sha256:64aae5c286fa3e1d7f018591050db17087ce080595d160759f792492375d6bc0
 export BUCKET=<your-bucket>
 export RUN_ID=job-001
 ```
+
+The image is public on [Docker Hub](https://hub.docker.com/r/mnrozhkov/santa-worker), built from [code/docker/Dockerfile](code/docker/Dockerfile) (lesson 03) for `linux/amd64`. You don't need Docker to use it.
 
 5. Upload the kids' list to the bucket. The Job reads it from there, so you can change the list without rebuilding the image:
 
@@ -201,7 +218,7 @@ Three things to know before you run it:
 
 It logs a line for every model load and every finished asset, so the Job's logs show where it is. `--help` lists the options: `--n`, `--out` and `--step`.
 
-The worker image is built from [code/docker/Dockerfile](code/docker/Dockerfile), the one lesson 03 walks through, with this module's folder as the build context: the scripts come from `code/`, the kids list, the fonts and the music from `assets/`. Weights, secrets and outputs stay out; the module's [.dockerignore](.dockerignore) lets nothing else in.
+The worker image, `mnrozhkov/santa-worker:v0.1.0`, is built from [code/docker/Dockerfile](code/docker/Dockerfile), the one lesson 03 walks through, with this module's folder as the build context: the scripts come from `code/`, the kids list, the fonts and the music from `assets/`. Weights, secrets and outputs stay out; the module's [.dockerignore](.dockerignore) lets nothing else in.
 
 Each step works through all N kids before the next one starts: it loads its model once, makes N assets and saves each one to the kid's folder in the S3 bucket. The next step reads its inputs from that folder. Steps hand over only through the bucket, so a step can be rerun or moved to another machine without touching the others.
 
@@ -215,34 +232,47 @@ There are two ways to run the worker, and both end with the results in your S3 b
 
 Start here: it is the easiest way to see the pipeline work, and the place to develop and debug the worker before it goes into a Job. A DevLab is JupyterLab on a GPU VM. Here nothing is submitted: you call the pipeline's functions yourself in your DevLab's Python environment, look at each result, and only then run the script. The bucket is mounted at `/data`, as in the Job in path B, so the script reads the same `kids.csv` and writes to the same bucket.
 
+Where path A writes:
+
+| What | Where | Survives deleting the DevLab |
+| --- | --- | --- |
+| The notebook's one-kid card | `/data/runs/santa-dev/cards/<kid id>/` in your bucket | Yes |
+| The notebook's three-kid batch | `/data/runs/santa-dev-batch/` in your bucket | Yes |
+| The script in step 4 | `/data/runs/batch_inference/devlab-001/` in your bucket | Yes |
+| Model weights | The DevLab's container disk | No, and it doesn't need to |
+
+If `/data` isn't mounted, the notebook says so and writes to `runs/` on the DevLab's disk instead; those files go when you delete the DevLab.
+
 A DevLab can't be preemptible: it bills at the regular price while it runs, and its disk until you delete it. 
 
 1. Create a DevLab from the **JupyterLab** template in the web console: [DevLabs quickstart](https://docs.nebius.com/serverless/quickstart/devlabs#web-console). In **Platform**, pick an H100, and a preset with one GPU, 16 vCPU and 200 GB of memory. Under **Container disk size**, set **500 GB**: the models are 127 GB, and a larger disk writes faster, so the download finishes sooner than on the default disk. [Disk performance](https://docs.nebius.com/compute/storage/types) Under **Mounted volumes**, click **Attach volume**, choose your bucket, and mount it at `/data` for reading and writing, the same place the Job uses ([Managing DevLabs](https://docs.nebius.com/serverless/devlabs/manage)). A DevLab bills at the regular price for as long as it runs, so plan the session. On an L40S you can do everything except the clip and the mix. Copy and keep the **Jupyter token**: that is what you type to open Jupyter. Leave **Bearer token authentication** off. That switch sits in front of Jupyter; with it on, the browser shows `Unauthorized` and the Jupyter token never gets a chance to sign you in. 
-2. Open the DevLab's HTTPS URL, sign in with your Jupyter token, and open a **Terminal**. The template has neither this repo nor `uv`. Install `uv`, clone the repo, and create the GPU environment once per DevLab. [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
+2. Open the DevLab's HTTPS URL, sign in with your Jupyter token, and open a **Terminal**. Run the module's DevLab setup, the same block as in lesson 02, then add the packages for the clip, greeting and mix steps. It installs `uv` and clones the repo only if they're missing, and checks out the course release `module-1-v1`. [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
    ```bash
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    source "$HOME/.local/bin/env"
-
-    git clone --branch 04-draft https://github.com/mnrozhkov/production-ai-agents-for-media-generation.git  # TODO before release: the release tag
-    cd production-ai-agents-for-media-generation
+    command -v uv >/dev/null || { curl -LsSf https://astral.sh/uv/install.sh | sh; source "$HOME/.local/bin/env"; }
+    REPO=~/work/production-ai-agents-for-media-generation
+    [ -d "$REPO" ] || git clone https://github.com/mnrozhkov/production-ai-agents-for-media-generation.git "$REPO"
+    cd "$REPO" && git fetch --tags && git checkout module-1-v1
 
     uv sync --extra gpu --extra notebooks
-    uv pip install "kokoro>=0.9.2" ftfy imageio imageio-ffmpeg pip
-    uv run spacy download en_core_web_sm
     uv run python -m ipykernel install --user --name course-gpu --display-name "course (GPU)"
+
+    # lesson 04 only: the same versions as the worker image
+    uv pip install kokoro==0.9.4 ftfy==6.3.1 imageio==2.38.1 imageio-ffmpeg==0.8.1 \
+      https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
    ```
 
-    `source` puts `uv` on the path in this terminal. Kokoro's English voice needs the spaCy model `en_core_web_sm`. Install `pip` into the environment first: the notebook kernel cannot see the `uv` command, and spaCy uses `pip` to fetch the model. Unknown words fall back to `espeakng-loader`, which comes with Kokoro. The DevLab account cannot install system packages.
-3. Open [code/nb-santa-cards.ipynb](code/nb-santa-cards.ipynb), choose the **course (GPU)** kernel and run it top to bottom. It makes Emma's card one step at a time and shows the text, the illustration, the card, the clip, the greeting and the final video. Its last cell runs the batch for three kids.
-4. Run the script, the same way a Job will, with the output on the bucket mount. `[verify on first run: this command hasn't been executed yet]`
+    The last line pins the versions [the worker image](https://hub.docker.com/r/mnrozhkov/santa-worker) uses, so the notebook and the Job run the same libraries. Kokoro's English voice needs the spaCy model `en_core_web_sm`; installing it here means nothing downloads it at run time. Unknown words fall back to `espeakng-loader`, which comes with Kokoro. The DevLab account cannot install system packages.
+3. Open [code/nb-santa-cards.ipynb](code/nb-santa-cards.ipynb), choose the **course (GPU)** kernel and run it top to bottom. It makes Emma's card one step at a time and shows the text, the illustration, the card, the clip, the greeting and the final video. Its last cell runs the batch for three kids. Both write to your bucket (see the table above).
+4. Run the script, the same way a Job will, with the output on the bucket mount. One kid is enough to check it; the ten-kid run is the Job in path B, which can use a preemptible GPU and stops billing by itself.
+   <!-- release QA: run this exact command once in a fresh DevLab -->
    ```bash
     cd 01-consistent-media-generation-on-serverless-gpus
-    uv run --no-sync python code/batch_inference.py --kids /data/inputs/kids.csv --n 10 \
+    uv run --no-sync python code/batch_inference.py --kids /data/inputs/kids.csv --n 1 \
       --out /data/runs/batch_inference/devlab-001
    ```
 
     It prints a line per asset and the path of the `cards` folder at the end. The files are in your bucket as soon as they are written: no upload step.
-5. Delete the DevLab when you're done. It bills its GPU while it runs, including while you read and type, and a stopped DevLab still bills its disk. 
+5. Delete the DevLab when you're done. It bills its GPU while it runs, including while you read and type, and a stopped DevLab still bills its disk. Your outputs are in the bucket, so nothing is lost.
 
 ### Path B: a Job from your laptop
 
@@ -250,12 +280,15 @@ Use this for the batch run once path A works. You submit one command, from a ter
 
 **Pick the price.** The pipeline needs an H100 for the clip step. You choose how to pay for it:
 
-|                                       | Set                                                             | Price                                                                       |
-| ------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| H100, preemptible (the command below) | nothing                                                         | A spot price that changes during the day, at most one cent below the regular price |
-| H100, regular                         | replace `--preemptible --follows-spot-price` with `--on-demand` | The regular price; the GPU isn't taken back                                 |
+|                                                  | Set                                                                                   | Price                                                                                                   |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| H100, preemptible, follows spot (the command below) | nothing                                                                            | The spot price, which can change every 15 minutes during the run. **No maximum**: it can go above the regular price |
+| H100, preemptible, with a max price              | replace `--follows-spot-price` with `--spot-pricing-policy-id <policy_ID>`            | The spot price, up to the max price you set. If spot goes above it, the Job is stopped                 |
+| H100, regular                                    | replace `--preemptible --follows-spot-price` with `--on-demand`                       | The fixed regular price; the GPU isn't taken back                                                       |
 
-Check [today's spot price](https://docs.nebius.com/signup-billing/spot-prices) and the [pricing page](https://docs.nebius.com/compute/resources/pricing) first. The pricing page caps the spot price at one cent below the regular price, so a preemptible run never costs more per hour than a regular one. We prefer a preemptible H100 when its spot price is low and one is available; if the Job can't get one, use the regular price.
+Spot prices [aren't capped and can rise above the regular price](https://docs.nebius.com/compute/resources/pricing). Check [today's spot price](https://docs.nebius.com/signup-billing/spot-prices) before you submit. To put a ceiling on what you pay, create a pricing policy for `gpu-h100-sxm` with a max price per GPU-hour (**Billing → Pricing → Pricing policy → Create pricing policy** in the console) and pass its ID. A max price below the current spot price blocks the policy, and the Job can't start until spot drops. [Spot pricing and pricing policies](https://docs.nebius.com/signup-billing/pricing-policy), [managing pricing policies](https://docs.nebius.com/signup-billing/manage-pricing-policy), [Jobs: pricing flags](https://docs.nebius.com/serverless/jobs/manage)
+
+We use a preemptible H100 when its spot price is well below the regular price and one is available; if the Job can't get one, or you need a fixed price, use `--on-demand`.
 
 One command creates the Job. Check the request first: `--dry-run` validates it without creating anything.
 
@@ -269,20 +302,20 @@ nebius ai job create --dry-run --name "$RUN_ID" --image "$WORKER_IMAGE" \
   --container-command bash --args "-c 'python /app/batch_inference.py --kids /data/inputs/kids.csv --n 10 --out /data/runs/batch_inference/$RUN_ID --region eu-north1 --platform gpu-h100-sxm --preset 1gpu-16vcpu-200gb --billing preemptible'"
 ```
 
-- `**--volume "$BUCKET:/data:rw"**` mounts your bucket into the container at `/data`, for reading and writing. The script reads the kids from `/data/inputs/kids.csv`, the file you uploaded, and whatever it saves under `/data` is in S3.
+- **`--volume "$BUCKET:/data:rw"`** mounts your bucket into the container at `/data`, for reading and writing. The script reads the kids from `/data/inputs/kids.csv`, the file you uploaded, and whatever it saves under `/data` is in S3.
 - **Preemptible by default.** Jobs run on a regular VM unless you ask for preemptible; preemptible is cheaper, and Nebius can take the GPU back. If that happens the Job ends in `ERROR` and isn't retried: run it again. [Jobs: manage](https://docs.nebius.com/serverless/jobs/manage), [auto-restarts](https://docs.nebius.com/serverless/jobs/auto-restarts)
-- `**--disk-size 500Gi**` is the container disk. The weights are 127 GB, and a larger disk writes faster, so 500 GB finishes that download sooner than the 250 GiB default. [Disk performance](https://docs.nebius.com/compute/storage/types)
-- `**--timeout 2h**` is the hard stop if anything hangs; the shortest allowed is `1h`. The run starts by writing those 127 GB onto the disk. Downloading on every run is wasteful on purpose here; Module 3 fixes it. `--timeout 4h` raises the limit for a longer run.
-- `**--restart-policy never**`: a failed run fails once, it doesn't loop.
-- `**--platform` and `--preset` always**, so you know which GPU you pay for.
-
-`[verify on first run: --volume by bucket name, and the --args quoting]`
+- **`--disk-size 500Gi`** is the container disk. The weights are 127 GB, and a larger disk writes faster, so 500 GB finishes that download sooner than the 250 GiB default. [Disk performance](https://docs.nebius.com/compute/storage/types)
+- **`--timeout 2h`** is the hard stop if anything hangs; the shortest allowed is `1h`. The run starts by writing those 127 GB onto the disk. Downloading on every run is wasteful on purpose here; Module 3 fixes it. `--timeout 4h` raises the limit for a longer run.
+- **`--restart-policy never`**: a failed run fails once, it doesn't loop.
+- **`--platform` and `--preset` always**, so you know which GPU you pay for.
+- **`--preemptible --follows-spot-price`**: a preemptible GPU at the current spot price, with no maximum. See "Pick the price" above for a capped or a regular run.
 
 Then run the same command without `--dry-run`. It prints the Job's ID.
 
-Ten kids is the default (`--n 10` in the command above, `--timeout 2h` is enough `[measure]`). The CSV has more rows if you want to experiment on your own; this lesson does not ask you to raise `--n`. After your run, open `metrics_batch.json` in the bucket: fixed model loads pay once per Job, and clip time grows with each kid `[measure]`.
+Ten kids is the default (`--n 10` in the command above). About 35 minutes is projected for it, so `--timeout 2h` leaves room `[calc: from our 20-kid H100 run]`. The CSV has more rows if you want to experiment on your own; this lesson does not ask you to raise `--n`. After your run, open `metrics_batch.json` in the bucket: the model loads are paid once per Job, and the clip step adds about 77 s for each kid `[measured: 2026-11-14, H100; assets/example_runs/h100.json]`.
 
-**From a notebook.** The same command works in a Jupyter cell on your laptop: set the variables with `%env WORKER_IMAGE=...`, `%env BUCKET=...`, `%env RUN_ID=...`, and put `!` in front of `nebius ai job create`. `[verify on first run]`
+**From a notebook.** The same command works in a Jupyter cell on your laptop: set the variables with `%env WORKER_IMAGE=...`, `%env BUCKET=...`, `%env RUN_ID=...`, and put `!` in front of `nebius ai job create`.
+<!-- release QA: run the command once from a notebook cell; the shell form is the tested one. -->
 
 **Watch it.** Follow the run with the ID the create command printed:
 
@@ -307,22 +340,24 @@ stateDiagram-v2
 
 *Conceptual; state names from the [lifecycle docs](https://docs.nebius.com/serverless/lifecycle).* 
 
-The logs show the script's progress: one line when a model has loaded, one for every finished asset `[measure: times from the author run]`:
+The logs show the script's progress: one line when a model has loaded, one for every finished asset. An excerpt with the load and per-kid times from our 20-kid H100 run (`[measured: 2026-11-14, H100; assets/example_runs/h100.json]`; clock times left out, yours will differ):
 
 ```text
-12:00:01 10 kids from /data/inputs/kids.csv, steps: text, illustration, card, clip, greeting, mix, out: /data/runs/batch_inference/job-001/cards
-12:00:01 text: written by the template
-12:00:01 text 1/10 k01 0.0 s
+10 kids from /data/inputs/kids.csv, steps: text, illustration, card, clip, greeting, mix, out: /data/runs/batch_inference/job-001/cards
+text 1/10 k01 0.0 s
 ...
-12:00:… illustration model loaded in … s
-12:00:… illustration 1/10 k01 … s
+illustration model loaded in 89.9 s
+illustration 1/10 k01 6.0 s
+illustration 2/10 k02 0.8 s
 ...
-12:…:… clip model loaded in … s
-12:…:… clip 1/10 k01 … s
+clip model loaded in 1046.0 s
+clip 1/10 k01 77.7 s
 ...
-12:…:… mix 10/10 k10 … s
-12:…:… finished: /data/runs/batch_inference/job-001/cards
+mix 10/10 k10 0.6 s
+finished: /data/runs/batch_inference/job-001/cards (metrics: /data/runs/batch_inference/job-001/metrics_batch.json)
 ```
+
+The first illustration is slower than the rest: the model warms up on its first call. The clip model's load includes downloading its weights.
 
 ## How the results are stored
 
@@ -354,7 +389,7 @@ runs/batch_inference/job-001/
 - **Two finals per kid:** `card.png` and `card.mp4`. The other four files are intermediates, kept so the next step can read its inputs and so you can inspect each step.
 - **Handover between steps is only through these files.** The illustration step reads the image prompt from `card.json`, the clip step reads `illustration.png`, and so on.
 - **Each file is written once and never edited,** which is what makes a bucket mount work as the output folder. PNG and JSON files are written to it directly. MP4 and WAV writers jump back inside a file to finish its header, which a bucket mount doesn't support, so the worker writes `clip.mp4`, `greeting.wav` and `card.mp4` to local disk first and copies each finished file over (`staged()` in [code/batch_inference.py](code/batch_inference.py)).
-- `**metrics_batch.json` records the run's times** (`started_at`, `finished_at`, `runtime_s`, and each step's `load_s` and per-kid `latency_s`) so lesson 05 can compute the cost per card without parsing the Job's logs. It also records `region`, `platform` (the GPU type), `preset` and `billing` (`regular` or `preemptible`) from the flags in the command above. The container cannot see the Job, and `nebius ai job get` does not return an hourly price, so the file has none. Lesson 05 reads the rate from the pricing page and the spot-price API.
+- **`metrics_batch.json` records the run's times** (`started_at`, `finished_at`, `runtime_s`, and each step's `load_s` and per-kid `latency_s`) so lesson 05 can compute the cost per card without parsing the Job's logs. It also records `region`, `platform` (the GPU type), `preset` and `billing` (`regular` or `preemptible`) from the flags in the command above. The container cannot see the Job, and `nebius ai job get` does not return an hourly price, so the file has none. Lesson 05 reads the rate from the pricing page and the spot-price API.
 - **Each card keeps its input.** `card.json` holds the kid's full row from `kids.csv`, so you can tell which profile made each card even after you change the list.
 
 ## See the results in the bucket
@@ -370,32 +405,34 @@ aws s3 ls --recursive s3://$BUCKET/runs/batch_inference/$RUN_ID/ \
   --endpoint-url https://storage.eu-north1.nebius.cloud
 ```
 
-You should see the six files for every kid from the tree above `[verify on first run]`. Get Emma's animated card and play it:
+You should see `metrics_batch.json` and the six files for every kid from the tree above. Get Emma's animated card and play it:
 
 ```bash
 aws s3 cp s3://$BUCKET/runs/batch_inference/$RUN_ID/cards/k01/card.mp4 emma.mp4 \
   --endpoint-url https://storage.eu-north1.nebius.cloud
 ```
 
-`[placeholder: Emma's card from the author run]`
+<!-- v1.1: embed Emma's card.mp4 from a santa-worker:v0.1.0 run. -->
 
-## Optional: download the media
+## Download the metrics and the media
 
-To look at all the cards, download the two finished files per kid, the card and the animated card:
+Lesson 05 and the homework use your run's `metrics_batch.json`. Download it now, with the two finished files per kid, the card and the animated card:
 
 ```bash
 aws s3 cp --recursive \
   s3://$BUCKET/runs/batch_inference/$RUN_ID \
   runs/batch_inference/$RUN_ID \
-  --exclude "*" --include "*/card.png" --include "*/card.mp4" \
+  --exclude "*" --include "metrics_batch.json" --include "*/card.png" --include "*/card.mp4" \
   --endpoint-url https://storage.eu-north1.nebius.cloud
 ```
 
-Leave out the `--exclude` and `--include` flags to get every intermediate file too. Downloading to your laptop is internet egress; reading from the bucket inside the same region is free. [Object Storage pricing](https://docs.nebius.com/object-storage/resources/pricing) 
+No AWS CLI? Download `metrics_batch.json` from the run's folder in the web console (see above). Leave out the `--exclude` and `--include` flags to get every intermediate file too. Downloading to your laptop is internet egress; reading from the bucket inside the same region is free. [Object Storage pricing](https://docs.nebius.com/object-storage/resources/pricing)
 
 ## Clean up
 
-A Job stops by itself; a DevLab doesn't, so delete it if you used path A. Then delete what's left in the bucket, once for each `RUN_ID` you created (`devlab-001`, `job-001`):
+A Job stops by itself; a DevLab doesn't, so delete it if you used path A. Your outputs are in the bucket, not on the DevLab.
+
+The bucket bills for what it stores, so delete the runs once you have what you need. Keep `metrics_batch.json` until you've done lesson 05: download it first (above). Then, once for each run folder you created (`batch_inference/devlab-001`, `batch_inference/job-001`, `santa-dev`, `santa-dev-batch`):
 
 ```bash
 aws s3 rm --recursive s3://$BUCKET/runs/batch_inference/$RUN_ID \
@@ -422,6 +459,7 @@ nebius ai devlab list
 **Before it runs**
 
 - **Stuck in `PROVISIONING`, then `ERROR` with `NotEnoughResources`**: no capacity; Serverless keeps trying for up to 30 minutes. Use `--on-demand`, another region, or try later.
+- **Doesn't start with `--spot-pricing-policy-id`**: the policy's max price is below the current spot price, so the policy is blocked. Raise the max price, wait for spot to drop, or use `--on-demand`.
 - **`FAILED` right after `IMAGE_PULLING`**: wrong architecture or a private image. Build for `linux/amd64`; use a public image or your project's registry.
 
 **Fails at once (input problems)**
@@ -431,7 +469,7 @@ nebius ai devlab list
 
 **While running**
 
-- **`ERROR` after running a while**: preempted. Run the Job again.
+- **`ERROR` after running a while**: preempted, or, with a pricing policy, the spot price went above your max price. Run the Job again.
 - **`CUDA out of memory` in the clip step**: the video model on a GPU smaller than an H100. Use an H100, or on an L40S run `--step text --step illustration --step card --step greeting`.
 - **The Job ends before the cards are done**: the weights download and the clips took longer than `--timeout`. Raise `--timeout`.
 
@@ -457,7 +495,7 @@ One Job on one GPU is the simplest batch that works. Santa's list has 200,000 ki
 
 | Left out here                   | Why it matters at 200,000                                                                                                                                   | Where we deal with it                                              |
 | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| Parallel workers                | One GPU makes one card after another: `[measure: time per card × 200,000]`                                                                                  | Module 3                                                           |
+| Parallel workers                | One GPU makes one card after another: about 4,400 GPU-hours, half a year, for 200,000 cards `[calc: 200,000 × 79 s per card]` | Module 3                                                           |
 | Hardware per step               | The CPU steps hold a GPU, and the GPU is sized for the largest model                                                                                        | Module 3                                                           |
 | Weights downloaded on every run | Each Job starts by downloading 127 GB for Sana, Wan2.2 and Kokoro before it makes anything, and pays GPU time for the wait `[measured: 2026-11-14, DevLab]` | Module 3 (keeping weights close to the GPU)                        |
 | Surviving an interruption       | A preempted Job starts again from the first kid                                                                                                             | Module 3                                                           |

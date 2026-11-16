@@ -47,10 +47,10 @@ See [05 - Measuring Startup, Load and Generation Costs](../../../../01-consisten
     * **Model**
     * **Ran as:** Endpoint, Job or DevLab
     * **GPU** and **region**
-    * **Price per hour** your run paid: the regular price, or the spot price at the time of the run if it was preemptible. Rates: [Nebius pricing](https://docs.nebius.com/compute/resources/pricing), [spot prices](https://docs.nebius.com/signup-billing/spot-prices).
+    * **Price per hour** for your run: the regular price, or for a preemptible run the spot price at the time of the run. Rates: [Nebius pricing](https://docs.nebius.com/compute/resources/pricing), [spot prices](https://docs.nebius.com/signup-billing/spot-prices). A spot price you read once is a snapshot, and spot can change during a run, so every cost below is a projection, not what you paid. What you paid is in **Billing → Usage**.
 * Record, in seconds:
-    * **Startup time `t_start`:** from create (Endpoint, Job or DevLab) until it is RUNNING
-    * **Ready time `t_ready`:** Endpoint: from RUNNING until `/v1/models` returns JSON (readiness wait). Job or DevLab: the model load timer in your code.
+    * **Startup time `t_start`:** Job or DevLab: from create until it is RUNNING. Endpoint: from clicking Create until `/v1/models` first returns JSON, as one interval (`create_to_ready_s` in lesson 02's `metrics.json`).
+    * **Ready time `t_ready`:** Job or DevLab: the model load timer in your code (`load_s`). Endpoint: `0`, because it's already in `t_start`. Don't add the notebook's polling time to the console's RUNNING time: polling starts when you run the cell, so the gap between them gets lost.
     * **Generation time `t_gen`:** per asset, for each of the 10. Endpoint: request latency from your client. Job or DevLab: the generation timer in your code. Use the median.
 * Save the assets. If you ran a Job, they are in your bucket.
 
@@ -58,7 +58,7 @@ You need `t_start` and `t_ready` for the breakeven below. Keep your numbers: you
 
 ### Find the API price
 
-Find a service that sells the same model (or the closest equivalent) as a per-call API. Write down the service, the price per asset for your settings (resolution, duration or characters), and the link to its pricing page.
+Find a service that sells the same model as a per-call API. If none does, use the closest equivalent and say which in Question 9. Write down the service, the price per asset for your settings (resolution, duration or characters), and the link to its pricing page.
 
 ### Compute the breakeven
 
@@ -123,15 +123,15 @@ What was your generation time per asset (median of your 10), in seconds?
 
 ### Question 7
 
-What is your marginal compute cost per asset, `c`, in USD?
+What is your projected marginal compute cost per asset, `c`, in USD?
 
 ### Question 8
 
-What is your total cost per asset for your 10-asset run, `F / 10 + c`, in USD?
+What is your projected total cost per asset for your 10-asset run, `F / 10 + c`, in USD?
 
 ### Question 9
 
-Which per-call API did you compare with, and what does it charge per asset? Format: `service, $price per asset, link`.
+Which per-call API did you compare with, and what does it charge per asset? Format: `service, model, $price per asset, link`. Name the model if it isn't the one you ran.
 
 ### Question 10
 

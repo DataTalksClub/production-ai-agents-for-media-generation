@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "mode": "jupyterlab",
+  "startup_s": null,
+  "ready_wait_s": null,
+  "load_s": 49.1289,
+  "latency_s": [
+    0.6374,
+    0.6348,
+    0.6341
+  ],
+  "billable_s": null,
+  "billing_basis": "unavailable",
+  "config": {
+    "model": "Efficient-Large-Model/Sana_1600M_1024px_diffusers",
+    "model_revision": "ac0da2ff55fbe434795be0dce883042e4d49e2fc",
+    "variant": "fp16",
+    "prompt": "A storybook illustration of a brass telescope glowing on snow under a starry night sky, a small decorated tree and wrapped presents, warm colors, no people, no text",
+    "seed": 7,
+    "params": {
+      "width": 512,
+      "height": 512,
+      "num_inference_steps": 20,
+      "guidance_scale": 4.5,
+      "negative_prompt": ""
+    }
+  },
+  "env": {
+    "driver": null,
+    "cuda": "13.0",
+    "torch": "2.13.0+cu130",
+    "diffusers": "0.39.0",
+    "peak_vram_gb": 10.935,
+    "gpu": "NVIDIA H100 80GB HBM3"
+  },
+  "assets": [
+    {"file": "asset-000.png", "bytes": 393626, "sha256": "9e737edd02405364b3664750ac81f1481e4f8cc4417e3d9521638a88bedebbc2"},
+    {"file": "asset-001.png", "bytes": 393626, "sha256": "9e737edd02405364b3664750ac81f1481e4f8cc4417e3d9521638a88bedebbc2"},
+    {"file": "asset-002.png", "bytes": 393626, "sha256": "9e737edd02405364b3664750ac81f1481e4f8cc4417e3d9521638a88bedebbc2"}
+  ],
+  "status": "completed",
+  "run_date": "2026-11-16"
+}
