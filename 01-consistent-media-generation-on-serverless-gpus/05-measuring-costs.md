@@ -12,11 +12,11 @@ next_url: ../02-multi-agent-media-workflows/01-agent-loop.md
 >
 > 💸 **Prices here are examples only.** They come from our runs and price checks on the dates shown, and what you pay can differ: prices change, and spot prices can change every 15 minutes. For real prices, see [Compute pricing](https://docs.nebius.com/compute/resources/pricing) and [spot prices](https://docs.nebius.com/signup-billing/spot-prices).
 >
-> 🧹 **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
+> ⚠️ **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
 
 <!-- Draft v5, 2026-11-16. Numbers: assets/example_runs/*.json (20 kids each, 2026-11-14), copied unchanged from the runs. Startup 157.7 s: one H100 Job on 2026-11-14 (not in metrics_batch.json). Prices: the notebook's "Prices and assumptions" (read 2026-11-15; spot snapshot 2026-11-14T15:05Z; fal checked 2026-11-15). Figures: .DEV/scripts/make_05_figures.py reads the example runs and that notebook cell. When prices change: update "Prices and assumptions", rerun the notebook and the figure script, then recheck every [calc] below. -->
 
-Say Santa's elves ran one batch Job that made animated gift cards for 20 kids: an illustration, a card, a short video clip, a spoken greeting and the final video with music, for each kid. On one H100 GPU, the worker ran for about 45 minutes `[measured]`, after a few minutes for the machine to start. So what does one card cost? And what would Santa's list of 200,000 kids cost?
+Say Santa's elves ran one batch Job that made animated gift cards for 20 kids: an illustration, a card, a short video clip, a spoken greeting and the final video with music, for each kid. On one H100 GPU, the worker ran for about 45 minutes in our run on 2026-11-14, after a few minutes for the machine to start. So what does one card cost? And what would Santa's list of 200,000 kids cost?
 
 There's no single answer. Starting the machine and loading the models is paid once per run. Making a card is paid once per card. In this lesson we split one run into those parts, turn them into a cost per card at different batch sizes, find the step that decides the bill, compare the most expensive step with a per-call API that sells the same model, compare four GPUs, and see what spot prices change.
 
@@ -54,7 +54,7 @@ A step's entry in `metrics_batch.json` looks like this (shortened to three of th
 }
 ```
 
-The file starts when the worker starts. The time before that, from **Create** until the container runs, is the startup: the machine starts and the worker image downloads. It isn't in the file. One H100 Job measured it at 157.7 s on 2026-11-14 `[measured]`, from the Job's `created_at` and `started_at`, and the notebook uses that for every run.
+The file starts when the worker starts. The time before that, from **Create** until the container runs, is the startup: the machine starts and the worker image downloads. It isn't in the file. One H100 Job measured it at 157.7 s on 2026-11-14, from the Job's `created_at` and `started_at`, and the notebook uses that for every run.
 
 **Assumed:** we count the startup as billed time. The docs say a Job bills its compute and storage "while running" ([Pricing and quotas](https://docs.nebius.com/serverless/pricing-quotas)) and don't say whether the minutes before the container starts count. Counting it is conservative for that one part: if the startup doesn't bill, every projection below is about $0.20 per run too high on an H100 at the regular price `[calc: 157.7 s × $4.50/h]`. That doesn't make the projection an upper bound: it leaves out the disk, the first-asset warm-up and retries (see "Left out of the projection"), and those push the real cost up.
 
@@ -64,7 +64,7 @@ Open [code/nb-measuring-costs.ipynb](code/nb-measuring-costs.ipynb) and run "Pri
 
 ![Two bar charts side by side for the H100 run. Left, model loading in seconds per run: the clip model 1,046 s, Sana 90 s, Kokoro 7 s, and no model for the text, card and mix steps. Right, generation in median seconds per card: clip 76.7 s, illustration 0.8 s, mix 0.6 s, card 0.4 s, greeting 0.2 s, text under 0.1 s.](assets/05-measuring-costs-01-time.png)
 
-*Measured `[measured]`: [h100.json](assets/example_runs/h100.json), NVIDIA H100 80GB, 20 kids, 2026-11-14. Blue: paid once per run. Orange: paid once per card. "No model": the step loads nothing, which isn't the same as a load time of zero.*
+*Measured: [h100.json](assets/example_runs/h100.json), NVIDIA H100 80GB, 20 kids, 2026-11-14. Blue: paid once per run. Orange: paid once per card. "No model": the step loads nothing, which isn't the same as a load time of zero.*
 
 **Takeaway:** the video step dominates both: 1,046 seconds to load, 76.7 seconds per card.
 
@@ -209,7 +209,7 @@ The notebook's "Same cards, different GPUs" section loops over the four runs and
 | H200 | 76.5 | 0.17 | 0.12 |
 | RTX PRO 6000 | 125.6 | 0.081 | 0.065 |
 
-*Seconds per card measured `[measured]`: [assets/example_runs/](assets/example_runs/), one run per GPU, 20 kids each, 2026-11-14. Costs projected `[calc]` at regular [GPU prices](#gpu-prices-for-the-calculations), with a 157.7 s startup for every GPU. The L40S run isn't in this table: it omitted the clip and mix steps, so it has no full-card cost.*
+*Seconds per card measured: [assets/example_runs/](assets/example_runs/), one run per GPU, 20 kids each, 2026-11-14. Costs projected at regular [GPU prices](#gpu-prices-for-the-calculations), with a 157.7 s startup for every GPU. The L40S run isn't in this table: it omitted the clip and mix steps, so it has no full-card cost.*
 
 **Takeaway:** faster hardware doesn't necessarily produce cheaper cards.
 
@@ -236,7 +236,7 @@ Every GPU ran the illustration step, so that's where all four compare. The GPU y
 | RTX PRO 6000 | 51.0 | 0.92 | $0.00046 |
 | L40S | 92.5 | 1.53 | $0.00066 |
 
-*Times measured `[measured]`: [assets/example_runs/](assets/example_runs/), 2026-11-14. Costs projected `[calc]` at regular [GPU prices](#gpu-prices-for-the-calculations).*
+*Times measured: [assets/example_runs/](assets/example_runs/), 2026-11-14. Costs projected at regular [GPU prices](#gpu-prices-for-the-calculations).*
 
 </details>
 
@@ -330,7 +330,7 @@ The lesson 02 notebooks save these fields in `metrics.json`. To get ten assets, 
 - [ ] A projection isn't quoted as what a run cost, and neither is a reconstruction. What you spent is the verified spend in Billing → Usage.
 - [ ] The container disk is either counted or said to be left out: about 1% of an H100 run here.
 
-Next: Module 2 puts an agent in front of these models.
+> ⚠️ **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
 
 ## References
 

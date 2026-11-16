@@ -24,7 +24,7 @@ Here is Emma's card made with five open models on Nebius Serverless AI, one requ
   </tr>
 </table>
 
-Times are one request each, measured from a laptop, network included `[measured: 2026-11-13, Sana and Kokoro on L40S; Qwen-Image-Edit-2511, ACE-Step and Wan2.2 on H100]`. These samples use other models, GPUs and settings than the measured table further down, so don't compare their times with it.
+Times are one request each from our runs on 2026-11-13, measured from a laptop, network included: Sana and Kokoro on an L40S; Qwen-Image-Edit-2511, ACE-Step and Wan2.2 on an H100. These samples use other models, GPUs and settings than the measured table further down, so don't compare their times with it.
 
 In this lesson we map the generative media modalities, see why video costs the most, compare open and closed models, and check what a licence really allows. You're done when you have written a five-line **model decision record** for your [Homework 1](../cohorts/2026/homework/01-consistent-media-generation-on-serverless-gpus/homework.md) idea: one asset you want to create (a card, a product shot, a voice greeting, a jingle). No idea yet? Use Emma's card.
 
@@ -274,7 +274,7 @@ Line 4 is an estimate from the measured table. We'll measure your real numbers i
 | A model repo is deleted, gated or relicensed | Hugging Face repos can change | Keep a copy of the weights in your own storage |
 | Same seed, different character in a new scene | A seed only repeats one prompt | Use reference-image editing (lesson 02, Module 2) |
 
-Next, generate your first media asset in [02 - First Media Generation in a Few Minutes](02-first-generation.md).
+> ⚠️ **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
 
 ## References
 

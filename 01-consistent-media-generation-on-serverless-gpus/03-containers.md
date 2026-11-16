@@ -15,7 +15,7 @@ next_url: 04-serving-vs-batch.md
 >
 > 💸 **Prices here are examples only.** They come from our runs and price checks on the dates shown, and what you pay can differ: prices change, and spot prices can change every 15 minutes. For real prices, see [Compute pricing](https://docs.nebius.com/compute/resources/pricing) and [spot prices](https://docs.nebius.com/signup-billing/spot-prices).
 >
-> 🧹 **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
+> ⚠️ **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
 
 Say you have a worker script that generates media on a GPU. Ours is [code/batch_inference.py](code/batch_inference.py): it makes gift cards with an image, a video and a speech model, and lesson 04 runs it. To run it on a cloud GPU, you package it as a container image. A container image is the easiest way to reproduce your runtime environment: the GPU host runs only what's in that image, and it doesn't know about your laptop, your virtual environment or the token in your shell. In this lesson we start from what goes wrong, trace each symptom to a line in a broken Dockerfile, and fix it. You're done when you can say, for each line of [code/docker/Dockerfile.bad](code/docker/Dockerfile.bad), what goes wrong on a GPU host and how [code/docker/Dockerfile](code/docker/Dockerfile) fixes it.
 
@@ -320,6 +320,8 @@ CMD ["python", "/app/batch_inference.py", "--n", "1", "--out", "/data/run"]
 ```
 
 The course's published image was built from this file: `docker.io/mnrozhkov/santa-worker:v0.1.0`, digest `sha256:64aae5c286fa3e1d7f018591050db17087ce080595d160759f792492375d6bc0`, for `linux/amd64`. Lesson 04 uses that digest, so the Job runs exactly this build even if the tag moves. If you change the worker, build your own image, push it to a registry the Job can pull from, and put your reference in `WORKER_IMAGE`.
+
+> ⚠️ **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
 
 ## References
 

@@ -15,7 +15,7 @@ next_url: 05-measuring-costs.md
 >
 > 💸 **Prices here are examples only.** They come from our runs and price checks on the dates shown, and what you pay can differ: prices change, and spot prices can change every 15 minutes. For real prices, see [Compute pricing](https://docs.nebius.com/compute/resources/pricing) and [spot prices](https://docs.nebius.com/signup-billing/spot-prices).
 >
-> 🧹 **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
+> ⚠️ **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
 
 
 
@@ -48,7 +48,9 @@ How long the image step takes each way: Sana at 512×512, 20 steps, on one H100,
 | 200 | 3.9 min | 2.6 min |
 | 200,000 | 65 h | 44 h |
 
-Generation time only `[calc: images × the time for one image]`. Endpoint: median of 3 requests from a laptop to the Sana template on an H100, the same 512×512, 20-step settings, in lesson 02's notebook `[measured: 2026-11-16, H100; [assets/example_runs/lesson02/endpoint-h100-2026-11-16.json](assets/example_runs/lesson02/endpoint-h100-2026-11-16.json)]`. Job: median of 20 illustrations in our worker `[measured: 2026-11-14, H100; assets/example_runs/h100.json]`. Startup and model load come on top of both; lesson 05 splits a run into those parts.
+Generation time only: images × the time for one image. Endpoint: median of 3 requests from a laptop to the Sana template on an H100, the same 512×512, 20-step settings, in lesson 02's notebook. Job: median of 20 illustrations in our worker.
+
+> **About our numbers.** Times and sizes in this lesson come from our own runs on H100 GPUs, 14–16 November 2026. The run files are in [assets/example_runs/](assets/example_runs/). Yours will differ with the GPU, region and model version. Startup and model load come on top of both; lesson 05 splits a run into those parts.
 
 In this setup the Endpoint pays about 0.4 s more per image: the network round trip, packing the image into the response, and the template's server. That's a property of the default settings with one request at a time, not of serving. An Endpoint that groups requests on the GPU, or takes requests from several clients at once, can close the gap; Module 3 covers that.
 
@@ -59,7 +61,7 @@ You're done when:
 - you've downloaded the run's `metrics_batch.json` for lesson 05;
 - nothing you created is still `RUNNING`.
 
-Time and cost: this is the most expensive run of the module. The Job runs on an H100 and starts by downloading 127 GB of weights for Sana, Wan2.2 and Kokoro `[measured: 2026-11-14, DevLab]`. For ten kids, expect about 35 minutes from **Create** to `COMPLETED`: 158 s startup, 1,143 s of model loads (mostly that download) and 10 × 79 s per card `[calc: from our 20-kid H100 run, assets/example_runs/h100.json]`. What that cost at the prices we read:
+Time and cost: this is the most expensive run of the module. The Job runs on an H100 and starts by downloading 127 GB of weights for Sana, Wan2.2 and Kokoro. For ten kids, expect about 35 minutes from **Create** to `COMPLETED`: 158 s startup, 1,143 s of model loads (mostly that download) and 10 × 79 s per card, projected from our 20-kid H100 run. What that cost at the prices we read:
 
 | Ten kids, one H100 (`gpu-h100-sxm`, `1gpu-16vcpu-200gb`, eu-north1), times from our 2026-11-14 run | Price per hour | Projected compute |
 | --- | --- | --- |
@@ -123,7 +125,7 @@ We build it as a deterministic pipeline: every kid goes through the same steps i
 | ![Storybook illustration: a glowing brass telescope on a tripod in the snow under a starry night sky, with two decorated Christmas trees and wrapped presents around it, no people](assets/example_runs/h100_k01_illustration.png) | ![Animated clip of the same illustration: the camera drifts slowly while snow falls and the lights on the trees twinkle](assets/example_runs/h100_k01_clip.webp) |
 | **2. Illustration.** Sana, 512×512, 20 steps, seed 7. `0.78 s` per illustration                                                                                                                                                    | **4. Clip.** Wan2.2-I2V-A14B, 832×480, 81 frames at 16 fps, about 5 s, silent: the mix step adds the greeting and the music. `76.7 s` per clip. MP4              |
 
-*Emma's illustration and clip from our run for 20 kids. Times are the median per kid across the run `[measured: 2026-11-14, H100 gpu-h100-sxm 1gpu-16vcpu-200gb, preemptible, eu-north1; assets/example_runs/h100.json]`.*
+*Emma's illustration and clip from our run for 20 kids. Times are the median per kid across the run.*
 
 <!-- v1.1: embed Emma's card.png and card.mp4 from a santa-worker:v0.1.0 run (the 2026-11-14 run used the older 1024x1400 card layout). -->
 
@@ -213,7 +215,7 @@ flowchart LR
 Three things to know before you run it:
 
 - **Every file is written once and never changed.** That's what lets `--out` be a bucket mounted into the container, with no upload code. The video and audio files are made on the container's local disk first and copied to `--out` when finished. "How the results are stored" below shows how.
-- **The clip step decides the GPU.** Wan2.2 image-to-video is the largest model in the pipeline: it needs an H100. The three models together are 127 GB, downloaded when the run starts `[measured: 2026-11-14, DevLab]`.  `--step text --step illustration --step card --step greeting` leaves the clip out; that part fits an L40S.
+- **The clip step decides the GPU.** Wan2.2 image-to-video is the largest model in the pipeline: it needs an H100. The three models together are 127 GB, downloaded when the run starts. `--step text --step illustration --step card --step greeting` leaves the clip out; that part fits an L40S.
 - **The text step copies the row.** The wish, the greeting and the illustration prompt come from [assets/kids.csv](assets/kids.csv). Nothing calls a language model. The music is one track from the module's shared media, [assets/4_jingle.mp3](assets/4_jingle.mp3); add `<mood>.mp3` files next to it to get a track per mood.
 
 It logs a line for every model load and every finished asset, so the Job's logs show where it is. `--help` lists the options: `--n`, `--out` and `--step`.
@@ -313,7 +315,7 @@ nebius ai job create --dry-run --name "$RUN_ID" --image "$WORKER_IMAGE" \
 
 Then run the same command without `--dry-run`. It prints the Job's ID.
 
-Ten kids is the default (`--n 10` in the command above). About 35 minutes is projected for it, so `--timeout 2h` leaves room `[calc: from our 20-kid H100 run]`. The CSV has more rows if you want to experiment on your own; this lesson does not ask you to raise `--n`. After your run, open `metrics_batch.json` in the bucket: the model loads are paid once per Job, and the clip step adds about 77 s for each kid `[measured: 2026-11-14, H100; assets/example_runs/h100.json]`.
+Ten kids is the default (`--n 10` in the command above). About 35 minutes is projected for it, so `--timeout 2h` leaves room. The CSV has more rows if you want to experiment on your own; this lesson does not ask you to raise `--n`. After your run, open `metrics_batch.json` in the bucket: the model loads are paid once per Job, and the clip step adds about 77 s for each kid.
 
 **From a notebook.** The same command works in a Jupyter cell on your laptop: set the variables with `%env WORKER_IMAGE=...`, `%env BUCKET=...`, `%env RUN_ID=...`, and put `!` in front of `nebius ai job create`.
 <!-- release QA: run the command once from a notebook cell; the shell form is the tested one. -->
@@ -341,7 +343,7 @@ stateDiagram-v2
 
 *Conceptual; state names from the [lifecycle docs](https://docs.nebius.com/serverless/lifecycle).* 
 
-The logs show the script's progress: one line when a model has loaded, one for every finished asset. An excerpt with the load and per-kid times from our 20-kid H100 run (`[measured: 2026-11-14, H100; assets/example_runs/h100.json]`; clock times left out, yours will differ):
+The logs show the script's progress: one line when a model has loaded, one for every finished asset. An excerpt with the load and per-kid times from our 20-kid H100 run (clock times left out, yours will differ):
 
 ```text
 10 kids from /data/inputs/kids.csv, steps: text, illustration, card, clip, greeting, mix, out: /data/runs/batch_inference/job-001/cards
@@ -498,12 +500,12 @@ One Job on one GPU is the simplest batch that works. Santa's list has 200,000 ki
 | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | Parallel workers                | One GPU makes one card after another: about 4,400 GPU-hours, half a year, for 200,000 cards `[calc: 200,000 × 79 s per card]` | Module 3                                                           |
 | Hardware per step               | The CPU steps hold a GPU, and the GPU is sized for the largest model                                                                                        | Module 3                                                           |
-| Weights downloaded on every run | Each Job starts by downloading 127 GB for Sana, Wan2.2 and Kokoro before it makes anything, and pays GPU time for the wait `[measured: 2026-11-14, DevLab]` | Module 3 (keeping weights close to the GPU)                        |
+| Weights downloaded on every run | Each Job starts by downloading 127 GB for Sana, Wan2.2 and Kokoro before it makes anything, and pays GPU time for the wait | Module 3 (keeping weights close to the GPU)                        |
 | Surviving an interruption       | A preempted Job starts again from the first kid                                                                                                             | Module 3                                                           |
 | Cost and limits                 | You want the price before the run, and a stop when it goes over                                                                                             | Lesson 05, then Module 3                                           |
 | Checking the cards              | The pipeline never looks at what it made, and nobody can look at 200,000 cards                                                                              | Module 2 (a judge that retries), Module 4 (evaluation and tracing) |
 
-Next: in [lesson 05](05-measuring-costs.md) we split a run into startup, model load and generation time, and turn them into a cost per asset.
+> ⚠️ **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
 
 ## References
 
