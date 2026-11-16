@@ -18,3 +18,7 @@ In this lesson we lower the cost per asset with three levers from the Module 1 f
 ## Change one variable at a time
 
 ## Practice: a baseline and two changes
+
+<!-- nav:start -->
+[← Previous: 3.2 Spot GPUs and Design for Interruption](02-spot-and-interruption.md) · [Next: 3.4 Breaking the Pipeline on Purpose →](04-breaking-the-pipeline.md)
+<!-- nav:end -->

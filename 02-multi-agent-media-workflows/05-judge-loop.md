@@ -28,3 +28,7 @@ Deterministic checks run before the judge. The full order of checks, judge and h
 ## Metrics per run: judge tokens and cost per verdict
 
 ## Also try: one agent or several agents
+
+<!-- nav:start -->
+[← Previous: 2.4 Long-running Tools: Submit, Poll, Resume](04-long-running-tools.md) · [Next: 3.1 One to 1,000: Fan-out with Jobs →](../03-batch-media-generation-at-scale/01-fan-out.md)
+<!-- nav:end -->

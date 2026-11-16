@@ -30,3 +30,7 @@ In this lesson we build one trace per record from `events.jsonl` and answer "why
 ## Sinks
 
 ## Practice: waterfall for the most expensive record
+
+<!-- nav:start -->
+[← Previous: 4.2 Judge Calibration and Regression Gates](02-multimodal-judges.md) · [Next: 4.4 Designing for Production: Architecture, SLO, Dashboard and Alerts →](04-designing-for-production.md)
+<!-- nav:end -->

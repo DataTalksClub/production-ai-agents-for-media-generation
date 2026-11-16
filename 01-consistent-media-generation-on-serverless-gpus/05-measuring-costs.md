@@ -235,3 +235,7 @@ print(calculate_cost(m["startup_s"], ready_s, m["latency_s"], price_per_hour=1.5
 You now have every number needed to submit [Homework 1: GPU Media Worker](../cohorts/2026/homework/01-consistent-media-generation-on-serverless-gpus/homework.md) and draft your one-page [Capstone Proposal](../projects/proposal-template.md).
 
 Double-check the Nebius console one last time to confirm you have **zero `RUNNING` Endpoints, DevLabs, or Jobs**. In [Module 2: Multi-Agent Media Workflows](../02-multi-agent-media-workflows/01-agent-loop.md), we will put an LLM agent in the control plane and give it these GPU models as tools.
+
+<!-- nav:start -->
+[← Previous: 1.4 Serving vs Batch Inference: the Same Generation for Different Use Cases](04-serving-vs-batch.md) · [Next: 2.1 The Agent Loop: Deep Dive →](../02-multi-agent-media-workflows/01-agent-loop.md)
+<!-- nav:end -->

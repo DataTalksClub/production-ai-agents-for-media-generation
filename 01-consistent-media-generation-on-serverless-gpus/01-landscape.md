@@ -279,3 +279,7 @@ Free resources to go deeper, picked for this lesson's topics:
 10. [Diffusers: reproducibility and seeds](https://huggingface.co/docs/diffusers/using-diffusers/reusing_seeds) (docs): what a seed does and doesn't guarantee.
 11. [Crreo](https://www.crreo.ai/) (product): turns a script into a video with generated visuals, voice and music, all the modalities from this lesson in one product. The free plan makes watermarked clips up to 30 seconds.
 12. [ComfyUI Wan2.2 workflows](https://docs.comfy.org/tutorials/video/wan/wan2_2) (docs): the text-to-video and image-to-video pipelines node by node. Run them locally or on Comfy Cloud.
+
+<!-- nav:start -->
+[← Previous: Module 1: Consistent Media Generation on Serverless GPUs](README.md) · [Next: 01b - What "Consistent" Means →](01b-consistency.md)
+<!-- nav:end -->

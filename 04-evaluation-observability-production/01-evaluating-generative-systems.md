@@ -20,3 +20,7 @@ In this lesson we choose metrics for the system, agent and media layers and comp
 ## Also try: cheap draft, then full final
 
 ## Practice: evals.json for your run
+
+<!-- nav:start -->
+[← Previous: 3.6 Fine-Tune a Model on a New Style (Optional, Advanced)](../03-batch-media-generation-at-scale/06-fine-tune-style.md) · [Next: 4.2 Judge Calibration and Regression Gates →](02-multimodal-judges.md)
+<!-- nav:end -->

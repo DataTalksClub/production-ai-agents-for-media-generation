@@ -22,3 +22,7 @@ In this lesson we run batch work on spot GPUs, checkpoint every item, and prove 
 ## Kill and resume proof
 
 ## Also try: chunk-size sweep
+
+<!-- nav:start -->
+[← Previous: 3.1 One to 1,000: Fan-out with Jobs](01-fan-out.md) · [Next: 3.3 Optimizing Cost per Asset: Cold Start, VRAM and Speed →](03-optimizing-cost.md)
+<!-- nav:end -->

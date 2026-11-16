@@ -28,3 +28,7 @@ With 40 labels and 10 held out, one disagreement moves agreement by 10 points. T
 ## Regression gate
 
 ## Practice: gate a worse candidate
+
+<!-- nav:start -->
+[← Previous: 4.1 Evaluating Generative Systems: System, Agent and Media](01-evaluating-generative-systems.md) · [Next: 4.3 Observability and Tracing →](03-observability-tracing.md)
+<!-- nav:end -->

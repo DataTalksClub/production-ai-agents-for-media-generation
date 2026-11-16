@@ -28,3 +28,7 @@ In this lesson we turn video generation into a long-running tool: submit, poll, 
 ## Submit and poll tools vs deferred tools
 
 ## Polling vs callbacks
+
+<!-- nav:start -->
+[← Previous: 2.3 GPU Workloads as Agentic Tools](03-gpu-tools.md) · [Next: 2.5 Planner, Generator, Reviewer: the Judge Loop →](05-judge-loop.md)
+<!-- nav:end -->

@@ -26,3 +26,7 @@ In this lesson we sketch a production architecture for a media agent, set an SLO
 ## Production checklist
 
 ## Practice: SLO, dashboard and go/no-go call
+
+<!-- nav:start -->
+[← Previous: 4.3 Observability and Tracing](03-observability-tracing.md) · [Next: 4.5 Production Concerns and the Capstone Brief →](05-production-concerns.md)
+<!-- nav:end -->

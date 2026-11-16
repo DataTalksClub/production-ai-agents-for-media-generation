@@ -20,3 +20,7 @@ In this optional lesson we teach an image model a style it can't do out of the b
 ## Pick the checkpoint by its samples
 
 ## Use the LoRA in your pipeline
+
+<!-- nav:start -->
+[← Previous: 3.4 Breaking the Pipeline on Purpose](04-breaking-the-pipeline.md) · [Next: 4.1 Evaluating Generative Systems: System, Agent and Media →](../04-evaluation-observability-production/01-evaluating-generative-systems.md)
+<!-- nav:end -->

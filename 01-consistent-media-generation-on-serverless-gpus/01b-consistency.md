@@ -62,3 +62,7 @@ Consistency mostly comes from how we build the pipeline, not from the model we p
 It touches the model choice in one place: if you need the same character across assets, pick a task that takes an image as input, like image editing or image-to-video, not only text-to-image.
 
 Next, we generate our first image and test seeds ourselves in [02 - First Media Generation in a Few Minutes](02-first-generation.md).
+
+<!-- nav:start -->
+[← Previous: 01 - Landscape: Modalities and Model Families](01-landscape.md) · [Next: 02 - First Media Generation in a Few Minutes →](02-first-generation.md)
+<!-- nav:end -->

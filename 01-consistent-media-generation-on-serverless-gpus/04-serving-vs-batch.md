@@ -215,3 +215,7 @@ Look at what `generate.py` just did inside the Job: it paid the container startu
 In Module 3 (`Batch Media Generation at Scale`), we will take this exact worker pattern and fan out 200 records across 10 parallel spot GPU Jobs — where each Job loads the model once and processes a 20-record shard.
 
 First, let's turn our startup, load, and generation timings into exact dollar figures and calculate our API breakeven in [1.5 Measuring Startup, Load and Generation Costs](05-measuring-costs.md).
+
+<!-- nav:start -->
+[← Previous: 03 - Containers for Generative AI](03-containers.md) · [Next: 1.5 Measuring Startup, Load and Generation Costs →](05-measuring-costs.md)
+<!-- nav:end -->

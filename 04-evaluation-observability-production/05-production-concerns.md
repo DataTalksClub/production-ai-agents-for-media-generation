@@ -32,3 +32,7 @@ Reference: [OWASP LLM01:2025 Prompt Injection](https://genai.owasp.org/llmrisk/l
 ## No secrets in traces or stored results
 
 ## Practice: controls, licences and provenance in the capstone brief
+
+<!-- nav:start -->
+[← Previous: 4.4 Designing for Production: Architecture, SLO, Dashboard and Alerts](04-designing-for-production.md) · [Next: Capstone Project: Production Multimodal Agent →](../projects/README.md)
+<!-- nav:end -->

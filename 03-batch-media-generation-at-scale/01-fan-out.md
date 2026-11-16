@@ -20,3 +20,7 @@ In this lesson we predict the wall time and cost of a batch run before launching
 ## Heterogeneous pools
 
 ## Practice: 100 records over 2 Jobs
+
+<!-- nav:start -->
+[← Previous: 2.5 Planner, Generator, Reviewer: the Judge Loop](../02-multi-agent-media-workflows/05-judge-loop.md) · [Next: 3.2 Spot GPUs and Design for Interruption →](02-spot-and-interruption.md)
+<!-- nav:end -->

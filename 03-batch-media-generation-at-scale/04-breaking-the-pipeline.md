@@ -14,3 +14,7 @@ In this lesson we inject failures one at a time, including budget and quality th
 ## Failures and fix patterns
 
 ## Fast path
+
+<!-- nav:start -->
+[← Previous: 3.3 Optimizing Cost per Asset: Cold Start, VRAM and Speed](03-optimizing-cost.md) · [Next: 3.6 Fine-Tune a Model on a New Style (Optional, Advanced) →](06-fine-tune-style.md)
+<!-- nav:end -->
