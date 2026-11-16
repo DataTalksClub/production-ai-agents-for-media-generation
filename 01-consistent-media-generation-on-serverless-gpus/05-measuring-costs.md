@@ -297,11 +297,9 @@ The homework needs a new run: one model, ten assets, one startup, one model load
 
 | You run | Startup + readiness | Generation, per asset |
 | --- | --- | --- |
-| Endpoint | One interval: from clicking **Create** to the first answer from `/v1/models`. Lesson 02's notebook computes it as `create_to_ready_s` if you type in the time you clicked **Create** | `latency_s` per request, from your laptop |
+| Endpoint | Startup is the same as a Job's, so use the measured startup above, plus the same model's `load_s` from our example run: the Endpoint doesn't report its load time | `latency_s` per request, from your laptop |
 | Job | `created_at` → `started_at` from `nebius ai job get <job_ID> --format json`, plus the model's `load_s` | `latency_s` in `metrics_batch.json` |
 | DevLab | **Create** → `RUNNING`, plus the model's `load_s` | The notebook's time per asset |
-
-For an Endpoint, don't add up the console's `RUNNING` time and the notebook's polling time: the polling starts when you run the cell, so any gap before that is lost. One interval from **Create** has no gap.
 
 The lesson 02 notebooks save these fields in `metrics.json`. To get ten assets, change their step 4 loop from `range(3)` to `range(10)`, then load the file in this notebook's section 5. What you report is a projection; section 6 checks it against Billing → Usage.
 

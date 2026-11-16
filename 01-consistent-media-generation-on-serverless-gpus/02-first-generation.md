@@ -81,8 +81,6 @@ sequenceDiagram
 
 Step 2 of the notebook waits for you: it asks `/v1/models` every 2 seconds until the model answers, and gives up after 10 minutes. Re-running it is safe.
 
-It also prints how long it polled and the time the model answered. The polling time only counts from when you ran the cell: if the Endpoint was already `RUNNING` by then, the real wait was longer. For cost, what matters is the whole interval from **Create** to the first answer, startup and loading together. Note the time you click **Create**; the notebook saves both numbers in `metrics.json` (step 4), and lesson 05 uses that interval.
-
 ### Generate the image
 
 Step 3 posts one JSON body to `/v1/images/generations`. The token goes in the `Authorization` header. The response is a PNG, base64-encoded in `data[0].b64_json`. Change the prompt if you like; keep it free of real people, brands and known characters. Each side of `size` must be a multiple of 32.
