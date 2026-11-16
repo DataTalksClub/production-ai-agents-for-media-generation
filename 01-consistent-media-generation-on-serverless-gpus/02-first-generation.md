@@ -163,13 +163,14 @@ You're done when:
 Use this path if you want to run the same experiments, practice scenes and share card directly on a GPU without creating an Endpoint: `ImageGenerator.local()` loads Sana once into your notebook's GPU memory and watches peak VRAM. The GPU bills the whole time the DevLab runs, including while you read and type.
 
 1. Create a DevLab from the **JupyterLab** template in the web console: [DevLabs quickstart](https://docs.nebius.com/serverless/quickstart/devlabs#web-console). In **Platform**, pick an L40S if your region offers it; Sana fits on it. From the CLI, always pass `--platform`: without it the CLI picks a default GPU platform for you ([Managing DevLabs](https://docs.nebius.com/serverless/devlabs/manage)). <!-- c:M1-208 --> Copy and keep the **Jupyter token**: that is what you type to open Jupyter. Leave **Bearer token authentication** off. That switch sits in front of Jupyter; with it on, the browser shows `Unauthorized` and the Jupyter token never gets a chance to sign you in.
-2. Open the DevLab's HTTPS URL, sign in with your Jupyter token, and open a **Terminal**. Run the module's DevLab setup once per DevLab. It installs `uv` and clones the repo only if they're missing, updates it to the latest `main`, and creates the GPU environment. Lesson 04 uses the same block. [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
+2. Open the DevLab's HTTPS URL, sign in with your Jupyter token, and open a **Terminal**. Run this once. It installs `uv`, clones the course repository, and creates the GPU kernel. Lesson 04 uses the same block. [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
 
    ```bash
-   command -v uv >/dev/null || { curl -LsSf https://astral.sh/uv/install.sh | sh; source "$HOME/.local/bin/env"; }
-   REPO=~/work/production-ai-agents-for-media-generation
-   [ -d "$REPO" ] || git clone https://github.com/mnrozhkov/production-ai-agents-for-media-generation.git "$REPO"
-   cd "$REPO" && git checkout main && git pull --ff-only
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   source "$HOME/.local/bin/env"
+
+   git clone https://github.com/DataTalksClub/production-ai-agents-for-media-generation.git
+   cd production-ai-agents-for-media-generation
 
    uv sync --extra gpu --extra notebooks
    uv run python -m ipykernel install --user --name course-gpu --display-name "course (GPU)"
