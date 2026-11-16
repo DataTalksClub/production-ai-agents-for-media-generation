@@ -51,7 +51,10 @@ KIDS_CSV = ASSETS / "kids.csv"  # id,name,age,wishlist,wish,greeting,prompt: 200
 FONTS = ASSETS / "fonts"
 DEFAULT_TRACK = ASSETS / "4_jingle.mp3"
 
-CARD_SIZE = (1024, 1400)
+CARD_SIZE = (1024, 1224)
+# Where the illustration sits on the card: x, y, width, height. The clip's 832x480 shape,
+# so the mix step can play the clip in the same place without cropping it.
+SLOT = (40, 40, 944, 544)
 MUSIC_VOLUME = 0.2  # the music sits under the voice
 MOTION = (
     "Gentle storybook motion: a slow camera drift across the illustration, softly falling snow "
@@ -199,14 +202,15 @@ def draw_illustration(pipe: SanaPipeline, prompt: str) -> Image.Image:
 
 
 def render_card(illustration: Image.Image, card: CardText) -> Image.Image:
-    """A 1024x1400 card: the illustration on top, then the kid's name and the wish."""
+    """A 1024x1224 card: the illustration on top, then the kid's name and the wish."""
+    x, y, width, height = SLOT
     image = Image.new("RGB", CARD_SIZE, "#fffaf2")
-    image.paste(ImageOps.fit(illustration.convert("RGB"), (944, 720)), (40, 40))
+    image.paste(ImageOps.fit(illustration.convert("RGB"), (width, height)), (x, y))
     draw = ImageDraw.Draw(image)
     title = ImageFont.truetype(str(FONTS / "Inter-Bold.ttf"), 64)
     body = ImageFont.truetype(str(FONTS / "Inter-Regular.ttf"), 38)
     headline = f"Merry Christmas, {card.kid.name}!"
-    draw.text((512, 850), headline, font=title, fill="#b30000", anchor="mm")
+    draw.text((512, 674), headline, font=title, fill="#b30000", anchor="mm")
 
     lines, line = [], ""  # wrap the wish to 880 px
     for word in card.wish.split():
@@ -217,7 +221,7 @@ def render_card(illustration: Image.Image, card: CardText) -> Image.Image:
             line = f"{line} {word}".strip()
     lines.append(line)
     draw.multiline_text(
-        (512, 940), "\n".join(lines), font=body, fill="#2c3e50",
+        (512, 764), "\n".join(lines), font=body, fill="#2c3e50",
         anchor="ma", align="center", spacing=14,
     )
     return image
@@ -296,22 +300,28 @@ def card_seconds(greeting: Path) -> float:
     return max(WAN_I2V.duration_s, greeting_s + 0.5)
 
 
-def mix(clip: Path, greeting: Path, music: Path, out: Path, seconds: float) -> None:
-    """Clip + spoken greeting + quiet background music -> one MP4 that lasts `seconds`.
+def mix(card: Path, clip: Path, greeting: Path, music: Path, out: Path, seconds: float) -> None:
+    """The card with the clip playing in its illustration slot, the spoken greeting and quiet
+    background music -> one MP4 that lasts `seconds`.
 
     The clip and the music loop, so the card can last longer than the clip.
     """
     import imageio_ffmpeg  # its own ffmpeg binary, the one export_to_video uses
 
-    audio = f"[2:a]volume={MUSIC_VOLUME}[m];[1:a][m]amix=inputs=2:duration=longest:normalize=0[a]"
+    x, y, width, height = SLOT
+    graph = (
+        f"[1:v]scale={width}:{height}[c];[0:v][c]overlay={x}:{y}[v];"
+        f"[3:a]volume={MUSIC_VOLUME}[m];[2:a][m]amix=inputs=2:duration=longest:normalize=0[a]"
+    )
     with staged(out) as tmp:
         command = [
             imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-loglevel", "error",
+            "-loop", "1", "-framerate", str(WAN_I2V.fps), "-i", str(card),  # the still card
             "-stream_loop", "-1", "-i", str(clip),
             "-i", str(greeting),
             "-stream_loop", "-1", "-i", str(music),
-            "-filter_complex", audio,
-            "-map", "0:v", "-map", "[a]", "-t", f"{seconds:.2f}",
+            "-filter_complex", graph,
+            "-map", "[v]", "-map", "[a]", "-t", f"{seconds:.2f}",
             "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", str(tmp),
         ]
         subprocess.run(command, check=True)
@@ -432,7 +442,8 @@ def run(
                 greeting = folder / "greeting.wav"
                 music = pick_music(read_card(folder).mood)
                 seconds = card_seconds(greeting)
-                mix(folder / "clip.mp4", greeting, music, folder / "card.mp4", seconds)
+                mix(folder / "card.png", folder / "clip.mp4", greeting, music,
+                    folder / "card.mp4", seconds)
 
     metrics = RunMetrics(
         n=len(kids),
