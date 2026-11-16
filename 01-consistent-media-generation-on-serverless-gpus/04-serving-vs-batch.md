@@ -246,12 +246,12 @@ If `/data` isn't mounted, the notebook says so and writes to `runs/` on the DevL
 A DevLab can't be preemptible: it bills at the regular price while it runs, and its disk until you delete it. 
 
 1. Create a DevLab from the **JupyterLab** template in the web console: [DevLabs quickstart](https://docs.nebius.com/serverless/quickstart/devlabs#web-console). In **Platform**, pick an H100, and a preset with one GPU, 16 vCPU and 200 GB of memory. Under **Container disk size**, set **500 GB**: the models are 127 GB, and a larger disk writes faster, so the download finishes sooner than on the default disk. [Disk performance](https://docs.nebius.com/compute/storage/types) Under **Mounted volumes**, click **Attach volume**, choose your bucket, and mount it at `/data` for reading and writing, the same place the Job uses ([Managing DevLabs](https://docs.nebius.com/serverless/devlabs/manage)). A DevLab bills at the regular price for as long as it runs, so plan the session. On an L40S you can do everything except the clip and the mix. Copy and keep the **Jupyter token**: that is what you type to open Jupyter. Leave **Bearer token authentication** off. That switch sits in front of Jupyter; with it on, the browser shows `Unauthorized` and the Jupyter token never gets a chance to sign you in. 
-2. Open the DevLab's HTTPS URL, sign in with your Jupyter token, and open a **Terminal**. Run the module's DevLab setup, the same block as in lesson 02, then add the packages for the clip, greeting and mix steps. It installs `uv` and clones the repo only if they're missing, and checks out the course release `module-1-v1`. [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
+2. Open the DevLab's HTTPS URL, sign in with your Jupyter token, and open a **Terminal**. Run the module's DevLab setup, the same block as in lesson 02, then add the packages for the clip, greeting and mix steps. It installs `uv` and clones the repo only if they're missing, and updates it to the latest `main`. [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
    ```bash
     command -v uv >/dev/null || { curl -LsSf https://astral.sh/uv/install.sh | sh; source "$HOME/.local/bin/env"; }
     REPO=~/work/production-ai-agents-for-media-generation
     [ -d "$REPO" ] || git clone https://github.com/mnrozhkov/production-ai-agents-for-media-generation.git "$REPO"
-    cd "$REPO" && git fetch --tags && git checkout module-1-v1
+    cd "$REPO" && git checkout main && git pull --ff-only
 
     uv sync --extra gpu --extra notebooks
     uv run python -m ipykernel install --user --name course-gpu --display-name "course (GPU)"
