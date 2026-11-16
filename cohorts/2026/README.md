@@ -12,6 +12,10 @@
 * Capstone submission, Attempt 2: Fri 29 Jan 2027
 * Final peer review, Attempt 2: Fri 5 Feb 2027
 
+## Homework
+
+* [Homework 1: GPU Media Worker](homework/01-consistent-media-generation-on-serverless-gpus/homework.md). Submit it on the [course platform](https://courses.datatalks.club/production-ai-agents-generative-media/homework/module1) by Mon 30 Nov 2026, 23:59 UTC.
+
 Coming soon:
 * Pre-launch sessions
 * Launch stream with course overview
