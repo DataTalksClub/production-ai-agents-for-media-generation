@@ -1,7 +1,7 @@
 ---
 video_url: ""
 prev_url: 04-long-running-tools.md
-next_url: ../03-batch-media-generation-at-scale/01-fan-out.md
+next_url: ../03-batch-media-generation-at-scale/01-batch-jobs.md
 ---
 # 2.5 Planner, Generator, Reviewer: the Judge Loop
 
@@ -11,7 +11,7 @@ In this lesson we write a versioned rubric from the brief, then build a planner,
 
 ## Rubric v1: criteria from the brief
 
-Criteria reference brief fields, not one brief, so the same rubric judges the Module 3 records. How far to trust it is [4.2](../04-evaluation-observability-production/02-multimodal-judges.md).
+Criteria reference brief fields, not one brief, so the same rubric judges the Module 3 records. How far to trust it is [4.1](../04-evaluation-observability-production/01-evaluating-media-quality.md), where you compare its verdicts with human labels on a golden set.
 
 ## Typed judge output: PASS, RETRY, WEAK
 
@@ -21,7 +21,7 @@ Criteria reference brief fields, not one brief, so the same rubric judges the Mo
 
 ## Runtime gates
 
-Deterministic checks run before the judge. The full order of checks, judge and human is in [4.1](../04-evaluation-observability-production/01-evaluating-generative-systems.md).
+Deterministic checks run before the judge.
 
 ## Prove recovery with a fixture
 

@@ -1,24 +1,20 @@
 ---
 video_url: ""
-prev_url: 01-fan-out.md
+prev_url: 01-batch-jobs.md
 next_url: 03-optimizing-cost.md
 ---
-# 3.2 Spot GPUs and Design for Interruption
+# 3.2 Spot GPUs and Surviving Interruptions
 
-In this lesson we run batch work on spot GPUs, checkpoint every item, and prove that a killed run resumes without regenerating finished items. You're done when the resume `summary.json` shows the items done before the kill, 0 of them regenerated, and the saved vs on-demand amount for the run.
+In this lesson we run the batch on Spot GPUs, see why a Spot Job can be interrupted, save progress after each completed record, then interrupt a run and resume it without regenerating finished assets. You're done when the resumed run's `summary.json` shows the records done before the interruption, 0 of them regenerated, and the amount Spot saved vs on-demand.
 
-## Spot Jobs
+## Spot GPUs and why Jobs get interrupted
 
 ## Preemption vs restart policy
 
-## Resubmit with the same run_id
-
 ## Spot pricing and savings
 
-## Per-item checkpoints
+## Save progress after each record
 
-## Chunk size
+## Resubmit with the same run_id
 
-## Kill and resume proof
-
-## Also try: chunk-size sweep
+## Practice: interrupt and resume

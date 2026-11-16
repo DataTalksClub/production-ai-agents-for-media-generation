@@ -7,8 +7,9 @@ Build a production multimodal agent and share it publicly. The capstone starts i
 * A production multimodal agent that uses **at least 2 GPU media models** (any combination of image, video, audio)
 * An **async workload**: the agent orchestrates long-running GPU jobs (job IDs, state persistence, resume — not blocking calls)
 * **Batch run**: 100 records for image and audio assets, 10 records for video assets
-* **Evaluation**: a golden set plus a regression gate, at system, agent and media layers
-* **Observability**: a trace per request that answers "why this cost / why this long", plus metrics, logs and a dashboard
+* **Evaluation**: a golden set with human labels, the judge's verdicts compared with those labels, and a quality baseline for your run
+* **Observability**: a trace per record that answers "why this cost / why this long", plus success rate, p95 time per asset and cost per accepted asset for the run
+* **SLO**: per-run targets for success rate, p95 time per asset and cost per accepted asset, a pass/fail check and your go/no-go call
 * Run it on **Nebius Serverless AI** (Jobs, Endpoints) as the reference execution layer
 * Code is open-source (MIT), OpenAI- and S3-compatible
 

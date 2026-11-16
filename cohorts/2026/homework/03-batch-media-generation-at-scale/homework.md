@@ -11,14 +11,14 @@ In this homework, you scale the Personalized Media Factory to 200 records over 1
 * Records: all 200 records in [`examples/mediafactory/data/kids.csv`](../../../../examples/mediafactory/data/kids.csv) (`id`, `name`, `age`, `wishlist`)
 * Prompts: your Homework 1 creative idea, personalized per record
 * Assets per record: card text, image and voice. Video for a 10-record sample only, picked with a fixed seed.
-* Models (fixed for the leaderboard): Sana for images, Kokoro-82M for voice, Wan2.2-I2V-A14B for the video sample
+* Models (fixed for this homework): Sana for images, Kokoro-82M for voice, Wan2.2-I2V-A14B for the video sample
 * Jobs: 10 spot Jobs in parallel (`--preemptible --follows-spot-price`), each with a `--timeout`
 * Your configuration from [3.3](../../../../03-batch-media-generation-at-scale/03-optimizing-cost.md)
-* A `budget_usd` and a judge pass-rate floor on the run, as in [3.4](../../../../03-batch-media-generation-at-scale/04-breaking-the-pipeline.md)
+* A spending limit (`budget_usd`), a `--timeout` on every Job and a minimum acceptance rate on the run, as in [3.4](../../../../03-batch-media-generation-at-scale/04-run-limits.md)
 
 ### Run
 
-* Before you launch, predict the wall time and the total run cost with the [3.1](../../../../03-batch-media-generation-at-scale/01-fan-out.md) formulas
+* Before you launch, predict the wall time and the total run cost from your [3.3](../../../../03-batch-media-generation-at-scale/03-optimizing-cost.md) startup and generation measurements
 * Launch the run. At about 50%, cancel at least one Job with `nebius ai job cancel`, then resume with the same `run_id`
 * Take the spot and on-demand rates from [Nebius pricing](https://docs.nebius.com/compute/resources/pricing) and write down the date
 
@@ -54,13 +54,11 @@ How many items that were done before the kill were regenerated after the resume?
 
 ### Question 7
 
-Which 3.3 change lowered your total run cost per asset the most?
+Which 3.3 setting gave you the lowest cost per accepted asset?
 
-- Cached weights (lower `F`)
-- bf16, attention backend or batch size (lower `t_gen`)
-- `torch.compile`
-- Fewer steps
-- Offloading or lower precision to fit a smaller GPU
+- One record per Job
+- Several records per model load, more than one model load per Job
+- All records in a Job share one model load
 - Other
 
 ### Question 8
@@ -89,7 +87,7 @@ Completed Module 3 of Production AI Agents for Generative Media!
 I generated personalized <image + voice> assets for <N> records on Nebius Serverless AI, over 10 spot GPU Jobs in parallel.
 One accepted asset cost $<X>. Spot saved $<Y> vs on-demand.
 I killed the run halfway and resumed it: <Z> finished items were regenerated.
-The change that mattered most: <your 3.3 change>.
+The setting that mattered most: <your 3.3 records-per-Job setting>.
 
 My code: <LINK>
 

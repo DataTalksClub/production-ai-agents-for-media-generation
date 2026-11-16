@@ -17,7 +17,7 @@ Media agents are an engineering problem, not a prompting problem. In this course
 5. **Scale:** from 1 to 1,000+ records, with a cost per asset
 
 <p align="center">
-  <img src="images/diagram-media-factory.png" alt="The Personalized Media Factory: a brief goes to an agent (Module 2), GPU models generate image, voice or video (Module 1), a check (Module 4) sends assets that aren't good enough back to the agent to revise and regenerate, and the factory scales from 1 to 1,000+ records with a cost per asset (Module 3)" width="100%">
+  <img src="images/diagram-media-factory.png" alt="The Personalized Media Factory: a brief goes to an agent (Module 2), GPU models generate image, voice or video (Module 1), a check (Module 2) sends assets that aren't good enough back to the agent to revise and regenerate, Module 4 measures quality and decides when the factory is ready to ship, and the factory scales from 1 to 1,000+ records with a cost per asset (Module 3)" width="100%">
 </p>
 
 ## What You'll Learn
@@ -26,6 +26,7 @@ Media agents are an engineering problem, not a prompting problem. In this course
 * How to give agents GPU models as tools (MCP) and build generate → evaluate → regenerate loops
 * How to fan out batch workloads on spot GPUs, handle failures and report cost per asset
 * How to add evals, tracing and SLOs so you can say what a media agent costs and when it is good enough to ship
+* Optional: how to fine-tune a LoRA for a consistent style and keep it only if it passes a regression gate
 
 ## Dates
 
@@ -38,7 +39,7 @@ All times are CET. Modules run Monday to Sunday. More on this cohort: [cohorts/2
 | Mon 16 Nov 2026 | Course launch | Live, 17:00-18:00 · [Register](https://luma.com/xey7h50c) |
 | Mon 16 - Sun 29 Nov 2026 | [**Module 1: Consistent Media Generation on Serverless GPUs**](01-consistent-media-generation-on-serverless-gpus/README.md) (two weeks) | Homework 1 and capstone proposal |
 | Mon 30 Nov - Sun 6 Dec 2026 | [**Module 2: Multi-Agent Media Workflows**](02-multi-agent-media-workflows/README.md) | Homework 2, due Sun 6 Dec |
-| Mon 7 - Sun 13 Dec 2026 | [**Module 3: Batch Media Generation at Scale**](03-batch-media-generation-at-scale/README.md) | Homework 3 (leaderboard), due Sun 13 Dec |
+| Mon 7 - Sun 13 Dec 2026 | [**Module 3: Batch Media Generation at Scale**](03-batch-media-generation-at-scale/README.md) | Homework 3, due Sun 13 Dec |
 | Mon 14 - Sun 20 Dec 2026 | [**Module 4: Evaluation, Observability and Production**](04-evaluation-observability-production/README.md) | Capstone brief |
 | Fri 15 Jan 2027 | Capstone submission, Attempt 1 | Capstone |
 | Fri 22 Jan 2027 | Peer review, Attempt 1 | Capstone |
@@ -85,23 +86,26 @@ Mon 30 Nov - Sun 6 Dec 2026
 
 ### [Module 3: Batch Media Generation at Scale](/03-batch-media-generation-at-scale)
 
-Mon 7 - Sun 13 Dec 2026
+Mon 7 - Sun 13 Dec 2026 · Run → Recover → Optimize → Control
 
-* Fan-out with Jobs
-* Spot GPUs and design for interruption
-* Optimizing cost per asset: cold start, VRAM and speed
-* Breaking the pipeline on purpose
-* **Homework 3: Factory Scale Challenge** (200 records over 10 parallel Jobs, public leaderboard), due Sun 13 Dec
+> **Updated 13 Nov 2026.** This lesson plan replaces the earlier outline. Lessons may still change before the module starts.
+
+* 3.1 Batch Generation with Serverless Jobs
+* 3.2 Spot GPUs and Surviving Interruptions
+* 3.3 Reducing Media Generation Costs
+* 3.4 Keeping Batch Runs Within Limits
+* **Homework 3: Factory Scale Challenge** (200 records over 10 parallel Jobs), due Sun 13 Dec
 
 ### [Module 4: Evaluation, Observability and Production](/04-evaluation-observability-production)
 
-Mon 14 - Sun 20 Dec 2026
+Mon 14 - Sun 20 Dec 2026 · Measure → Improve → Understand → Decide
 
-* Evaluating generative systems: system, agent and media
-* Judge calibration and regression gates
-* Observability and tracing
-* Designing for production: architecture, SLO, dashboard and alerts
-* Production concerns and the capstone brief: auth, quotas, abuse, prompt injection, content safety, licensing and provenance
+> **Updated 13 Nov 2026.** This lesson plan replaces the earlier outline. Lessons may still change before the module starts.
+
+* 4.1 Evaluating Media Quality
+* 4.2 Fine-Tuning for Consistent Style (optional)
+* 4.3 Tracing Runs with MLflow
+* 4.4 Production Readiness and Go/No-Go
 * No homework: you apply Module 4 in your capstone (**capstone brief**)
 
 ### [Capstone Project](/projects)
@@ -146,7 +150,7 @@ Working builders running open or custom GPU media models:
 
 Prior LLM or MLOps course experience helps but isn't required.
 
-**Not covered:** diffusion maths, training foundation models, deep fine-tuning, CUDA, Kubernetes, RAG, LLM fundamentals.
+**Not covered:** diffusion maths, training foundation models, deep fine-tuning (Module 4 covers only optional LoRA style tuning from a prepared recipe), CUDA, Kubernetes, RAG, LLM fundamentals.
 
 ## How to Join
 
@@ -182,7 +186,7 @@ Each module reports cost per asset, so you'll know what a run costs before you s
 | Agents and tools | Raw tool calling → MCP | Pydantic AI, LangGraph |
 | GPU compute | Nebius Serverless AI: Jobs, Endpoints | DevLabs with JupyterLab |
 | Storage and API | S3-compatible Object Storage · FastAPI | Gradio, Streamlit |
-| Tracking, tracing, evals | To be announced | Langfuse, OpenTelemetry |
+| Tracking, tracing, evals | MLflow | Langfuse, OpenTelemetry |
 
 ## Open and Portable
 

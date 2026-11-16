@@ -40,7 +40,7 @@ app = typer.Typer(
 finetune_app = typer.Typer(
     add_completion=False,
     no_args_is_help=True,
-    help="Lesson 3.6 style LoRA dataset preparation and ticketed training Jobs.",
+    help="Lesson 4.2 style LoRA dataset preparation and ticketed training Jobs.",
 )
 app.add_typer(finetune_app, name="finetune")
 
@@ -314,7 +314,7 @@ def finetune_prepare(
     fake: bool = typer.Option(False, "--fake", help="Use deterministic offline captioning"),
     confirm_create: bool = typer.Option(False, "--confirm-create", help="Use live VLM captioning"),
 ) -> None:
-    """Deduplicate training images, generate/check captions, and write a contact sheet (Lesson 3.6)."""
+    """Deduplicate training images, generate/check captions, and write a contact sheet (Lesson 4.2)."""
     mode = _resolve_mode(fake=fake, local=False, confirm_create=confirm_create)
     if mode == "dry_run":
         console.print(
@@ -354,7 +354,7 @@ def finetune_submit(
     fake: bool = typer.Option(False, "--fake", help="Simulate ticketed LoRA Job offline"),
     confirm_create: bool = typer.Option(False, "--confirm-create", help="Submit live GPU Job"),
 ) -> None:
-    """Submit or dry-run a ticketed LoRA style fine-tuning Job with `--timeout` (Lesson 3.6)."""
+    """Submit or dry-run a ticketed LoRA style fine-tuning Job with `--timeout` (Lesson 4.2)."""
     lora_cfg = LoraConfig.from_file(config)
     res = start_finetune(
         lora_cfg,
