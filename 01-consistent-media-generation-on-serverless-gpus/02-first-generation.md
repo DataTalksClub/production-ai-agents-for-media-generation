@@ -1,5 +1,5 @@
 ---
-video_url: ""
+video_url: "https://youtu.be/MvYApjjGsv0"
 code:
   - label: Notebook (on your laptop)
     path: code/nb-first-generation-local.ipynb
