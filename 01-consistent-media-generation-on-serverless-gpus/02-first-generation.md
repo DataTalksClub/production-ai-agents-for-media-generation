@@ -7,7 +7,7 @@ code:
     path: code/first_image_devlab.ipynb
   - label: Image client
     path: code/image.py
-prev_url: 01-landscape.md
+prev_url: 01b-consistency.md
 next_url: 03-containers.md
 ---
 # 02 - First Media Generation in a Few Minutes
