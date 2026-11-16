@@ -93,7 +93,7 @@ response = requests.post(
 
 There is no seed in this request. The server picks one, so every run generates a new image. Our first request took 5.5 s `[measured: 2026-11-12]`. <!-- c:M1-211 c:M1-212 -->
 
-`ImageGenerator` ([code/image.py](code/image.py)) posts this same body, saves the PNG, and returns the path. The cells after step 3 use it so the request stays in one place. Seed, size and steps are the defaults in `generate_image`.
+`ImageGenerator` ([code/image.py](code/image.py)) posts this same body, saves the PNG, and returns the path. The cells after step 3 use it so the request stays in one place. Seed, size and steps come from `SANA` ([code/models.py](code/models.py)).
 
 <!-- visual: id=V4 | teaches=the first asset and its record | shape=before-after | must-be-accurate=image and metrics from the same run, measured tag | claims=measured -->
 

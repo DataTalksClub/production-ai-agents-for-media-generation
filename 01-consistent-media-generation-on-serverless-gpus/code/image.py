@@ -8,20 +8,16 @@ import urllib.error
 from pathlib import Path
 
 import common
+from models import SANA
 from share_card import share_card
 
 __all__ = [
-    "DEFAULT_MODEL",
-    "DEFAULT_REVISION",
     "ImageGenerator",
     "cached_image",
     "image_comparison",
     "request_id",
     "share_card",
 ]
-
-DEFAULT_MODEL = "Efficient-Large-Model/Sana_1600M_1024px_diffusers"
-DEFAULT_REVISION = "ac0da2ff55fbe434795be0dce883042e4d49e2fc"
 
 
 def _parse_size(size: str) -> tuple[int, int]:
@@ -44,7 +40,7 @@ class ImageGenerator:
         self,
         endpoint: str | None = None,
         token: str | None = None,
-        model: str = DEFAULT_MODEL,
+        model: str = SANA.model,
         *,
         pipe: object | None = None,
     ):
@@ -64,16 +60,15 @@ class ImageGenerator:
     @classmethod
     def local(
         cls,
-        model: str = DEFAULT_MODEL,
+        model: str = SANA.model,
         *,
-        model_revision: str | None = DEFAULT_REVISION,
-        variant: str = "fp16",
+        model_revision: str | None = SANA.model_revision,
+        variant: str = SANA.variant,
     ) -> ImageGenerator:
         """Load the Diffusers pipeline onto the local CUDA GPU once and return a ready ImageGenerator."""
         import torch
 
         from common import load_pipeline
-        from models import SANA
 
         torch.cuda.reset_peak_memory_stats()
         torch.cuda.synchronize()
@@ -99,30 +94,29 @@ class ImageGenerator:
         prompt: str,
         *,
         out: str | Path = "runs/first-image.png",
-        seed: int | None = 7,
-        size: str = "512x512",
-        num_inference_steps: int = 20,
-        guidance_scale: float = 4.5,
-        negative_prompt: str = "",
+        seed: int | None = SANA.seed,
+        size: str = SANA.size,
+        num_inference_steps: int = SANA.num_inference_steps,
+        guidance_scale: float = SANA.guidance_scale,
+        negative_prompt: str = SANA.negative_prompt,
         timeout: int = 300,
     ) -> Path:
+        width, height = _parse_size(size)
         if self._pipe is not None:
             import torch
 
-            width, height = _parse_size(size)
-            torch.cuda.reset_peak_memory_stats()
-            torch.cuda.synchronize()
-            start = time.perf_counter()
-            rng = torch.Generator(device="cuda").manual_seed(seed) if seed is not None else None
-            image = self._pipe(
-                prompt=prompt,
-                negative_prompt=negative_prompt,
+            spec = SANA.with_overrides(
                 width=width,
                 height=height,
                 num_inference_steps=num_inference_steps,
                 guidance_scale=guidance_scale,
-                generator=rng,
-            ).images[0]
+                negative_prompt=negative_prompt,
+            )
+            torch.cuda.reset_peak_memory_stats()
+            torch.cuda.synchronize()
+            start = time.perf_counter()
+            rng = torch.Generator(device="cuda").manual_seed(seed) if seed is not None else None
+            image = self._pipe(prompt=prompt, **spec.params, generator=rng).images[0]
             torch.cuda.synchronize()
             self.last_s = time.perf_counter() - start
             self.peak_vram_gb = torch.cuda.max_memory_allocated() / 1e9
@@ -175,12 +169,39 @@ def request_id(**request):
     return hashlib.sha256(json.dumps(request, sort_keys=True).encode()).hexdigest()[:8]
 
 
-def cached_image(generator, folder, prompt, seed, *, name, **opts):
-    """Generate once per model, prompt and seed. Re-running reuses the PNG if those are unchanged."""
-    request = {"model": generator.model, "prompt": prompt, "seed": seed}
+def cached_image(
+    generator,
+    folder,
+    prompt,
+    seed=SANA.seed,
+    *,
+    name,
+    size=SANA.size,
+    num_inference_steps=SANA.num_inference_steps,
+    guidance_scale=SANA.guidance_scale,
+    **opts,
+):
+    """Generate once per model, prompt, seed and settings. Re-running reuses the PNG if those are unchanged."""
+    request = {
+        "model": generator.model,
+        "prompt": prompt,
+        "seed": seed,
+        "size": size,
+        "num_inference_steps": num_inference_steps,
+        "guidance_scale": guidance_scale,
+        **opts,
+    }
     path = Path(folder) / f"{name}-{request_id(**request)}.png"
     if not path.exists():
-        generator.generate_image(prompt, out=path, seed=seed, **opts)
+        generator.generate_image(
+            prompt,
+            out=path,
+            seed=seed,
+            size=size,
+            num_inference_steps=num_inference_steps,
+            guidance_scale=guidance_scale,
+            **opts,
+        )
     return path.resolve()
 
 

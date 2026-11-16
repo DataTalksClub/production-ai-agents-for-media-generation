@@ -92,7 +92,7 @@ flowchart LR
         driver --> gpu
     end
 
-    bucket["Object Storage bucket<br/>Images · metrics.json · trace.jsonl<br/>Remain after the Job ends"]
+    bucket["Object Storage bucket<br/>cards/<id>/ · metrics_batch.json<br/>Remain after the Job ends"]
 
     image ==>|"Start from image"| app
     secrets -.->|"Pass as environment variables"| app
