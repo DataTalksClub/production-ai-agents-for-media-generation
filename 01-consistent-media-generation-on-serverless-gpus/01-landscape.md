@@ -1,5 +1,5 @@
 ---
-video_url: ""
+video_url: "https://youtu.be/ssxOBJDUdYw"
 prev_url: README.md
 next_url: 01b-consistency.md
 ---
