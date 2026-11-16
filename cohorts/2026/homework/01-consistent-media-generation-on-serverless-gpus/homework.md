@@ -2,80 +2,52 @@
 
 > [!NOTE]
 > You need a Nebius project with credits. See [Module 1](../../../../01-consistent-media-generation-on-serverless-gpus/README.md).
-> Stop or delete every Endpoint, Job and JupyterLab when you're done. A forgotten Endpoint bills while it's RUNNING.
+> Stop or delete every Endpoint, Job and DevLab when you're done. A forgotten Endpoint bills while it's RUNNING.
 
-In this homework, you generate 10 media assets on a GPU in one run, measure the run, and decide when self-hosting beats a per-call API.
+In this homework, you generate 10 media assets on a GPU in one run, as in [lesson 02](../../../../01-consistent-media-generation-on-serverless-gpus/02-first-generation.md), and measure their cost, as in [lesson 05](../../../../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md).
 
 ### Find a creative idea
 
-Start with what you want to create, then pick the model. A few ideas:
+Start with what you want to create, then pick the model. Any media works: image, video, speech, music or something else. A few ideas:
 
 * A cartoon character or a comic panel
 * A birthday or holiday gift card
 * A product ad shot or a short product clip
 * A children's storybook illustration
 * A short looping video for social media
-* A personal voice greeting or a podcast intro (speech)
-* A jingle or background track (music)
+* A personal voice greeting or a podcast intro
+* A jingle or background track
 
-You will reuse the same idea in Homework 3, so pick one you like.
+You can reuse the same idea in Homework 3, so pick one you like.
 
-### Setup
+### Pick a model and how to run it
 
-* Use a Jupyter notebook or a `.py` script.
-* Pick **one** model from the list below. Any modality: image, video, speech or music.
-* Run it any way from Module 1: an Endpoint called from your laptop, a Job, or a DevLab (JupyterLab on a GPU). The calculation below is the same for all three.
+Any open model works. The [Serverless AI Cookbook templates](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/README.md) deploy image, video, speech and music models in a few clicks.
 
-| Task | Model |
-|---|---|
-| Text-to-image | Sana, Qwen-Image, Z-Image-Turbo |
-| Image editing | Qwen-Image-Edit-2511 |
-| Text-to-video | Wan2.1-T2V-1.3B |
-| Image-to-video | Wan2.2-I2V-A14B |
-| Text-to-speech | Kokoro-82M, Chatterbox |
-| Text-to-music | ACE-Step 1.5 |
+Run it one of three ways from Module 1:
 
-Templates for all of them: [Serverless AI Cookbook](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/README.md).
+* **Endpoint**, called from your laptop: [lesson 02, Option A](../../../../01-consistent-media-generation-on-serverless-gpus/02-first-generation.md#option-a-endpoint-and-notebook-on-your-laptop). Works with any template.
+* **DevLab** (JupyterLab on a GPU): [lesson 02, Option B](../../../../01-consistent-media-generation-on-serverless-gpus/02-first-generation.md#option-b-jupyterlab-on-a-gpu).
+* **Job**: [lesson 04, Path B](../../../../01-consistent-media-generation-on-serverless-gpus/04-serving-vs-batch.md#path-b-a-job-from-your-laptop). The lesson 04 worker runs Sana (image) or Kokoro-82M (speech).
+
+The easiest path is Sana with the lesson 02 notebook: it records the times for you.
+
+Run on a preemptible (spot) GPU when you can: it's cheaper and leaves more of your credits for the next modules. The cookbook templates and the lesson 04 Job are preemptible by default. A DevLab bills at the regular price.
 
 ### Generate and measure
 
-See [05 - Measuring Startup, Load and Generation Costs](../../../../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md).
+1. Turn your idea into a prompt.
+2. Generate **10 assets in one run**: one startup, one model load, ten generations. Use the same prompt, or ten variations of your idea.
+    * Lesson 02 notebooks: change the step 4 loop from `range(3)` to `range(10)`.
+    * Job: run with `--n 10` and only the steps of your model: `--step text --step illustration` for Sana, or `--step text --step greeting` for Kokoro. Upload your own 10-row CSV with the same columns as `kids.csv`, with your idea in `prompt` (image) or `greeting` (speech).
+3. Save the assets. Then stop the Endpoint, or delete the DevLab.
+4. Open [nb-measuring-costs.ipynb](../../../../01-consistent-media-generation-on-serverless-gpus/code/nb-measuring-costs.ipynb) and fill in section 5 with your run. Where each time comes from: [lesson 05, Measure a run of your own](../../../../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md#measure-a-run-of-your-own-homework).
+5. Use the preemptible (spot) price per hour for your GPU and region at the time of the run: [spot prices](https://docs.nebius.com/signup-billing/spot-prices), or [Compute pricing](https://docs.nebius.com/compute/resources/pricing) for GPUs with a fixed preemptible price such as the L40S. See [lesson 05, Prices and assumptions](../../../../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md#prices-and-assumptions) for how to read them. On a DevLab, use the regular price.
+6. Project the cost per asset to N = 1000 from your run: [lesson 05, From time to money](../../../../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md#from-time-to-money).
 
-* Turn your creative idea into a prompt.
-* Generate **10 assets in one run**: one startup, one model load, ten generations. Use the same prompt and parameters, or ten variations of your idea.
-* Record how you ran it:
-    * **Model**
-    * **Ran as:** Endpoint, Job or DevLab
-    * **GPU** and **region**
-    * **Price per hour** for your run: the regular price, or for a preemptible run the spot price at the time of the run. Rates: [Nebius pricing](https://docs.nebius.com/compute/resources/pricing), [spot prices](https://docs.nebius.com/signup-billing/spot-prices). A spot price you read once is a snapshot, and spot can change during a run, so every cost below is a projection, not what you paid. What you paid is in **Billing → Usage**.
-* Record, in seconds:
-    * **Startup time `t_start`:** Job or DevLab: from create until it is RUNNING. Endpoint: from clicking Create until `/v1/models` first returns JSON, as one interval (`create_to_ready_s` in lesson 02's `metrics.json`).
-    * **Ready time `t_ready`:** Job or DevLab: the model load timer in your code (`load_s`). Endpoint: `0`, because it's already in `t_start`. Don't add the notebook's polling time to the console's RUNNING time: polling starts when you run the cell, so the gap between them gets lost.
-    * **Generation time `t_gen`:** per asset, for each of the 10. Endpoint: request latency from your client. Job or DevLab: the generation timer in your code. Use the median.
-* Save the assets. If you ran a Job, they are in your bucket.
+### Find a benchmark
 
-You need `t_start` and `t_ready` for the breakeven below. Keep your numbers: you will compare them with Homework 3.
-
-### Find the API price
-
-Find a service that sells the same model as a per-call API. If none does, use the closest equivalent and say which in Question 9. Write down the service, the price per asset for your settings (resolution, duration or characters), and the link to its pricing page.
-
-### Compute the breakeven
-
-Let:
-
-* `rate` = your GPU price per second (price per hour / 3600)
-* `t_start`, `t_ready`, `t_gen` = your measured times, in seconds
-* `p` = the API price per asset
-
-Then:
-
-* Marginal compute cost per asset: `c = rate × t_gen`
-* Fixed cost of one run (startup + ready): `F = rate × (t_start + t_ready)`
-* Total run cost per asset for `N` assets: `F / N + c`. For your run, `N = 10`.
-* Breakeven, in assets per run: `N = ceil(F / (p − c))`
-
-The formulas assume one startup per run, assets generated one after another, and no idle time. If `p ≤ c`, self-hosting never breaks even on this model. Enter `0`.
+Find a service that sells the same model, or the closest one, as a per-call API. Convert its price to USD per asset for your settings (resolution, duration or characters). Lesson 05 does it for one model: [The per-call API](../../../../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md#the-per-call-api-wan-22-a14b-on-fal).
 
 ### Question 1
 
@@ -85,25 +57,25 @@ What is the creative idea behind your asset? Why did you choose this topic? Two 
 
 Which model did you use?
 
-- Sana
-- Qwen-Image
-- Z-Image-Turbo
-- Qwen-Image-Edit-2511
-- Wan2.1-T2V-1.3B
-- Wan2.2-I2V-A14B
-- Kokoro-82M
-- Chatterbox
-- ACE-Step 1.5
-
 ### Question 3
+
+Which modality?
+
+- Image
+- Video
+- Speech
+- Music
+- Other
+
+### Question 4
 
 How did you run it?
 
-- Endpoint, called from my laptop
+- Endpoint
+- DevLab
 - Job
-- DevLab (JupyterLab on a GPU)
 
-### Question 4
+### Question 5
 
 Which GPU did you run on?
 
@@ -113,29 +85,21 @@ Which GPU did you run on?
 - RTX PRO 6000
 - Other
 
-### Question 5
-
-Which region did you run in? For example `eu-north1`.
-
 ### Question 6
 
-What was your generation time per asset (median of your 10), in seconds?
+What was your median generation time per media asset, in seconds?
 
 ### Question 7
 
-What is your projected marginal compute cost per asset, `c`, in USD?
+What is your projected cost per asset at N = 1000, in USD?
 
 ### Question 8
 
-What is your projected total cost per asset for your 10-asset run, `F / 10 + c`, in USD?
+Which benchmark service or API did you compare with? Text or link.
 
 ### Question 9
 
-Which per-call API did you compare with, and what does it charge per asset? Format: `service, model, $price per asset, link`. Name the model if it isn't the one you ran.
-
-### Question 10
-
-What is your self-host breakeven `N`, in number of assets?
+What does the benchmark charge per asset, in USD?
 
 ## Learning in Public
 
@@ -150,6 +114,7 @@ Completed Module 1 of Production AI Agents for Generative Media!
 
 I ran <model> on Nebius Serverless AI and generated this <image/video/audio> (attached).
 It takes <Z> s to generate one asset (median of 10).
+At 1000 assets, one costs about $<X>; <benchmark> charges $<Y>.
 
 The idea: <what you wanted to create and why you chose this topic>.
 
@@ -162,3 +127,8 @@ My code: <LINK>
 
 * Submit your results here: [placeholder]
 * All questions are about your own run. Any honest answer counts.
+
+## Clean up
+
+> [!WARNING]
+> 🧹 **Remove all running resources when you're done, even after a failed run.** Stop or delete every Endpoint, Job and DevLab you started. An Endpoint or DevLab keeps billing while it runs, even when idle, and a stopped DevLab still bills its disk until you delete it. Delete bucket data you no longer need. Check **Billing → Usage** the next day to confirm nothing is still billing.
