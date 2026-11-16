@@ -32,8 +32,6 @@ We start with one child: Emma, a 7-year-old who wishes for a telescope.
   </tr>
 </table>
 
-Times are one request each from our runs on 2026-11-13, measured from a laptop, network included: Sana and Kokoro on an L40S; Qwen-Image-Edit-2511, ACE-Step and Wan2.2 on an H100. These samples use other models, GPUs and settings than the measured table further down, so don't compare their times with it.
-
 Once it works for Emma, we make a card for each of [the 200 kids](../examples/mediafactory/data/kids.csv) on our mailing list, each with a name, an age and a wish.
 
 Then we ask what it would take to do this for every child in the world: thousands or millions of cards, each one different, with a known cost and no drop in quality.
@@ -264,8 +262,6 @@ If we added the clip to Emma's card, we would write image-to-video on line 1, Wa
 We'll measure your real numbers in [lesson 05](05-measuring-costs.md). 
 
 Next, we look at how to keep Emma the same across assets in [01b - What "Consistent" Means](01b-consistency.md).
-
-> ⚠️ **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
 
 ## References
 
