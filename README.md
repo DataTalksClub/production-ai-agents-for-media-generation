@@ -6,6 +6,10 @@
 <b>Starts Mon 16 Nov 2026 · <a href="https://courses.datatalks.club/register/production-ai-agents-generative-media/">Apply here</a></b>
 </p>
 
+<p align="center">
+  <a href="https://courses.datatalks.club/register/production-ai-agents-generative-media/"><img src="https://img.shields.io/badge/Apply-Free%20live%20cohort-2ea44f?style=for-the-badge" alt="Apply for the free live cohort"></a>
+</p>
+
 > How do you build a production AI system when an agent can launch expensive, slow, failure-prone GPU workloads that produce large media artifacts?
 
 Media agents are an engineering problem, not a prompting problem. In this course, you build one production system that handles it: a **Personalized Media Factory**.
@@ -28,6 +32,8 @@ Media agents are an engineering problem, not a prompting problem. In this course
 * How to add evals, tracing and SLOs so you can say what a media agent costs and when it is good enough to ship
 * Optional: how to fine-tune a LoRA for a consistent style and keep it only if it passes a regression gate
 
+**Want to build it with the cohort?** [Apply for free](https://courses.datatalks.club/register/production-ai-agents-generative-media/).
+
 ## Dates
 
 All times are CET. Modules run Monday to Sunday. More on this cohort: [cohorts/2026](cohorts/2026).
@@ -47,6 +53,8 @@ All times are CET. Modules run Monday to Sunday. More on this cohort: [cohorts/2
 | Fri 5 Feb 2027 | Final peer review, Attempt 2 | Capstone |
 
 Materials and dates may change.
+
+Module 1 runs two weeks, so you can still apply after the course starts on Mon 16 Nov. [Apply here](https://courses.datatalks.club/register/production-ai-agents-generative-media/).
 
 ## Modules
 
@@ -82,13 +90,11 @@ Mon 30 Nov - Sun 6 Dec 2026
 * GPU models as typed tools over MCP
 * Long-running tools
 * Planner / generator / reviewer
-* **Homework 2: Media Agent** (a 10-second ad plus an execution trace), due Sun 6 Dec
+* **Homework 2: Media Agent** (a 10-second ad plus an execution trace), due Mon 7 Dec
 
 ### [Module 3: Batch Media Generation at Scale](/03-batch-media-generation-at-scale)
 
 Mon 7 - Sun 13 Dec 2026 · Run → Recover → Optimize → Control
-
-> **Updated 13 Nov 2026.** This lesson plan replaces the earlier outline. Lessons may still change before the module starts.
 
 * 3.1 Batch Generation with Serverless Jobs
 * 3.2 Spot GPUs and Surviving Interruptions
@@ -129,6 +135,8 @@ Your project needs:
 
 Ideas: a marketing studio, podcast producer, video localization, storybook generator, product ad agent or paper-to-explainer video.
 
+Already have an idea? Tell us what you're building, and [apply](https://courses.datatalks.club/register/production-ai-agents-generative-media/).
+
 Share your progress as you go: see [Learning in public](learning-in-public.md).
 
 ## Who Should Join
@@ -151,6 +159,8 @@ Working builders running open or custom GPU media models:
 Prior LLM or MLOps course experience helps but isn't required.
 
 **Not covered:** diffusion maths, training foundation models, deep fine-tuning (Module 4 covers only optional LoRA style tuning from a prepared recipe), CUDA, Kubernetes, RAG, LLM fundamentals.
+
+**Sounds like you?** [Apply for free](https://courses.datatalks.club/register/production-ai-agents-generative-media/).
 
 ## How to Join
 
@@ -219,10 +229,10 @@ People behind this course:
 No GPU or cluster to manage: the models run as Jobs and Endpoints on Nebius Serverless AI. Applicants get GPU credits through the [Nebius AI Builder Program](https://dev.nebius.com/builders); usage beyond the credits is billed to your account. If you follow along without applying, you need your own GPU access.
 
 **Can I join after the course starts?**
-Yes. Module 1 runs two weeks, so late joiners can catch up.
+Yes. Module 1 runs for two weeks, so late joiners can catch up. [Apply here](https://courses.datatalks.club/register/production-ai-agents-generative-media/).
 
 **Do I have to attend live sessions?**
-No. Lectures are pre-recorded and live classes aren't mandatory. The pre-course Live Q&A, the course launch and the weekly office hour are live.
+No. Lectures are pre-recorded, and live classes aren't mandatory. The pre-course Live Q&A, the course launch and the weekly office hour are live.
 
 **What if I'm not approved?**
 All materials are public (MIT), so you can follow along on your own, with your own GPU access.
@@ -236,3 +246,7 @@ Open-weights models come with their own licences. Check each model's licence bef
 ## Getting Help
 
 Ask questions in the [DataTalks.Club Slack](https://datatalks.club/slack.html) and bring them to the weekly live office hour.
+
+<p align="center">
+  <a href="https://courses.datatalks.club/register/production-ai-agents-generative-media/"><img src="https://img.shields.io/badge/Apply-Free%20live%20cohort-2ea44f?style=for-the-badge" alt="Apply for the free live cohort"></a>
+</p>

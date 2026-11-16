@@ -103,7 +103,7 @@ What does the benchmark charge per asset, in USD?
 
 ## Learning in Public
 
-Share your asset and the idea behind it in a short post. Use `#[placeholder]`, tag DataTalksClub and Nebius, and submit the post link with your homework. Don't share credentials, Endpoint tokens or bucket keys.
+Share your asset and the idea behind it in a short post. Tag DataTalksClub and Nebius, and submit the post link with your homework. Don't share credentials, Endpoint tokens or bucket keys.
 
 See the [learning in public guide](https://datatalks.club/docs/courses/zoomcamp-logistics/learning-in-public/) for more ideas.
 
@@ -120,12 +120,12 @@ The idea: <what you wanted to create and why you chose this topic>.
 
 My code: <LINK>
 
-#[placeholder] @DataTalksClub @Nebius
+@DataTalksClub @Nebius
 ```
 
 ## Submit the results
 
-* Submit your results here: [placeholder]
+* Submit your results here: https://courses.datatalks.club/production-ai-agents-generative-media/homework/module1
 * All questions are about your own run. Any honest answer counts.
 
 ## Clean up
