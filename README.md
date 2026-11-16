@@ -10,6 +10,31 @@
   <a href="https://courses.datatalks.club/register/production-ai-agents-generative-media/"><img src="https://img.shields.io/badge/Apply-Free%20live%20cohort-2ea44f?style=for-the-badge" alt="Apply for the free live cohort"></a>
 </p>
 
+<p align="center">
+<a href="https://datatalks.club/slack.html">Join Slack</a> •
+<a href="https://app.slack.com/client/T01ATQK62F8/C0CEG1BUDKL">#course-ai-mediagen Channel</a> •
+<a href="https://www.youtube.com/playlist?list=PLC73BZc0zZKM">Course Playlist</a> •
+<a href="https://datatalks.club/faq/production-ai-agents-generative-media.html">FAQ</a>
+</p>
+
+<p align="center">
+<a href="https://github.com/DataTalksClub/production-ai-agents-for-media-generation/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs welcome"></a>
+<a href="https://datatalks.club/slack.html"><img src="https://img.shields.io/badge/Slack-Join%20Community-4A154B?style=for-the-badge&logo=slack" alt="Join Slack"></a>
+</p>
+
+## Quick Links
+
+| Resource | Link |
+|----------|------|
+| Course materials | [GitHub repository](https://github.com/DataTalksClub/production-ai-agents-for-media-generation) |
+| Apply | [Application form](https://courses.datatalks.club/register/production-ai-agents-generative-media/) |
+| Video lectures | [YouTube playlist](https://www.youtube.com/playlist?list=PLC73BZc0zZKM) · [Course launch stream](https://www.youtube.com/watch?v=Y5__PUmOTdg) · [Pre-course Q&A](https://www.youtube.com/watch?v=iACtrkiXndw) |
+| Documentation | [Production AI Agents for Generative Media](https://datatalks.club/docs/courses/production-ai-agents-generative-media/) |
+| Course platform (deadlines, homework) | [courses.datatalks.club](https://courses.datatalks.club/production-ai-agents-generative-media/) |
+| Slack channel | [#course-ai-mediagen](https://app.slack.com/client/T01ATQK62F8/C0CEG1BUDKL) |
+| FAQ | [FAQ document](https://datatalks.club/faq/production-ai-agents-generative-media.html) |
+| GPU credits | [Nebius AI Builder Program](https://dev.nebius.com/builders) |
+
 > How do you build a production AI system when an agent can launch expensive, slow, failure-prone GPU workloads that produce large media artifacts?
 
 Media agents are an engineering problem, not a prompting problem. In this course, you build one production system that handles it: a **Personalized Media Factory**.
@@ -181,7 +206,7 @@ Not applying? All materials are in this repo and anyone can follow along. You'll
 
 The course itself is free. The workloads run on GPUs, which cost money:
 
-* **GPU credits:** applicants get credits through the [Nebius AI Builder Program](https://dev.nebius.com/builders), which is free to join. Usage beyond the credits is billed to your account.
+* **GPU credits:** applicants get credits through the [Nebius AI Builder Program](https://dev.nebius.com/builders), which is free to join: $25 on joining and $50 after Homework 2. Usage beyond the credits is billed to your account.
 * **Following on your own:** you pay for your own GPU usage.
 
 Each module reports cost per asset, so you'll know what a run costs before you scale it.
@@ -245,7 +270,7 @@ Open-weights models come with their own licences. Check each model's licence bef
 
 ## Getting Help
 
-Ask questions in the [DataTalks.Club Slack](https://datatalks.club/slack.html) and bring them to the weekly live office hour.
+Join the [DataTalks.Club Slack](https://datatalks.club/slack.html) and ask questions in the [#course-ai-mediagen](https://app.slack.com/client/T01ATQK62F8/C0CEG1BUDKL) channel. See also the [FAQ](https://datatalks.club/faq/production-ai-agents-generative-media.html) and the [course docs](https://datatalks.club/docs/courses/production-ai-agents-generative-media/). Bring questions to the weekly live office hour.
 
 <p align="center">
   <a href="https://courses.datatalks.club/register/production-ai-agents-generative-media/"><img src="https://img.shields.io/badge/Apply-Free%20live%20cohort-2ea44f?style=for-the-badge" alt="Apply for the free live cohort"></a>
