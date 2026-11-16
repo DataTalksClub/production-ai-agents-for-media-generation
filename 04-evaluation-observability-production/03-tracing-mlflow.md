@@ -18,3 +18,7 @@ In this lesson we start MLflow locally, trace a media-generation run, and inspec
 ## p95 on a small run
 
 ## Practice: trace your run
+
+<!-- nav:start -->
+[← Previous: 4.2 Fine-Tuning for Consistent Style (Optional)](02-fine-tune-style.md) · [Next: 4.4 Production Readiness and Go/No-Go →](04-production-readiness.md)
+<!-- nav:end -->

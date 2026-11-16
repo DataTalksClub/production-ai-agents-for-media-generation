@@ -516,3 +516,7 @@ One Job on one GPU is the simplest batch that works. Santa's list has 200,000 ki
 - [Full Stack Deep Learning 2022, Lecture 5: Deployment](https://fullstackdeeplearning.com/course/2022/lecture-5-deployment/)
 - [Santa Scale Challenge](https://github.com/mnrozhkov/santa-scale-challenge): the pipeline this lesson adapts
 - [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) and [Wan2.2-I2V-A14B](https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B-Diffusers), model cards
+
+<!-- nav:start -->
+[← Previous: 03 - Containers for Generative AI](03-containers.md) · [Next: 05 - Measuring Startup, Load and Generation Costs →](05-measuring-costs.md)
+<!-- nav:end -->

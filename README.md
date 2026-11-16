@@ -52,6 +52,8 @@ All times are CET. Modules run Monday to Sunday. More on this cohort: [cohorts/2
 | Fri 29 Jan 2027 | Capstone submission, Attempt 2 | Capstone |
 | Fri 5 Feb 2027 | Final peer review, Attempt 2 | Capstone |
 
+All session recordings are collected in the [YouTube playlist](https://www.youtube.com/playlist?list=PLC73BZc0zZKM).
+
 Materials and dates may change.
 
 Module 1 runs two weeks, so you can still apply after the course starts on Mon 16 Nov. [Apply here](https://courses.datatalks.club/register/production-ai-agents-generative-media/).

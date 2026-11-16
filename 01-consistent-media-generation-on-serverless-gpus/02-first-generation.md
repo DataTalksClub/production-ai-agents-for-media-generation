@@ -7,7 +7,7 @@ code:
     path: code/nb-first-generation-devlab.ipynb
   - label: Image client
     path: code/image.py
-prev_url: 01-landscape.md
+prev_url: 01b-consistency.md
 next_url: 03-containers.md
 ---
 # 02 - First Media Generation in a Few Minutes
@@ -232,3 +232,7 @@ Free resources to go deeper:
 8. [SANA: Efficient High-Resolution Image Synthesis with Linear Diffusion Transformers](https://arxiv.org/abs/2410.10629) (paper): why Sana is fast on one GPU.
 9. [Kubernetes: liveness, readiness and startup probes](https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/) (concept docs): "started" vs "ready for traffic".
 10. [Hugging Face Diffusion Models Course](https://huggingface.co/learn/diffusion-course/unit0/1) (free course): Diffusers basics in notebooks.
+
+<!-- nav:start -->
+[← Previous: 01b - What "Consistent" Means](01b-consistency.md) · [Next: 03 - Containers for Generative AI →](03-containers.md)
+<!-- nav:end -->

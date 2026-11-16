@@ -20,3 +20,7 @@ In this lesson we set a spending limit, timeouts and a minimum acceptance rate o
 ## Run summary: completion, failures, quality and cost
 
 ## Practice: breach a limit on purpose
+
+<!-- nav:start -->
+[← Previous: 3.3 Reducing Media Generation Costs](03-optimizing-cost.md) · [Next: 4.1 Evaluating Media Quality →](../04-evaluation-observability-production/01-evaluating-media-quality.md)
+<!-- nav:end -->

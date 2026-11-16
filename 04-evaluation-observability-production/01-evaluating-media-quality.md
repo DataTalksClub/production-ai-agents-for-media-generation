@@ -18,3 +18,7 @@ In this lesson we start from the rubric developed in [2.5](../02-multi-agent-med
 ## Quality baseline for a sample run
 
 ## Practice: a baseline for your run
+
+<!-- nav:start -->
+[← Previous: 3.4 Keeping Batch Runs Within Limits](../03-batch-media-generation-at-scale/04-run-limits.md) · [Next: 4.2 Fine-Tuning for Consistent Style (Optional) →](02-fine-tune-style.md)
+<!-- nav:end -->

@@ -338,3 +338,7 @@ The lesson 02 notebooks save these fields in `metrics.json`. To get ten assets, 
 - [fal: Wan2.2-A14B image-to-video](https://fal.ai/models/fal-ai/wan/v2.2-a14b/image-to-video)
 - [ServerlessLLM: low-latency serverless inference for large language models (OSDI '24)](https://arxiv.org/abs/2401.14351), Fu et al.: why loading weights dominates cold starts
 - [Wan2.2-I2V-A14B](https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B-Diffusers), model card
+
+<!-- nav:start -->
+[← Previous: 04 - Serving vs Batch Inference: the Same Generation for Different Use Cases](04-serving-vs-batch.md) · [Next: 2.1 The Agent Loop: Deep Dive →](../02-multi-agent-media-workflows/01-agent-loop.md)
+<!-- nav:end -->

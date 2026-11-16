@@ -18,3 +18,7 @@ In this lesson we design typed tools: the signature becomes the schema, retries 
 ## Return references, not bytes
 
 ## Structured outputs for LLM steps
+
+<!-- nav:start -->
+[← Previous: 2.1 The Agent Loop: Deep Dive](01-agent-loop.md) · [Next: 2.3 GPU Workloads as Agentic Tools →](03-gpu-tools.md)
+<!-- nav:end -->

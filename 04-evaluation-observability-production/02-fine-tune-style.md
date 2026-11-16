@@ -18,3 +18,7 @@ In this optional lesson we train a LoRA from a prepared recipe on Nebius Serverl
 ## Regression gate: pass or fail
 
 ## Practice: gate your tuned model
+
+<!-- nav:start -->
+[← Previous: 4.1 Evaluating Media Quality](01-evaluating-media-quality.md) · [Next: 4.3 Tracing Runs with MLflow →](03-tracing-mlflow.md)
+<!-- nav:end -->

@@ -18,3 +18,7 @@ In this lesson we run the batch on Spot GPUs, see why a Spot Job can be interrup
 ## Resubmit with the same run_id
 
 ## Practice: interrupt and resume
+
+<!-- nav:start -->
+[← Previous: 3.1 Batch Generation with Serverless Jobs](01-batch-jobs.md) · [Next: 3.3 Reducing Media Generation Costs →](03-optimizing-cost.md)
+<!-- nav:end -->

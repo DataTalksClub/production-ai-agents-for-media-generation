@@ -26,3 +26,7 @@ In this lesson we define a per-run SLO with targets for success rate, p95 time p
 ## Go/no-go decision
 
 ## Practice: readiness checklist and capstone brief
+
+<!-- nav:start -->
+[← Previous: 4.3 Tracing Runs with MLflow](03-tracing-mlflow.md) · [Next: Capstone Project: Production Multimodal Agent →](../projects/README.md)
+<!-- nav:end -->

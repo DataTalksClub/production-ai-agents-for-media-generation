@@ -16,3 +16,7 @@ In this lesson we submit one GPU Job, check its status and retrieve its output, 
 ## Collect results and track completed records
 
 ## Practice: a small batch over parallel Jobs
+
+<!-- nav:start -->
+[← Previous: 2.5 Planner, Generator, Reviewer: the Judge Loop](../02-multi-agent-media-workflows/05-judge-loop.md) · [Next: 3.2 Spot GPUs and Surviving Interruptions →](02-spot-and-interruption.md)
+<!-- nav:end -->

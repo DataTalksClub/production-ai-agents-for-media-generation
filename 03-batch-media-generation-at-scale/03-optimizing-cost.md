@@ -18,3 +18,7 @@ In this lesson we measure what a run pays for startup and for generation, compar
 ## Predict a run before you launch it
 
 ## Practice: pick your Homework 3 configuration
+
+<!-- nav:start -->
+[← Previous: 3.2 Spot GPUs and Surviving Interruptions](02-spot-and-interruption.md) · [Next: 3.4 Keeping Batch Runs Within Limits →](04-run-limits.md)
+<!-- nav:end -->

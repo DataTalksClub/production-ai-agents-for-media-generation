@@ -332,3 +332,7 @@ The course's published image was built from this file: `docker.io/mnrozhkov/sant
 - [nvidia/container-images/cuda](https://gitlab.com/nvidia/container-images/cuda), NVIDIA
 - [Slacker: Fast Distribution with Lazy Docker Containers](https://www.usenix.org/conference/fast16/technical-sessions/presentation/harter), USENIX FAST '16
 - [Full Stack Deep Learning 2022, Lecture 5: Deployment](https://fullstackdeeplearning.com/course/2022/lecture-5-deployment/)
+
+<!-- nav:start -->
+[← Previous: 02 - First Media Generation in a Few Minutes](02-first-generation.md) · [Next: 04 - Serving vs Batch Inference: the Same Generation for Different Use Cases →](04-serving-vs-batch.md)
+<!-- nav:end -->

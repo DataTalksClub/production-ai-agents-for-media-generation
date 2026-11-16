@@ -20,3 +20,7 @@ In this lesson we keep the agent on CPU and give it GPU workloads as tools: infe
 ## Default path: Sana as generate_image
 
 ## Also try: tools behind an MCP server
+
+<!-- nav:start -->
+[← Previous: 2.2 Tools and Structured Outputs](02-tools.md) · [Next: 2.4 Long-running Tools: Submit, Poll, Resume →](04-long-running-tools.md)
+<!-- nav:end -->
