@@ -26,7 +26,7 @@ flowchart LR
     profileLoader["profile/<br/>Validate schema, templates + records<br/>Materialize brief.json"]
     agentPipeline["workflows/pipeline.py (M2)<br/>Plan copy → Generate keyframe → VLM Judge<br/>(PASS | RETRY | WEAK)"]
     batchFanout["workflows/batch.py (M3)<br/>Stage sampler + K parallel batch Jobs<br/>tickets.py + two-level Budget"]
-    loraWorkflow["workflows/finetune.py (M3.6)<br/>Dedupe, caption + ticketed LoRA Job"]
+    loraWorkflow["workflows/finetune.py (M4.2)<br/>Dedupe, caption + ticketed LoRA Job"]
   end
 
   subgraph dataPlane ["3. Data-Plane Execution (GPU / Local / Fake)"]
@@ -64,7 +64,7 @@ examples/mediafactory/
 ├── README.md                      # Quickstart and application customization guide
 ├── config/
 │   ├── models.yaml                # Role -> model, pinned revision, GPU placement, policy caps
-│   └── lora_config.yaml           # Lesson 3.6 style LoRA training Job template
+│   └── lora_config.yaml           # Lesson 4.2 style LoRA training Job template
 ├── data/
 │   ├── kids.csv                   # 200 records for Module 3 (id, name, age, wishlist)
 │   └── kids_10.csv                # First 10 rows of kids.csv
@@ -129,7 +129,7 @@ uv run mediafactory batch \
 
 Inspect `runs/m3-demo/summary.json`, `runs/m3-demo/metrics.json`, `runs/m3-demo/events.jsonl`, and `runs/m3-demo/items/<id>/`.
 
-### 4. Style LoRA fine-tuning workflow (Lesson 3.6)
+### 4. Style LoRA fine-tuning workflow (Lesson 4.2)
 
 ```bash
 # Dry-run the LoRA training Job command and cost cap:

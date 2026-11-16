@@ -56,11 +56,11 @@ All with 1-click templates in the [Serverless AI Cookbook](https://github.com/ne
 
 ## Homework 1: GPU Media Worker
 
-Generate one media asset with any model from the [table above](#models-used-in-this-module), measure it, and compare its cost with a per-call API.
+Generate 10 media assets in one run with any model from the [table above](#models-used-in-this-module), measure the run, and compare its cost with a per-call API.
 
 * Notebook or `.py` script, your choice
-* Report your model, generation time and cost per asset, and the creative idea behind your asset
-* Find the per-call API price for the same model and compute your self-host breakeven in number of assets
+* Report your model, generation time and projected cost per asset, and the creative idea behind your assets
+* Find the per-call API price for the same model, or the closest equivalent if no service sells it, and compute your self-host breakeven in number of assets
 
 Questions and submission: [homework.md](../cohorts/2026/homework/01-consistent-media-generation-on-serverless-gpus/homework.md).
 
@@ -70,7 +70,7 @@ Write a one-page proposal for your capstone: problem, records, two GPU media mod
 
 ## Module structure
 
-One page per lesson at the module root, all code flat in `code/` (files import each other), guide images in `images/`.
+One page per lesson at the module root, all code flat in `code/` (files import each other), media in `assets/`.
 
 ```text
 01-consistent-media-generation-on-serverless-gpus/
@@ -81,15 +81,21 @@ One page per lesson at the module root, all code flat in `code/` (files import e
 ├── 03-containers.md
 ├── 04-serving-vs-batch.md
 ├── 05-measuring-costs.md
-├── images/                         # guide images: NN-slug-MM-what.png
+├── .dockerignore                         # 03, 04: what may enter the worker image build
+├── assets/                               # media for the guides; data and media the code reads: kids.csv, fonts/, 4_jingle.mp3
 └── code/
-    ├── .env                        # you create it: Endpoint URL + token (notebooks write it; git-ignored)
-    ├── first_image_local.ipynb     # 02: your laptop → Endpoint
-    ├── first_image_devlab.ipynb    # 02: JupyterLab on a GPU
-    ├── image.py                    # 02: ImageGenerator client (generate_image), comparison strip, request_id
-    ├── batch_inference.py          # 04, 05: n images through an Endpoint with one config → assets, metrics.json, trace.jsonl; CLI --n 3
-    ├── common.py                   # 02–05: setup_endpoint(), request(), wait_ready(), .env helpers, config checks, metrics/trace writers, calculate_cost()
-    └── docker/                     # 03, 04: Dockerfiles
+    ├── .env                              # you create it: Endpoint URL + token (notebooks write it; git-ignored)
+    ├── nb-first-generation-local.ipynb   # 02: your laptop → Endpoint
+    ├── nb-first-generation-devlab.ipynb  # 02: JupyterLab on a GPU
+    ├── nb-emma-gift.ipynb                # follow-up to 02: Emma's card, one asset per modality, one Endpoint each
+    ├── image.py                          # 02: ImageGenerator client (generate_image), comparison strip, request_id
+    ├── share_card.py                     # 02: the share card image
+    ├── batch_inference.py                # 03, 04: Santa's gift cards for N kids in one Job: text, illustration, card, clip, greeting, mix
+    ├── nb-santa-cards.ipynb              # 04: the same steps for one kid, to explore and test, on a GPU
+    ├── nb-measuring-costs.ipynb          # 05: cost per asset
+    ├── models.py                         # 02, 04: model specs (Sana, Wan2.2, Kokoro, ...), pinned
+    ├── common.py                         # 02–05: Sana loader, setup_endpoint(), request(), wait_ready(), .env helpers, metrics writers, calculate_cost()
+    └── docker/                           # 03, 04: Dockerfile (the worker image), Dockerfile.bad (what not to do)
 ```
 
 ## Setup
@@ -110,6 +116,21 @@ Do this once, before any lesson in this module. Every lesson needs steps 1–3, 
 Endpoint URL and token: the notebooks ask for them and save them to `code/.env`, which only you can read and Git ignores. Never commit tokens or paste them into chats or screenshots.
 
 Stop or delete every Endpoint, Job and JupyterLab when you finish: an Endpoint bills while it's `RUNNING`, even when it serves no requests.
+
+### What the module costs
+
+Compute only, eu-north1. Prices change: the date in each row is when we read it, so check [Compute pricing](https://docs.nebius.com/compute/resources/pricing) and [spot prices](https://docs.nebius.com/signup-billing/spot-prices) before you run. Your cost depends on how long things run, so stop them when you're done.
+
+| Lesson | What bills | Price or projection, with its date |
+|---|---|---|
+| 01, 03, 05 | Nothing: reading, and notebooks on your laptop | $0 |
+| 02 | A Sana Endpoint on one preemptible L40S (`1gpu-8vcpu-32gb`) while `RUNNING` | $0.75 per hour, fixed preemptible price, read 2026-11-16 |
+| 02, GPU path | A DevLab on an L40S (`1gpu-8vcpu-32gb`) at the regular price | $1.55 per hour, read 2026-11-16 |
+| 04 | One 10-kid Job on an H100, about 35 min (times from our 2026-11-14 run) | About $2.60 at the regular price (read 2026-11-15); about $1.20 at the spot snapshot of 2026-11-14 15:05 UTC |
+| 04, path A | A DevLab on an H100 at the regular price, on top of the Job | $4.50 per hour, read 2026-11-15 |
+| Homework | Your 10-asset run | Depends on the model and GPU you pick |
+
+Spot prices change every 15 minutes and aren't capped, so a preemptible run can cost more than the snapshot. Lesson 04 shows how to set a max price.
 
 # Community Notes
 

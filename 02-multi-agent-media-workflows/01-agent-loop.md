@@ -24,5 +24,5 @@ In this lesson we build a minimal PydanticAI agent on Token Factory, open up the
 ## Trace events
 
 <!-- nav:start -->
-[← Previous: 1.5 Measuring Startup, Load and Generation Costs](../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md) · [Next: 2.2 Tools and Structured Outputs →](02-tools.md)
+[← Previous: 05 - Measuring Startup, Load and Generation Costs](../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md) · [Next: 2.2 Tools and Structured Outputs →](02-tools.md)
 <!-- nav:end -->

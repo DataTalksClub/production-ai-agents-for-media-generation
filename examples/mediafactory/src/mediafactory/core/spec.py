@@ -73,7 +73,7 @@ class InputImage(BaseModel):
 
 
 class LoraAdapter(BaseModel):
-    """Optional style LoRA weights produced by Lesson 3.6 fine-tuning (`SPEC.md` §7.1, §8.4)."""
+    """Optional style LoRA weights produced by Lesson 4.2 fine-tuning (`SPEC.md` §7.1, §8.4)."""
 
     model_config = ConfigDict(extra="forbid")
 

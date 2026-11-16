@@ -1,4 +1,4 @@
-"""`events.jsonl` trace contract (`SPEC.md` §7.3, Module 2 & Module 4.3 waterfall)."""
+"""`events.jsonl` trace contract (`SPEC.md` §7.3, Module 2 & Module 4.3 tracing)."""
 
 from __future__ import annotations
 

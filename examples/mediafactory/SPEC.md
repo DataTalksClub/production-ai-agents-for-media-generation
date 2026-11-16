@@ -139,7 +139,7 @@ Santa module on the left, factory module on the right:
 |---|---|---|
 | `spec.py` | `core/spec.py` | Closed `GenerationSpec`. Adds `model_revision`, `lora_adapter`, `input_image`, `negative_prompt`, `voice`, `fps`, `frames`. `prompt` is always resolved before writing `spec.json`; `brief_ref` is provenance metadata. |
 | `result.py` | `core/result.py` | Closed `ResultReport`. Adds `fake: bool`, `cache_hit: bool`, and links to shared worker `worker_run_id` when produced in a batch Job. |
-| — | `core/events.py` | Closed `TraceEvent` schema and `events.jsonl` writer (M2 & M4.3 waterfall). |
+| — | `core/events.py` | Closed `TraceEvent` schema and `events.jsonl` writer (M2 & M4.3 tracing). |
 | `cost.py` | `core/cost.py` | Marginal (`c = r × t_gen`) and fixed (`F = r × (startup_s + t_ready + idle_s)`) formulas from Lesson 1.5; thread-safe `Budget` with `reserve / commit / release`. |
 | `storage.py` | `core/storage.py` | FUSE-safe `staged_write`; content-addressed cache lookup; S3 / local run-folder reader. |
 | `schemas.py`, `prompts.py` | `profile/application.py` | Removed holiday schemas from engine. Loads `application.yaml`, `prompts.yaml`, `rubric.yaml`, and validates `{placeholder}` templates and `copy_schema`. |
@@ -150,7 +150,7 @@ Santa module on the left, factory module on the right:
 | — | `workflows/tickets.py` | Persistent async ticket state machine (`intent → submitted → completed \| failed`) and reconciliation before retry (Lesson 2.4). |
 | — | `workflows/pipeline.py` | Single-record planner → generator → judge loop (M2). |
 | — | `workflows/batch.py` | Manifest builder, deterministic stage sampler, batch partitioner, K-Job launcher, poll/reconcile loop, `summary.json` aggregator (M3). |
-| — | `workflows/finetune.py` + `config/lora_config.yaml` | Lesson 2.3 & 3.6 style LoRA workflow: `prepare_dataset` (dedupe, VLM captions, style-word check, contact sheet), `start_finetune` / `get_status` (ticketed Nebius GPU Job with `--timeout`). |
+| — | `workflows/finetune.py` + `config/lora_config.yaml` | Lesson 2.3 & 4.2 style LoRA workflow: `prepare_dataset` (dedupe, VLM captions, style-word check, contact sheet), `start_finetune` / `get_status` (ticketed Nebius GPU Job with `--timeout`). |
 | `config.py` + `config/models.yaml` | `config.py` + `config/models.yaml` | Roles, pinned revisions, GPU placement, fallbacks (`off` by default), policy caps. |
 | `doctor.py`, `teardown.py` | `ops.py` | Prerequisite checks (`doctor`) and resource cleanup (`teardown`). |
 | `cli.py` | `cli.py` | CLI entry point is `mediafactory`. |
@@ -164,7 +164,7 @@ examples/mediafactory/
 ├── README.md
 ├── config/
 │   ├── models.yaml                # roles, pinned revisions, placement, policy
-│   └── lora_config.yaml           # AI Toolkit / LoRA training Job template (Lesson 3.6)
+│   └── lora_config.yaml           # AI Toolkit / LoRA training Job template (Lesson 4.2)
 ├── data/
 │   ├── kids.csv                   # storybook sample, 200 rows
 │   └── kids_10.csv                # first 10 rows
@@ -336,7 +336,7 @@ Closed schema (`extra="forbid"`). Unlike a mutable reference, `spec.json` always
 | `prompt` | `str` | **yes** | Resolved generation prompt (for `speech`, the exact text to speak). |
 | `negative_prompt` | `str \| null` | no | Negative prompt for `image` / `video`. |
 | `voice` | `str \| null` | no | Voice preset ID for `speech` (e.g. `"af_heart"`). |
-| `lora_adapter` | `{uri: str, sha256: str, scale: float, trigger_word: str \| null} \| null` | no | Optional style LoRA weights produced by `mediafactory finetune` (Lesson 3.6), referenced from `styles.presets.<name>.lora`. |
+| `lora_adapter` | `{uri: str, sha256: str, scale: float, trigger_word: str \| null} \| null` | no | Optional style LoRA weights produced by `mediafactory finetune` (Lesson 4.2), referenced from `styles.presets.<name>.lora`. |
 | `input_image` | `{uri: str, sha256: str, mime: str} \| null` | required for I2V | Reference keyframe for image-to-video. `sha256` is 64-hex of the image bytes. |
 | `brief_ref` | `str \| null` | no | Relative path to `items/<id>/brief.json` (provenance metadata; not a substitute for `prompt`). |
 | `record_id` | `str` | **yes** | Record `id` this asset belongs to. |
@@ -409,7 +409,7 @@ runs/<run_id>/
         └── result.json
 ```
 
-**`events.jsonl` schema (aligns with M2 & M4.3 waterfall):**
+**`events.jsonl` schema (aligns with M2 & M4.3 tracing):**
 Every event line is a closed JSON object with:
 - `schema_version`: `1`
 - `event_id`: unique ID
@@ -429,7 +429,7 @@ Every event line is a closed JSON object with:
 - `cost_usd`: `float` (marginal cost charged to this event; see §8.3)
 - Judge events additionally carry: `rubric_version`, `judge_model`, `score`, `reasons`.
 
-**`summary.json` schema (aligns with M3 HW3 & M4.4 dashboard):**
+**`summary.json` schema (aligns with M3 HW3 & M4.4 SLO check):**
 - `schema_version`: `1`, `run_id`, `application`, `fake`: `bool`
 - `records`: `{total, valid, completed_accepted, rejected_weak, dead_lettered, video_sampled}`
 - `jobs`: `{requested_parallel, peak_parallel, total_submitted, preempted_or_killed}`
@@ -483,9 +483,9 @@ Every long-running tool call (an async Video Endpoint request in M2 or a Serverl
    - If `spent + reserved + estimate_usd` exceeds either `record_budget_usd` or `run_budget_usd`, `reserve` raises `BudgetExceeded`, logs a `budget` refusal event with `cost_usd: 0.0`, and halts the record (or run) without launching the workload.
    - When the call finishes, `commit(record_id, actual_usd)` replaces the reservation with the measured cost; on launch failure before billing, `release(record_id)` frees the reservation.
 
-### 8.4 Style Fine-Tuning Workflow (Lesson 2.3 & Lesson 3.6)
+### 8.4 Style Fine-Tuning Workflow (Lesson 2.3 & Lesson 4.2)
 
-`src/mediafactory/workflows/finetune.py` and `config/lora_config.yaml` unify the four Lesson 3.6 scripts (`prepare_dataset.py`, `lora_config.yaml`, `train_lora_job.sh`, `finetune_tool.py`) into the factory:
+`src/mediafactory/workflows/finetune.py` and `config/lora_config.yaml` unify the four Lesson 4.2 scripts (`prepare_dataset.py`, `lora_config.yaml`, `train_lora_job.sh`, `finetune_tool.py`) into the factory:
 
 1. **Dataset preparation (`mediafactory finetune prepare --images <dir> --trigger <word>`):**
    - Deduplicates training images by SHA-256 content hash, generates captions via the `judge`/`vlm` role (or `--fake` captions), flags captions that leak the style trigger word so the LoRA learns the visual style on the trigger rather than the caption words, and renders `contact_sheet.png` + `dataset_manifest.json`.
@@ -568,7 +568,7 @@ Identities are stable. A withdrawn requirement is marked withdrawn and its ID is
 
 ## 12. Out of scope
 
-- Foundation model pretraining (LoRA style fine-tuning as a ticketed Job from Lesson 3.6 *is* supported via `workflows/finetune.py`).
+- Foundation model pretraining (LoRA style fine-tuning as a ticketed Job from Lesson 4.2 *is* supported via `workflows/finetune.py`).
 - A web UI, kiosk, or hosted gallery.
 - Holiday- or Santa-specific Python classes inside `src/mediafactory`.
 - Diffusion math, CUDA kernels, Kubernetes, RAG.
@@ -585,7 +585,7 @@ The implementation passes Phase 1 when automated tests and dry runs verify all s
 4. **Zero-regeneration resume.** Cancelling a multi-Job batch run at ~50% completion and resuming with the same `run_id` completes the remaining items with `items_regenerated_after_resume == 0`.
 5. **Content-addressed cache invalidation.** Re-running with an identical spec is a cache hit (`cost_usd == 0.0`); changing the prompt, seed, `model_revision`, or `input_image.sha256` invalidates the cache and triggers a new generation.
 6. **Concurrent budget enforcement.** Parallel workers sharing a `Budget` respect both `record_budget_usd` and `run_budget_usd` under contention, accounting for failed/retried attempts and emitting `refused` events when the cap is reached.
-7. **Module 4 offline compatibility.** A completed run folder contains `events.jsonl`, `metrics.json`, `summary.json`, `dead_letter.jsonl`, and cached `verdict.json` / `transcript.json` with all fields required to build the M4.1 `evals.json` and M4.3 per-record cost/time waterfall without network calls.
+7. **Module 4 offline compatibility.** A completed run folder contains `events.jsonl`, `metrics.json`, `summary.json`, `dead_letter.jsonl`, and cached `verdict.json` / `transcript.json` with all fields required to build the M4.1 `evals.json` and M4.3 per-record cost and time metrics without network calls.
 
 ### Phase 2 (Optional extensions)
 

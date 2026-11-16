@@ -1,6 +1,6 @@
-"""Lesson 2.3 & Lesson 3.6 style LoRA fine-tuning workflow (`SPEC.md` §8.4).
+"""Lesson 2.3 & Lesson 4.2 style LoRA fine-tuning workflow (`SPEC.md` §8.4).
 
-Unifies the four Lesson 3.6 scripts:
+Unifies the four Lesson 4.2 scripts:
 1. ``prepare_dataset``: deduplicates images by SHA-256, captions via VLM (or `--fake`), flags
    captions that leak the style trigger word, and writes ``dataset_manifest.json`` +
    ``contact_sheet.png``.

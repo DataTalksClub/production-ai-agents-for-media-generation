@@ -1,5 +1,5 @@
 """Comprehensive offline test suite verifying `examples/mediafactory/SPEC.md` requirements
-and all 7 Phase 1 acceptance criteria + Lesson 3.6 fine-tuning workflow.
+and all 7 Phase 1 acceptance criteria + Lesson 4.2 fine-tuning workflow.
 """
 
 from __future__ import annotations
@@ -496,12 +496,12 @@ def test_ac7_module4_run_folder_and_hw3_200_records(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Lesson 3.6 Style Fine-Tuning Workflow & CLI Modes
+# Lesson 4.2 Style Fine-Tuning Workflow & CLI Modes
 # ---------------------------------------------------------------------------
 
 
 def test_lesson36_finetune_prepare_and_ticketed_submit(tmp_path: Path) -> None:
-    """Lesson 3.6: prepare_dataset deduplicates & flags trigger leaks; start_finetune uses tickets."""
+    """Lesson 4.2: prepare_dataset deduplicates & flags trigger leaks; start_finetune uses tickets."""
     raw_imgs = tmp_path / "raw_images"
     raw_imgs.mkdir()
     img1 = make_fake_png(512, 512, seed_tag="img-1")

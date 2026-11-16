@@ -64,27 +64,7 @@ One page per lesson at the module root, all code flat in `code/`, images in `ima
 ├── 04-long-running-tools.md
 ├── 05-judge-loop.md
 ├── images/
-└── code/
-    ├── README.md                   # how to run each file, env vars, the two fake modes
-    ├── models.yaml                 # every model ID and revision for Module 2, pinned
-    ├── trace.py                    # emit() → events.jsonl, per the trace contract
-    ├── check_trace.py              # validates events.jsonl: fields, no cost on node events, steps, totals
-    ├── fake.py                     # scripted model (FunctionModel) + placeholder GPU tools
-    ├── agent_loop.py               # 2.1
-    ├── bench_tool_calling.py       # 2.1
-    ├── tools.py                    # 2.2: typed tools, spec hash, bucket cache, retry classes
-    ├── gpu_tools.py                # 2.3: Endpoint tool, Job tool
-    ├── mcp_server.py               # 2.3 also try
-    ├── tickets.py                  # 2.4: ticket states, reconcile
-    ├── video_tool.py               # 2.4: async Videos API; Job variant
-    ├── kill_resume.sh              # 2.4: one run per restart boundary
-    ├── rubric.yaml                 # 2.5: rubric v1, criteria from brief fields with pass and fail examples, version
-    ├── judge.py                    # 2.5: typed verdict with rubric_version, judge_model, reasons
-    ├── review_loop.py              # 2.5: one agent, role prompts
-    ├── multi_agent.py              # 2.5 also try: planner + reviewer agents
-    └── fixtures/
-        ├── bad_keyframe.png        # 2.5: breaks the brief on purpose
-        └── bad_keyframe.json       # expected verdict and why
+└── code/                           # lesson code, filled in as each lesson is built
 ```
 
 # Community Notes

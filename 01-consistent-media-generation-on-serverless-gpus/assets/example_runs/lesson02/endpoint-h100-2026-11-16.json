@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "mode": "endpoint",
+  "startup_s": null,
+  "ready_wait_s": 0.2,
+  "load_s": null,
+  "latency_s": [
+    1.1997,
+    1.1565,
+    1.1742
+  ],
+  "billable_s": null,
+  "billing_basis": "unavailable",
+  "config": {
+    "model": "Efficient-Large-Model/Sana_1600M_1024px_diffusers",
+    "prompt": "A storybook illustration of a brass telescope glowing on snow under a starry night sky, a small decorated tree and wrapped presents, warm colors, no people, no text",
+    "seed": 7,
+    "params": {
+      "width": 512,
+      "height": 512,
+      "num_inference_steps": 20,
+      "guidance_scale": 4.5,
+      "negative_prompt": ""
+    }
+  },
+  "env": {
+    "driver": null,
+    "cuda": null,
+    "torch": null,
+    "diffusers": null,
+    "peak_vram_gb": null,
+    "gpu": "H100"
+  },
+  "assets": [
+    {"file": "asset-000.png", "bytes": 396509, "sha256": "6dd0a6ff2029a4fe9289130e000b64dc1cf3b36c74e725dae9397666979edac1"},
+    {"file": "asset-001.png", "bytes": 396509, "sha256": "6dd0a6ff2029a4fe9289130e000b64dc1cf3b36c74e725dae9397666979edac1"},
+    {"file": "asset-002.png", "bytes": 396509, "sha256": "6dd0a6ff2029a4fe9289130e000b64dc1cf3b36c74e725dae9397666979edac1"}
+  ],
+  "status": "completed",
+  "create_to_ready_s": null,
+  "ready_at_utc": "2026-11-16T11:11:02.185889+00:00",
+  "_note": "env.gpu added by hand: the client can't see the Endpoint's GPU (confirmed by the author)."
+}
