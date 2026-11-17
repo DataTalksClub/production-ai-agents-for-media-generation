@@ -162,8 +162,8 @@ You need the Nebius CLI and an Object Storage bucket. An S3 access key is option
 4. Set three variables in your shell:
 
 ```bash
-# the course's prebuilt worker, pinned by digest: the tag is for reading, the digest is what runs
-export WORKER_IMAGE=docker.io/mnrozhkov/santa-worker:v0.1.0@sha256:64aae5c286fa3e1d7f018591050db17087ce080595d160759f792492375d6bc0
+# the course's prebuilt worker, pinned to a release tag
+export WORKER_IMAGE=docker.io/mnrozhkov/santa-worker:v0.1.0
 export BUCKET=<your-bucket>
 export RUN_ID=job-001
 ```

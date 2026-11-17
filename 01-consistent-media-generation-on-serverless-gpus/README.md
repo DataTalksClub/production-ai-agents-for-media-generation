@@ -95,7 +95,7 @@ One page per lesson at the module root, all code flat in `code/` (files import e
     ├── nb-measuring-costs.ipynb          # 05: cost per asset
     ├── models.py                         # 02, 04: model specs (Sana, Wan2.2, Kokoro, ...), pinned
     ├── common.py                         # 02–05: Sana loader, setup_endpoint(), request(), wait_ready(), .env helpers, metrics writers, calculate_cost()
-    └── docker/                           # 03, 04: Dockerfile (the worker image), Dockerfile.bad (what not to do)
+    └── docker/                           # 03, 04: Dockerfile (the worker image), requirements.txt (pinned worker deps), Dockerfile.bad (what not to do)
 ```
 
 ## Setup
