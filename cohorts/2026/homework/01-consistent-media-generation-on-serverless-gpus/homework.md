@@ -4,7 +4,7 @@
 > You need a Nebius project with credits. See [Module 1](../../../../01-consistent-media-generation-on-serverless-gpus/README.md).
 > Stop or delete every Endpoint, Job and DevLab when you're done. A forgotten Endpoint bills while it's RUNNING.
 
-In this homework, you generate 10 media assets on a GPU in one run, as in [lesson 02](../../../../01-consistent-media-generation-on-serverless-gpus/02-first-generation.md), and measure their cost, as in [lesson 05](../../../../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md).
+In this homework, you generate 10 media assets on a GPU in one run and work out their cost the way [lesson 05](../../../../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md) does.
 
 ### Find a creative idea
 
@@ -24,11 +24,7 @@ You can reuse the same idea in Homework 3, so pick one you like.
 
 Any open model works. The [Serverless AI Cookbook templates](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/README.md) deploy image, video, speech and music models in a few clicks.
 
-Run it one of three ways from Module 1:
-
-* **Endpoint**, called from your laptop: [lesson 02, Option A](../../../../01-consistent-media-generation-on-serverless-gpus/02-first-generation.md#option-a-endpoint-and-notebook-on-your-laptop). Works with any template.
-* **DevLab** (JupyterLab on a GPU): [lesson 02, Option B](../../../../01-consistent-media-generation-on-serverless-gpus/02-first-generation.md#option-b-jupyterlab-on-a-gpu).
-* **Job**: [lesson 04, Path B](../../../../01-consistent-media-generation-on-serverless-gpus/04-serving-vs-batch.md#path-b-a-job-from-your-laptop). The lesson 04 worker runs Sana (image) or Kokoro-82M (speech).
+Run it any way from Module 1: an Endpoint called from your laptop, a DevLab, or a Job.
 
 The easiest path is Sana with the lesson 02 notebook: it records the times for you.
 
@@ -38,16 +34,10 @@ Run on a preemptible (spot) GPU when you can: it's cheaper and leaves more of yo
 
 1. Turn your idea into a prompt.
 2. Generate **10 assets in one run**: one startup, one model load, ten generations. Use the same prompt, or ten variations of your idea.
-    * Lesson 02 notebooks: change the step 4 loop from `range(3)` to `range(10)`.
-    * Job: run with `--n 10` and only the steps of your model: `--step text --step illustration` for Sana, or `--step text --step greeting` for Kokoro. Upload your own 10-row CSV with the same columns as `kids.csv`, with your idea in `prompt` (image) or `greeting` (speech).
 3. Save the assets. Then stop the Endpoint, or delete the DevLab.
-4. Open [nb-measuring-costs.ipynb](../../../../01-consistent-media-generation-on-serverless-gpus/code/nb-measuring-costs.ipynb) and fill in section 5 with your run. Where each time comes from: [lesson 05, Measure a run of your own](../../../../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md#measure-a-run-of-your-own-homework).
-5. Use the preemptible (spot) price per hour for your GPU and region at the time of the run: [spot prices](https://docs.nebius.com/signup-billing/spot-prices), or [Compute pricing](https://docs.nebius.com/compute/resources/pricing) for GPUs with a fixed preemptible price such as the L40S. See [lesson 05, Prices and assumptions](../../../../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md#prices-and-assumptions) for how to read them. On a DevLab, use the regular price.
-6. Project the cost per asset to N = 1000 from your run: [lesson 05, From time to money](../../../../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md#from-time-to-money).
-
-### Find a benchmark
-
-Find a service that sells the same model, or the closest one, as a per-call API. Convert its price to USD per asset for your settings (resolution, duration or characters). Lesson 05 does it for one model: [The per-call API](../../../../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md#the-per-call-api-wan-22-a14b-on-fal).
+4. Record the startup, the model load and the time for each asset. Split them into the fixed cost per run and the cost per asset, as lesson 05 does.
+5. Use the price per hour your run paid: the preemptible price for your GPU and region at the time of the run, or the regular price on a DevLab. See [Nebius prices](https://nebius.com/prices).
+6. Project the cost per asset to N = 1000 from your run.
 
 ### Question 1
 
@@ -93,14 +83,6 @@ What was your median generation time per media asset, in seconds?
 
 What is your projected cost per asset at N = 1000, in USD?
 
-### Question 8
-
-Which benchmark service or API did you compare with? Text or link.
-
-### Question 9
-
-What does the benchmark charge per asset, in USD?
-
 ## Learning in Public
 
 Share your asset and the idea behind it in a short post. Tag DataTalksClub and Nebius, and submit the post link with your homework. Don't share credentials, Endpoint tokens or bucket keys.
@@ -114,7 +96,7 @@ Completed Module 1 of Production AI Agents for Generative Media!
 
 I ran <model> on Nebius Serverless AI and generated this <image/video/audio> (attached).
 It takes <Z> s to generate one asset (median of 10).
-At 1000 assets, one costs about $<X>; <benchmark> charges $<Y>.
+At 1000 assets, one costs about $<X>.
 
 The idea: <what you wanted to create and why you chose this topic>.
 
