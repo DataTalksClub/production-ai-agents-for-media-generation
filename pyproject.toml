@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-notebooks = ["jupyterlab>=4.4,<5", "ipykernel>=6.29,<8"]
+notebooks = ["jupyterlab>=4.4,<5", "ipykernel>=6.29,<8", "matplotlib>=3.9,<4"]
 gpu = [
     "torch==2.13.0",
     "torchvision==0.28.0",
