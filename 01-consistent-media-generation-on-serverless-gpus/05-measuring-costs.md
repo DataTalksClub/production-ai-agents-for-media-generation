@@ -19,6 +19,36 @@ next_url: ../02-multi-agent-media-workflows/01-agent-loop.md
 
 Santa's elves ran one batch Job on one H100 GPU. It made animated greeting cards for 20 kids: for each kid, an illustration, a card, a short video clip, a spoken greeting and the final video with music. The worker ran for about 45 minutes in our run on 2026-11-14, after a few minutes for the machine to start. So what does one card cost? And what would Santa's list of 200,000 kids cost?
 
+```mermaid
+---
+config:
+  htmlLabels: false
+  flowchart:
+    htmlLabels: false
+---
+flowchart LR
+    list[("Santa's list<br/>200,000 children")] --> child
+    subgraph one["For each child"]
+        direction LR
+        child["Child<br/>name, what they wished for"] --> ill["Illustration<br/>of the wish"]
+        child --> card["Card<br/>illustration, name, a note from Santa"]
+        ill --> card
+        ill --> clip["Short clip<br/>the illustration, animated"]
+        child --> voice["Spoken greeting<br/>to the child, by name"]
+        music["Music"]
+        card --> anim["Animated greeting card<br/>the card with the clip playing,<br/>the greeting and music"]
+        clip --> anim
+        voice --> anim
+        music --> anim
+    end
+    card --> done[("200,000 cards<br/>and 200,000 animated greeting cards")]
+    anim --> done
+    deadline["All ready before the holidays.<br/>Nobody waits for any single card."]
+    deadline -.-> done
+    classDef note fill:none,stroke:none,color:#345a91
+    class deadline note
+```
+
 There's no single answer, because a run has two kinds of cost. Starting the machine and loading the models is paid once per run. Making a card is paid once per card. In this lesson you split one run into those two parts and turn them into a cost per card at any batch size. Then you use the split to answer four questions: which step decides the bill, which GPU makes the cheapest card, what spot prices change, and when self-hosting beats a per-call API.
 
 You're done when you have:

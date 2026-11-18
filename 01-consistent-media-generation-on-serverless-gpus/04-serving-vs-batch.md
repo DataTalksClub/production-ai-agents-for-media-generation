@@ -20,6 +20,12 @@ next_url: 05-measuring-costs.md
 Santa wants a personalized greeting card for each of the 200,000 children on his list. Each card shows an illustration of the child's wish, their name and a note from Santa. Then the card comes alive: the illustration animates into a short clip, with a spoken greeting and music. Nobody waits for any single card. All of them have to be ready before the holidays.
 
 ```mermaid
+---
+config:
+  htmlLabels: false
+  flowchart:
+    htmlLabels: false
+---
 flowchart LR
     list[("Santa's list<br/>200,000 children")] --> child
     subgraph one["For each child"]
@@ -72,6 +78,12 @@ Spot prices aren't capped (see [Pick the price](#pick-the-price)), so check [tod
 The same model can run in two ways. The choice decides who waits, what you tune and what you pay for while nothing happens.
 
 ```mermaid
+---
+config:
+  htmlLabels: false
+  flowchart:
+    htmlLabels: false
+---
 flowchart LR
     subgraph S["Serving: a request waits"]
         direction LR
@@ -181,14 +193,20 @@ So we run Santa's pipeline as a Job.
 The point of a batch is to load each model **once**. Each step loads its model, makes its file for every kid, frees the GPU and moves on. Ten separate Jobs for ten kids would pay startup and every model load ten times.
 
 ```mermaid
+---
+config:
+  htmlLabels: false
+  flowchart:
+    htmlLabels: false
+---
 flowchart LR
     rec[("N kid profiles<br/>10 to 200")] --> txt
     subgraph job["One Job, one H100: the steps run one after another"]
         txt["Step 1: Text<br/>from kids.csv"]
         img["Step 2: Illustration<br/>Sana"]
         crd["Step 3: Card<br/>Pillow, CPU"]
-        vid["Step 4: Clip<br/>Wan2.2-I2V-A14B"]
-        spk["Step 5: Greeting<br/>Kokoro-82M"]
+        vid["Step 4: Clip<br/>Wan2.2<br/>I2V-A14B"]
+        spk["Step 5<br/>Greeting<br/>Kokoro-82M"]
         mix["Step 6: Mix<br/>ffmpeg, CPU"]
         txt -- "image prompt" --> img
         img -- "illustration" --> crd
@@ -353,6 +371,10 @@ nebius ai job logs <job_ID> --follow
 ```
 
 ```mermaid
+---
+config:
+  htmlLabels: false
+---
 stateDiagram-v2
     [*] --> PROVISIONING
     PROVISIONING --> STARTING
