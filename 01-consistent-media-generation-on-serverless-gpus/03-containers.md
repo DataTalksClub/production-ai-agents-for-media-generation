@@ -1,5 +1,5 @@
 ---
-video_url: ""
+video_url: "https://drive.google.com/file/d/1TkylfsUhkCj1gwsTXQYaV9q4sAnOQsbn/view?usp=drive_link"
 code:
   - label: What not to put in a GPU container
     path: code/docker/Dockerfile.bad

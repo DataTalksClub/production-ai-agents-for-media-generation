@@ -1,5 +1,5 @@
 ---
-video_url: ""
+video_url: "https://drive.google.com/file/d/1qhSXouXyQ1pcGu1aWdbn7dX43SeaLCR5/view?usp=drive_link"
 code:
   - label: Cost per card, what to optimize, GPUs, API comparison (notebook)
     path: code/nb-measuring-costs.ipynb
