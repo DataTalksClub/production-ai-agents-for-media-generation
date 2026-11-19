@@ -1,5 +1,5 @@
 ---
-video_url: "https://drive.google.com/file/d/13puckxjFyXodVi0WSmk89BJcv2Zp2Niz/view?usp=drive_link"
+video_url: "https://youtu.be/BTr2Df4FlJw"
 code:
   - label: Santa cards pipeline (all steps, runs inside the Job)
     path: code/batch_inference.py
