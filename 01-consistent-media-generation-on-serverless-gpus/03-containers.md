@@ -1,5 +1,5 @@
 ---
-video_url: ""
+video_url: "https://drive.google.com/file/d/1TkylfsUhkCj1gwsTXQYaV9q4sAnOQsbn/view?usp=drive_link"
 code:
   - label: What not to put in a GPU container
     path: code/docker/Dockerfile.bad
@@ -11,74 +11,62 @@ next_url: 04-serving-vs-batch.md
 
 # 03 - Containers for Generative AI
 
-> ⚠️ **Read this first**
->
-> 💸 **Prices here are examples only.** They come from our runs and price checks on the dates shown, and what you pay can differ: prices change, and spot prices can change every 15 minutes. For real prices, see [Compute pricing](https://docs.nebius.com/compute/resources/pricing) and [spot prices](https://docs.nebius.com/signup-billing/spot-prices).
->
-> ⚠️ **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
+> ⚠️ **Remove running resources to avoid bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab bills while it runs, even when idle.
 
-Say you have a worker script that generates media on a GPU. Ours is [code/batch_inference.py](code/batch_inference.py): it makes gift cards with an image, a video and a speech model, and lesson 04 runs it. To run it on a cloud GPU, you package it as a container image. A container image is the easiest way to reproduce your runtime environment: the GPU host runs only what's in that image, and it doesn't know about your laptop, your virtual environment or the token in your shell. In this lesson we start from what goes wrong, trace each symptom to a line in a broken Dockerfile, and fix it. You're done when you can say, for each line of [code/docker/Dockerfile.bad](code/docker/Dockerfile.bad), what goes wrong on a GPU host and how [code/docker/Dockerfile](code/docker/Dockerfile) fixes it.
+Your worker script runs fine on your laptop. On a cloud GPU, the same code can fail right after the image pull, ignore the GPU, or finish and save nothing. Almost every one of these failures traces back to a single line in the Dockerfile.
 
-Time and cost: about 20 minutes of reading. No GPU and no credits needed. You don't need Docker on your laptop for this course: the worker this lesson builds is published as [`mnrozhkov/santa-worker:v0.1.0`](https://hub.docker.com/r/mnrozhkov/santa-worker), and lesson 04 runs it pinned by digest. Building it yourself is an optional extra at the end.
+A GPU host runs only what's inside your container image. It doesn't see your laptop, your virtual environment or the token in your shell. So the image has to carry everything the worker needs, and nothing it shouldn't.
 
-## Template or your own container?
+In this lesson we take a broken Dockerfile, match each failure to the line that causes it, and fix it.
 
-Most of the time you don't write a Dockerfile at all.
+- **Goal:** for each line of [code/docker/Dockerfile.bad](code/docker/Dockerfile.bad), you can say what goes wrong on a GPU host and how [code/docker/Dockerfile](code/docker/Dockerfile) fixes it.
+- **Time:** about 20 minutes of reading. No GPU and no credits needed.
+- **Optional:** build the fixed image yourself with the command in [The fixed Dockerfile](#the-fixed-dockerfile).
 
-| You want to                                                                     | Use                                                                                                                            |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Serve a catalog model (Sana, Wan, Kokoro, …) behind an HTTP API                 | A [cookbook template](https://github.com/nebius/serverless-ai-cookbook/tree/main/templates): image, port and GPU are filled in |
-| Run your own script once, then stop                                             | Your own image: the worker in this lesson                                                                                      |
-| Change the server, add a model the templates don't have, pin your own libraries | Your own image                                                                                                                 |
+## Do you need your own image?
 
-**Using a cookbook template? You can skim the rest of this lesson.** Come back when you need your own worker.
+Usually not. To serve a catalog model, a template already has the image, port and GPU filled in.
 
-## Start from a template image
-
-You can also build on a template's image, not only use it as is. The Sana template image already has the CUDA runtime, PyTorch and the pinned Diffusers stack, so your Dockerfile only adds your code. [Sana template Dockerfile](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-sana/Dockerfile)
-
-```dockerfile
-FROM cr.eu-north1.nebius.cloud/e00gw2b7v3pxetvpy7/sana-serve:660347b
-ENV HF_HOME=/cache/huggingface
-COPY worker.py /app/
-RUN mkdir -p /cache /data
-CMD ["python", "/app/worker.py", "--out", "/data/run"]
-```
-
-`worker.py` stands for your own script that uses the Sana stack.
-
-| You inherit | You add or change |
+| You want to | Use |
 | --- | --- |
-| CUDA runtime, PyTorch, pinned `diffusers`, `transformers`, `accelerate` | Your code and config |
-| `serve.py`, `fastapi`, `uvicorn` (unused by the worker) | `CMD`: without it the container starts the template's server |
-| The template's choices: you get its pins, not yours | The weights cache path and `/data` |
+| Serve a catalog model (Sana, Wan, Kokoro and others) behind an HTTP API | A [cookbook template](https://github.com/nebius/serverless-ai-cookbook/tree/main/templates): image, port and GPU are filled in |
+| Change the server, add a model the templates don't have, or pin your own libraries | Your own image |
+| Run your own script once, then stop | Your own image. Lesson 04 shows the pipeline |
 
-The example uses a tag to stay short; [section 1](#1-base-image-and-platform) explains pinning by digest. The rest of this lesson builds our worker from the PyTorch base, so you see every line a template image hides.
+You can also build on top of a template's image: see [Build on a template image](#build-on-a-template-image). This lesson builds the worker from the PyTorch base instead, so you see every line a template hides.
 
-## What goes inside the image, and what stays outside
+## What's in the image, and what isn't
 
-An **image** is the package you build and reuse. A **container** is a running instance of that image. The two diagrams show the package first, then what happens when it runs.
+The image is the package you build once. The container is that package running on a GPU host. Some things belong in the package. Others arrive only when it runs.
 
-**At build time: software is packaged in layers.**
+**At build time, software is packaged in layers.**
 
 ```mermaid
-flowchart TB
-    subgraph image["Container image · built once, reused across runs"]
-        direction TB
-        code["APPLICATION LAYER<br/>batch_inference.py · common.py · models.py<br/>Changes most often"]
-        libs["DEPENDENCY LAYER<br/>Diffusers · Transformers · Accelerate<br/>Pinned versions"]
-        base["BASE LAYERS<br/>CUDA runtime · Python · PyTorch<br/>Base image pinned by tag and digest"]
-        code ~~~ libs ~~~ base
+flowchart RL
+    subgraph image["Container image: built once, reused across runs"]
+        code["APPLICATION LAYER<br/>batch_inference.py, common.py, models.py"]
+        libs["DEPENDENCY LAYER<br/>Diffusers, Transformers, Accelerate"]
+        base["BASE LAYERS<br/>CUDA runtime, Python, PyTorch"]
     end
 
+    codeNote["Changes most often"]
+    libsNote["Pinned versions"]
+    baseNote["Pinned version tag"]
+
+    codeNote -.-> code
+    libsNote -.-> libs
+    baseNote -.-> base
+
     classDef layer fill:#ffffff,stroke:#5477aa,color:#183153
+    classDef note fill:none,stroke:none,color:#345a91
     class code,libs,base layer
+    class codeNote,libsNote,baseNote note
     style image fill:#e8efff,stroke:#345a91,stroke-width:3px,color:#183153
 ```
 
-*Read the stack from bottom to top: start with the base image, install libraries, then copy the worker code. Changing only the code lets Docker reuse the earlier layers. These are conceptual groups; the base image itself contains multiple filesystem layers.*
+*Read the image from bottom to top: base image, then libraries, then worker code. When only the code changes, Docker reuses the layers below it. These are conceptual groups: the base image itself has many filesystem layers.*
 
-**At run time: the worker receives inputs, uses the host GPU, and saves results.**
+**At run time, the worker gets inputs, uses the host GPU and saves results.**
 
 ```mermaid
 flowchart LR
@@ -87,7 +75,7 @@ flowchart LR
     hub["Hugging Face Hub<br/>Model weights"]
 
     subgraph host["GPU host"]
-        subgraph container["Running container · temporary"]
+        subgraph container["Running container: temporary"]
             app["Worker process<br/>/app/batch_inference.py"]
             cache["Local model cache<br/>/cache/huggingface"]
             out["/data<br/>Mounted bucket"]
@@ -98,7 +86,7 @@ flowchart LR
         driver --> gpu
     end
 
-    bucket["Object Storage bucket<br/>cards/<id>/ · metrics_batch.json<br/>Remain after the Job ends"]
+    bucket["Object Storage bucket<br/>cards/<id>/, metrics_batch.json<br/>Remain after the Job ends"]
 
     image ==>|"Start from image"| app
     secrets -.->|"Pass as environment variables"| app
@@ -117,29 +105,29 @@ flowchart LR
     class driver,gpu hardware
 ```
 
-*The image supplies the CUDA runtime; the host supplies the NVIDIA driver and GPU. Amber marks the worker and its temporary cache. Green follows the output path to persistent storage:* `/data` *is a mount point, not a second copy of the bucket.*
+*The image brings the CUDA runtime. The host brings the NVIDIA driver and the GPU. Amber is temporary: the worker and its cache. Green is persistent: the output path to the bucket.*
 
-**Outside the image does not mean outside the running container.** Downloaded weights sit in the container's local cache, injected secrets are available to the process, and the bucket appears at `/data`. None of them is baked into the image. When the container is removed, its local cache is lost, but bucket outputs remain. Creating an `/data` directory alone does not make it persistent: whoever starts the container must mount the bucket there.
+Outside the image doesn't mean outside the container. At run time, downloaded weights sit in the container's cache, secrets are in the process environment, and the bucket appears at `/data`. None of them is baked into the image. When the container is removed, the cache is gone and the bucket outputs stay. [5. Outputs](#5-outputs) shows how `/data` becomes persistent.
 
-## Common failures and recovery
+## What breaks on a GPU host
 
-These are the ways a container that works on a laptop goes wrong on a GPU host. Most come from putting something in the wrong place in the picture above. Each row points to the section that fixes it.
+These are the ways a container that works on your laptop fails on a GPU host. Most come from putting something in the wrong place in the picture above.
 
-| You see                                                           | Cause                                                   | Fix                                                      |
-| ----------------------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------------- |
-| The container fails right after the image pull                    | Image built for arm64                                   | [1. Base image and platform](#1-base-image-and-platform) |
-| `torch.cuda.is_available()` is `False` on a GPU                   | CPU-only PyTorch, or no CUDA runtime in the image       | [1. Base image and platform](#1-base-image-and-platform) |
-| CUDA errors at the first GPU call, while the image looks fine     | The image's CUDA is newer than the host driver supports | [1. Base image and platform](#1-base-image-and-platform) |
-| It worked before; after a rebuild it breaks or the outputs change | Unpinned libraries                                      | [2. Dependencies](#2-dependencies)                       |
-| Every code edit reinstalls all libraries                          | Code copied before the install                          | [2. Dependencies](#2-dependencies)                       |
-| Push and pull take forever; the image is huge                     | Weights baked into the image                            | [3. Model weights](#3-model-weights)                     |
-| Every start waits for a download                                  | Weights downloaded at start (a trade-off, not a bug)    | [3. Model weights](#3-model-weights)                     |
-| A token shows up in `docker history`                              | Secret in `ENV` or `ARG`                                | [4. Secrets and stray files](#4-secrets-and-stray-files) |
-| The run finishes but nothing is saved                             | Outputs written inside the container                    | [5. Outputs](#5-outputs)                                 |
+| You see | Cause | Fix |
+| --- | --- | --- |
+| The container fails right after the image pull | Image built for arm64 | [1. Base image and platform](#1-base-image-and-platform) |
+| `torch.cuda.is_available()` is `False` on a GPU | CPU-only PyTorch, or no CUDA runtime in the image | [1. Base image and platform](#1-base-image-and-platform) |
+| CUDA errors at the first GPU call, while the image looks fine | The image's CUDA is newer than the host driver supports | [1. Base image and platform](#1-base-image-and-platform) |
+| It worked before; after a rebuild it breaks or the outputs change | Unpinned libraries | [2. Dependencies](#2-dependencies) |
+| Every code edit reinstalls all libraries | Code copied before the install | [2. Dependencies](#2-dependencies) |
+| Push and pull take forever; the image is huge | Weights baked into the image | [3. Model weights](#3-model-weights) |
+| Every start waits for a download | Weights downloaded at start (a trade-off, not a bug) | [3. Model weights](#3-model-weights) |
+| A token shows up in `docker history` | Secret in `ENV` or `ARG` | [4. Secrets and stray files](#4-secrets-and-stray-files) |
+| The run finishes but nothing is saved | Outputs written inside the container | [5. Outputs](#5-outputs) |
 
-## Five causes, five fixes
+## Five fixes, line by line
 
-Every bad line below comes from one file. **Don't build it.** [code/docker/Dockerfile.bad](code/docker/Dockerfile.bad):
+Every bad line below comes from [code/docker/Dockerfile.bad](code/docker/Dockerfile.bad). **Don't build it.**
 
 ```dockerfile
 FROM --platform=linux/arm64 python:latest
@@ -160,21 +148,21 @@ FROM --platform=linux/arm64 python:latest
 RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
 
 # fixed
-FROM pytorch/pytorch:2.13.0-cuda13.0-cudnn9-runtime@sha256:db80a41f8428644cebcb3d75b0b62df334ab6c0e75785951eb25f48bfbd42407
+FROM pytorch/pytorch:2.13.0-cuda13.0-cudnn9-runtime
 ```
 
-| Bad line                 | What goes wrong                                                                                                                                                             | Fix                                           |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| `--platform=linux/arm64` | The GPU host is `linux/amd64`; an arm64 image doesn't start there                                                                                                           | Build for `linux/amd64`                       |
-| `python:latest`          | Two problems. `latest` is a tag that moves: a rebuild next month can start from a different Python version. And it's a plain Python image, with no CUDA runtime for the GPU | A CUDA runtime base, pinned by tag and digest |
-| `torch … /whl/cpu`       | CPU-only PyTorch: the GPU sits unused                                                                                                                                       | Use the PyTorch build in the CUDA base image  |
+| Bad line | What goes wrong | Fix |
+| --- | --- | --- |
+| `--platform=linux/arm64` | The GPU host is `linux/amd64`, so an arm64 image doesn't start | Build for `linux/amd64` |
+| `python:latest` | `latest` moves, so next month's rebuild can start from a different Python. It's also plain Python, with no CUDA runtime | A CUDA runtime base, pinned to a version tag |
+| `torch … /whl/cpu` | CPU-only PyTorch, so the GPU sits unused | Use the PyTorch build in the CUDA base image |
 
-- `linux/amd64`**.** On an Apple Silicon Mac, Docker builds for arm64 unless you pass `--platform linux/amd64`. Check the platform you building for. 
-- **Don't pick the newest CUDA.** Your image brings the CUDA runtime; the GPU host brings the driver. If the image's CUDA is newer than the driver supports, the container starts but fails at the first GPU call. Take the base image from a cookbook template or from this lesson (`cuda13.0`), and change it only when you know why. [NVIDIA CUDA release notes](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html) 
-- **Runtime, not devel.** A `-devel` image adds compilers and headers you only need if you compile CUDA code, which this course doesn't. It works, but it's a bigger image to pull.
-- **Tag and digest.** The digest pins the exact base image, so a rebuild starts from the same bytes. Re-pin it on purpose, for example for a security fix.
+- **Build for `linux/amd64` on a Mac.** On Apple Silicon, Docker builds for arm64 unless you pass `--platform linux/amd64`.
+- **Don't pick the newest CUDA.** The image brings the CUDA runtime and the host brings the driver. If the image's CUDA is newer than the driver supports, the container starts but fails at the first GPU call. Take the base image from a cookbook template or from this lesson (`cuda13.0`), and change it only when you know why. [NVIDIA CUDA release notes](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html)
+- **Use `runtime`, not `devel`.** A `-devel` image adds compilers and headers for compiling CUDA code. This course compiles none, so you'd only get a bigger image to pull.
+- **Pin a version tag, not `latest`.** `2.13.0-cuda13.0-cudnn9-runtime` fixes the PyTorch, CUDA and cuDNN versions, so a rebuild next month starts from the same stack.
 
-> 💡 **On Nebius Serverless AI:** images must be `linux/amd64`. `--image` accepts `registry/path@digest`, so you can deploy the exact digest you pinned. [Nebius tutorial](https://docs.nebius.com/serverless/quickstart/endpoints), [Endpoints: manage](https://docs.nebius.com/serverless/endpoints/manage) 
+> 💡 **On Nebius Serverless AI:** images must be `linux/amd64`. [Nebius tutorial](https://docs.nebius.com/serverless/quickstart/endpoints), [Endpoints: manage](https://docs.nebius.com/serverless/endpoints/manage)
 
 ### 2. Dependencies
 
@@ -185,20 +173,21 @@ WORKDIR /app
 RUN pip install diffusers transformers
 
 # fixed: pinned installs first, then code
-RUN pip install diffusers==0.39.0 transformers==5.13.1 
 WORKDIR /app
+COPY code/docker/requirements.txt /app/requirements.txt
+RUN pip install -r /app/requirements.txt
 COPY code/common.py code/models.py code/batch_inference.py /app/
 ```
 
 | Bad line | What goes wrong | Fix |
 | --- | --- | --- |
-| `pip install diffusers transformers` | Unpinned: a rebuild can change outputs or break | Pin exact versions |
-| `COPY . /app` before `pip install` | Any code edit invalidates the layers after it, so every edit reinstalls every library | Install libraries first, copy code last |
+| `pip install diffusers transformers` | Unpinned, so a rebuild can change outputs or break | Pin exact versions in `requirements.txt` |
+| `COPY . /app` before `pip install` | Any code edit invalidates every layer after it, so every edit reinstalls every library | Install libraries first, copy code last |
 
-- **What the pins cover.** We pin the libraries we install by exact version. Their own dependencies can still move. For a fully repeatable build, install from a lock file that pins those too, ideally with hashes. [pip: repeatable installs](https://pip.pypa.io/en/stable/topics/repeatable-installs/)
-- **Libraries first, code last.** Docker caches each layer and reuses it until something above it changes. In the bad file the code sits above the installs, and above the weights download too, so one edit to `generate.py` repeats all of them. In the fixed file the same edit rebuilds only the last layers.
+- **Install libraries first, copy code last.** Docker reuses a cached layer until something above it changes. In the bad file the code sits above the installs and the weights download, so one code edit repeats all of them. In the fixed file, the same edit rebuilds only the last layers.
+- **Pins cover your direct dependencies only.** [code/docker/requirements.txt](code/docker/requirements.txt) pins the libraries we install. Their own dependencies can still move. For a fully repeatable build, install from a lock file that pins those too, ideally with hashes. [pip: repeatable installs](https://pip.pypa.io/en/stable/topics/repeatable-installs/)
 
-> 💡 **On Nebius Serverless AI:** an Endpoint's image, command and env vars can't be changed after it is created. A rebuilt image means a new Endpoint, which is one more reason to pin. [Endpoints: manage](https://docs.nebius.com/serverless/endpoints/manage) 
+> 💡 **On Nebius Serverless AI:** you can't change an Endpoint's image, command or env vars after you create it. A rebuilt image means a new Endpoint, which is one more reason to pin. [Endpoints: manage](https://docs.nebius.com/serverless/endpoints/manage)
 
 ### 3. Model weights
 
@@ -211,21 +200,21 @@ ENV HF_HOME=/cache/huggingface
 RUN mkdir -p /cache
 ```
 
-| Bad line                          | What goes wrong                                                                     | Fix                                              |
-| --------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------ |
-| `snapshot_download(...)` at build | About 9.7 GB of weights baked into the image (the sum of the fp16 files on the Hub) | Download at start into a cache, or mount storage |
+| Bad line | What goes wrong | Fix |
+| --- | --- | --- |
+| `snapshot_download(...)` at build | About 9.7 GB of weights baked into the image: the sum of the fp16 files on the Hub | Download at start into a cache, or mount storage |
 
-Baking weights in isn't a bug: the image runs. You pay for it in size, push and pull time, and a rebuild for every model change. The fix moves that cost to start time. There are three places weights can live:
+Baking weights in isn't a bug: the image runs. You pay in image size, push and pull time, and a rebuild for every model change. Downloading at start moves that cost to startup. Weights can live in three places:
 
-| Option                                               | Good                             | Watch out                                                                                                                                                                                                           |
-| ---------------------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Baked into the image                                 | One artifact                     | Huge image; slow push and pull; rebuild for every model change                                                                                                                                                      |
-| On a bucket or shared filesystem mounted at run time | Download once, reuse across runs | Needs a mount. The Hugging Face cache uses symlinks; on storage without symlink support it falls back to copying files, with a warning. [HF cache](https://huggingface.co/docs/huggingface_hub/guides/manage-cache) |
-| Downloaded at start into a cache (our worker)        | Simplest; small image            | Every cold start downloads again                                                                                                                                                                                    |
+| Option | Good | Watch out |
+| --- | --- | --- |
+| Baked into the image | One artifact | Huge image, slow push and pull, rebuild for every model change |
+| On a bucket or shared filesystem mounted at run time | Download once, reuse across runs | Needs a mount. The Hugging Face cache uses symlinks. On storage without symlink support it copies files instead and shows a warning. [HF cache](https://huggingface.co/docs/huggingface_hub/guides/manage-cache) |
+| Downloaded at start into a cache (our worker) | Simplest, small image | Every cold start downloads the weights again |
 
-The cache at `/cache/huggingface` is inside the container, so it's gone when the container is removed. LoRA files follow the same rules as base weights.
+The cache at `/cache/huggingface` lives inside the container and disappears with it. LoRA files follow the same rules as base weights.
 
-> 💡 **On Nebius Serverless AI:** `--volume` mounts a bucket or a shared filesystem into the container. The bucket mount doesn't fully support symlinks, which the Hugging Face cache uses, so put a shared weights cache on a filesystem. With the Sana template, an Endpoint can show RUNNING while the weights are still downloading. [`nebius ai job create`](https://docs.nebius.com/cli/reference/ai/job/create), [Sana template](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-sana/README.md) 
+> 💡 **On Nebius Serverless AI:** `--volume` mounts a bucket or a shared filesystem into the container. The bucket mount doesn't fully support symlinks, so put a shared weights cache on a filesystem. 
 
 ### 4. Secrets and stray files
 
@@ -238,21 +227,20 @@ COPY . /app
 COPY code/common.py code/models.py code/batch_inference.py /app/
 ```
 
-| Bad line         | What goes wrong                                                                                                           | Fix                                                                         |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `ENV HF_TOKEN=…` | `ENV` and build args persist in the final image. [Docker: build secrets](https://docs.docker.com/build/building/secrets/) | Keep secrets out of the Dockerfile; pass them when the container starts     |
-| `COPY . /app`    | Copies whatever is in the build context. Without a `.dockerignore` that means `.env`, local runs and notebooks            | Copy only the files the worker needs, and keep an allowlist `.dockerignore` |
+| Bad line | What goes wrong | Fix |
+| --- | --- | --- |
+| `ENV HF_TOKEN=…` | `ENV` and build args stay in the final image. [Docker: build secrets](https://docs.docker.com/build/building/secrets/) | Keep secrets out of the Dockerfile and pass them when the container starts |
+| `COPY . /app` | Copies the whole build context. Without a `.dockerignore`, that includes `.env`, local runs and notebooks | Copy only the files the worker needs, and keep an allowlist `.dockerignore` |
 
-**Secrets: pass them at run time.** The token lives in your shell or a local file, and Docker hands it to the container when it starts. `-e HF_TOKEN` takes the value from your shell. `-e HF_TOKEN=value` also works, but then the secret is typed into the command and lands in your shell history, so prefer the first form. Either way it never appears in the Dockerfile or the image. [Docker: set environment variables](https://docs.docker.com/reference/cli/docker/container/run/#env)
+**Pass secrets when the container starts.** Keep the token in your shell or a local file. `-e HF_TOKEN` copies its value from your shell into the container, so it never appears in the Dockerfile or the image. Avoid `-e HF_TOKEN=value`: it works, but the token lands in your shell history. [Docker: set environment variables](https://docs.docker.com/reference/cli/docker/container/run/#env)
 
 ```bash
 export HF_TOKEN=...                                  # in your shell, not in the Dockerfile
 docker run --rm -e HF_TOKEN santa-worker:local        # value taken from the shell
-docker run --rm -e HF_TOKEN=hf_xxx santa-worker:local # also valid, but the value is typed in the command
 docker run --rm --env-file .env santa-worker:local    # or several from a file that stays out of git and out of the build context
 ```
 
-**If a build step needs a secret, mount it for that one step.** Our worker doesn't, because it downloads nothing at build. When you do need one, a secret mount exists only during its `RUN` instruction and isn't stored in a layer. [Docker: build secrets](https://docs.docker.com/build/building/secrets/) 
+**If a build step needs a secret, mount it for that step only.** Our worker downloads nothing at build, so it doesn't need one. A secret mount exists only during its `RUN` instruction and isn't stored in any layer. [Docker: build secrets](https://docs.docker.com/build/building/secrets/)
 
 ```dockerfile
 RUN --mount=type=secret,id=hf_token \
@@ -263,21 +251,22 @@ RUN --mount=type=secret,id=hf_token \
 docker build --secret id=hf_token,env=HF_TOKEN .
 ```
 
-**Stray files: allowlist the build context.** The image is built from this module's folder, because the worker needs files from `code/` and from `assets/`. That folder also holds `code/.env` and your local runs. [.dockerignore](.dockerignore) lists what may enter the build: the first line `*` excludes everything, then each `!path` lets one file or folder back in. The last matching line wins. [Docker: build context](https://docs.docker.com/build/concepts/context/) 
+**Allowlist the build context.** We build from the module folder because the worker needs files from `code/` and `assets/`. That folder also holds `code/.env` and your local runs. [.dockerignore](.dockerignore) decides what may enter the build: `*` excludes everything, then each `!path` lets one file or folder back in. The last matching line wins. [Docker: build context](https://docs.docker.com/build/concepts/context/)
 
 ```text
 *
 !code/common.py
 !code/models.py
 !code/batch_inference.py
+!code/docker/requirements.txt
 !assets/kids.csv
 !assets/4_jingle.mp3
 !assets/fonts/
 ```
 
-`COPY . /app` here would be safe only because of this file. Don't rely on that: name the files in the Dockerfile too.
+Without its `!` line, `code/docker/requirements.txt` stays excluded and `COPY` can't read it. This file is also what would make `COPY . /app` safe here. Don't rely on it alone: name the files in the Dockerfile too.
 
-> 💡 **On Nebius Serverless AI:** pass secrets with `--env-secret`; the value is read from SecretStash when the container starts. [Endpoints: manage](https://docs.nebius.com/serverless/endpoints/manage) 
+> 💡 **On Nebius Serverless AI:** pass secrets with `--env-secret`. The value is read from SecretStash when the container starts. [Endpoints: manage](https://docs.nebius.com/serverless/endpoints/manage)
 
 ### 5. Outputs
 
@@ -287,41 +276,108 @@ CMD ["python", "batch_inference.py", "--out", "/tmp/results"]
 
 # fixed
 RUN mkdir -p /data
-CMD ["python", "/app/batch_inference.py", "--n", "1", "--out", "/data/run"]
+ENTRYPOINT ["python", "/app/batch_inference.py"]
+CMD ["--n", "1", "--out", "/data/run"]
 ```
 
 | Bad line | What goes wrong | Fix |
 | --- | --- | --- |
 | `--out /tmp/results` | Outputs vanish when the container exits | Write to a bucket mounted at `/data` |
 
-Creating a `/data` directory alone does not make it persistent. Whoever starts the container must mount a bucket there. Files written to the mounted bucket remain after the container is removed. The mount works both ways: the worker can also read its inputs from it, such as a list of records you uploaded. Lesson 04 reads the kids' profiles from `/data` and writes the cards to it.
+A `/data` directory in the image is just an empty folder. It becomes persistent only when whoever starts the container mounts a bucket there. Then files written to `/data` stay after the container is removed. The mount works both ways: lesson 04 reads the kids' profiles from `/data` and writes the cards back to it.
 
-This matters for a container that runs once and exits. A server that returns its result in the HTTP response doesn't need this.
+This matters for a container that runs once and exits. A server that returns its result in the HTTP response doesn't need it.
 
->💡 **On Nebius Serverless AI:** mount a bucket or a shared filesystem at `/data` with `--volume`: `--volume <bucket>:/data:rw` for a bucket, `--volume <filesystem-id>:/data:rw` for a shared filesystem. Choose a shared filesystem if you need symlinks, which the bucket mount doesn't fully support. [`nebius ai endpoint create`](https://docs.nebius.com/cli/reference/ai/endpoint/create)
+> 💡 **On Nebius Serverless AI:** mount a bucket or a shared filesystem at `/data` with `--volume`: `--volume <bucket>:/data:rw` for a bucket, `--volume <filesystem-id>:/data:rw` for a shared filesystem. Choose the filesystem if you need symlinks. [`nebius ai endpoint create`](https://docs.nebius.com/cli/reference/ai/endpoint/create)
 
 ## The fixed Dockerfile
 
-All five fixes together, [code/docker/Dockerfile](code/docker/Dockerfile), built from the module folder with `docker buildx build --platform linux/amd64 -f code/docker/Dockerfile .`:
+All five fixes together are in [code/docker/Dockerfile](code/docker/Dockerfile). Build it from the module folder:
+
+```bash
+docker buildx build --platform linux/amd64 -f code/docker/Dockerfile -t santa-worker:local .
+```
 
 ```dockerfile
-FROM pytorch/pytorch:2.13.0-cuda13.0-cudnn9-runtime@sha256:db80a41f8428644cebcb3d75b0b62df334ab6c0e75785951eb25f48bfbd42407
+FROM pytorch/pytorch:2.13.0-cuda13.0-cudnn9-runtime
 ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 PIP_BREAK_SYSTEM_PACKAGES=1 HF_HOME=/cache/huggingface
-RUN apt-get update && apt-get install -y --no-install-recommends espeak-ng && rm -rf /var/lib/apt/lists/*
-RUN pip install diffusers==0.39.0 transformers==5.13.1 accelerate==1.14.0 sentencepiece==0.2.1 protobuf==6.33.0
-RUN pip install kokoro==0.9.4 ftfy==6.3.1 imageio==2.38.1 imageio-ffmpeg==0.8.1 pillow==12.2.0 pydantic==2.14.3 typer==0.29.1 rich==15.0.0 \
-    && pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
 WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends espeak-ng && rm -rf /var/lib/apt/lists/*
+COPY code/docker/requirements.txt /app/requirements.txt
+RUN pip install -r /app/requirements.txt
+RUN mkdir -p /cache /data
 COPY code/common.py code/models.py code/batch_inference.py /app/
 COPY assets/kids.csv assets/4_jingle.mp3 /assets/
 COPY assets/fonts /assets/fonts
-RUN mkdir -p /cache /data
-CMD ["python", "/app/batch_inference.py", "--n", "1", "--out", "/data/run"]
+ENTRYPOINT ["python", "/app/batch_inference.py"]
+CMD ["--n", "1", "--out", "/data/run"]
 ```
 
-The course's published image was built from this file: `docker.io/mnrozhkov/santa-worker:v0.1.0`, digest `sha256:64aae5c286fa3e1d7f018591050db17087ce080595d160759f792492375d6bc0`, for `linux/amd64`. Lesson 04 uses that digest, so the Job runs exactly this build even if the tag moves. If you change the worker, build your own image, push it to a registry the Job can pull from, and put your reference in `WORKER_IMAGE`.
+- **`PYTHONUNBUFFERED=1`** flushes `stdout` and `stderr` immediately, so `nebius ai job logs --follow` shows progress live instead of waiting on a buffer.
+- **`PIP_NO_CACHE_DIR=1`** skips saving downloaded `.whl` files under `/root/.cache/pip`, keeping them out of the image layer (saves ~150–180 MB here).
+- **`PIP_BREAK_SYSTEM_PACKAGES=1`** lets `pip` install into the base image's system Python, where CUDA PyTorch is already installed. Ubuntu 24.04 blocks system-wide `pip install` by default (PEP 668) to protect OS utilities on a shared machine; in a single-purpose container, installing directly into that Python environment is safe.
 
-> ⚠️ **Remove all running resources after the lesson to prevent bills.** Stop or delete every Endpoint, Job and DevLab you started, even after a failed run, and delete bucket data you no longer need. An Endpoint or DevLab keeps billing while it runs, even when idle.
+We built the course image from this file for `linux/amd64` and published it as `docker.io/mnrozhkov/santa-worker:v0.1.0`. Lesson 04 runs that tag.
+
+If you change the worker, build your own image, push it to a registry the Job can pull from, and put your reference in `WORKER_IMAGE`.
+
+## Going further
+
+Optional. The worker runs without these.
+
+### Build on a template image
+
+Instead of the PyTorch base, you can start from a template's image. The Sana template image already has the CUDA runtime, PyTorch and the pinned Diffusers stack, so your Dockerfile only adds your code. [Sana template Dockerfile](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-sana/Dockerfile)
+
+```dockerfile
+FROM cr.eu-north1.nebius.cloud/e00gw2b7v3pxetvpy7/sana-serve:660347b
+ENV HF_HOME=/cache/huggingface
+COPY worker.py /app/
+RUN mkdir -p /cache /data
+CMD ["python", "/app/worker.py", "--out", "/data/run"]
+```
+
+`worker.py` stands for your own script that uses the Sana stack.
+
+| You inherit | You add or change |
+| --- | --- |
+| CUDA runtime, PyTorch, pinned `diffusers`, `transformers`, `accelerate` | Your code and config |
+| `serve.py`, `fastapi`, `uvicorn`, unused by the worker | `CMD`: without it, the container starts the template's server |
+| The template's pins, not yours | The weights cache path and `/data` |
+
+### Run the worker as a non-root user
+
+The PyTorch base image runs as `root`. Our worker holds `HF_TOKEN`, imports third-party packages, loads model weights and writes to `/data`, all as the container user. As `root`, a compromised dependency or model file can change `/app`, system libraries or any other path in the container, not only `/cache` and `/data`.
+
+A dedicated user such as UID `1001` can own `/cache` and `/data` and only read `/app` and `/assets`. That's all the access the worker needs. It doesn't hide `HF_TOKEN` or block writes to `/data`, so you still scope secrets and the bucket. It limits what the process can change everywhere else.
+
+```dockerfile
+RUN groupadd --system --gid 1001 app && \
+    useradd --system --uid 1001 --gid 1001 --create-home app
+RUN mkdir -p /cache /data && chown -R 1001:1001 /cache /data
+COPY code/common.py code/models.py code/batch_inference.py /app/
+COPY assets/kids.csv assets/4_jingle.mp3 /assets/
+COPY assets/fonts /assets/fonts
+USER 1001:1001
+```
+
+Check your mounts before you add `USER`. On GPU platforms, a bucket or shared filesystem at `/data` and the NVIDIA device nodes can be owned by `root`. If UID `1001` can't write to `/data` or open the GPU, the Job fails at the first write or the first CUDA call. Our worker image stays on `root` unless the mounted storage is writable by that UID.
+
+### Cache `apt` and `pip` outside the image
+
+Our Dockerfile sets `PIP_NO_CACHE_DIR=1` and deletes the apt lists to keep caches out of the image. The cost is rebuild speed: every change to `requirements.txt` downloads every wheel again.
+
+BuildKit cache mounts keep the `apt` and `pip` caches on the build host, outside the image layers. A bind mount reads `requirements.txt` without a separate `COPY` layer. To switch, put `# syntax=docker/dockerfile:1` on the first line, drop `PIP_NO_CACHE_DIR=1`, and replace the install steps with:
+
+```dockerfile
+# syntax=docker/dockerfile:1
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends espeak-ng
+RUN --mount=type=bind,source=code/docker/requirements.txt,target=/tmp/requirements.txt \
+    --mount=type=cache,target=/root/.cache/pip \
+    pip install -r /tmp/requirements.txt
+```
 
 ## References
 

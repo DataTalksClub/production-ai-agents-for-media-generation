@@ -1,0 +1,19 @@
+# Direct pins for the Santa cards worker image (code/docker/Dockerfile).
+# PyTorch comes from the CUDA base image; do not add torch or torchvision here.
+diffusers==0.39.0
+transformers==5.13.1
+accelerate==1.14.0
+sentencepiece==0.2.1
+protobuf==6.33.0
+kokoro==0.9.4
+# Wan prompt cleaning.
+ftfy==6.3.1
+imageio==2.38.1
+# MP4 export and the audio/video mix step.
+imageio-ffmpeg==0.8.1
+pillow==12.2.0
+pydantic==2.14.3
+typer==0.29.1
+rich==15.0.0
+# Kokoro's English pipeline, installed at build time so a Job does not pip-install it at runtime.
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl

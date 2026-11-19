@@ -93,9 +93,10 @@ One page per lesson at the module root, all code flat in `code/` (files import e
     ├── batch_inference.py                # 03, 04: Santa's gift cards for N kids in one Job: text, illustration, card, clip, greeting, mix
     ├── nb-santa-cards.ipynb              # 04: the same steps for one kid, to explore and test, on a GPU
     ├── nb-measuring-costs.ipynb          # 05: cost per asset
+    ├── costs.py                          # 05: cost helpers and the lesson's charts, used by the notebook
     ├── models.py                         # 02, 04: model specs (Sana, Wan2.2, Kokoro, ...), pinned
     ├── common.py                         # 02–05: Sana loader, setup_endpoint(), request(), wait_ready(), .env helpers, metrics writers, calculate_cost()
-    └── docker/                           # 03, 04: Dockerfile (the worker image), Dockerfile.bad (what not to do)
+    └── docker/                           # 03, 04: Dockerfile (the worker image), requirements.txt (pinned worker deps), Dockerfile.bad (what not to do)
 ```
 
 ## Setup
