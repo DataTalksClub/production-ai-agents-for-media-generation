@@ -7,7 +7,7 @@
 Welcome to Module 1 of Production AI Agents for Generative Media! These two weeks we make it work: run image, video and audio models on serverless GPUs, for serving and for batch, and measure what one asset costs.
 
 > [!NOTE]
-> Before you start: join the Builder Program, create a Nebius AI Cloud account with payment details and apply your promo code. Steps: see [Setup](#setup) below.
+> Before you start: join the Builder Program, follow the instructions in your AI Cloud promo code email to set up Cloud and redeem the code. Steps: see [Setup](#setup) below.
 
 > [!WARNING]
 > Make sure you stop or delete your resources (Endpoints, Jobs, JupyterLab) when you finish the module to avoid charges. An Endpoint bills while it's RUNNING, even when it serves no requests.
@@ -103,9 +103,9 @@ One page per lesson at the module root, all code flat in `code/` (files import e
 
 Do this once, before any lesson in this module. Every lesson needs steps 1–3, whether you call an Endpoint from your laptop or work in JupyterLab on a GPU.
 
-1. **Join the [Nebius AI Builder Program](https://dev.nebius.com/builders)** and get your promo code. It's free.
-2. **Create a Nebius AI Cloud account and add payment details** at [console.nebius.com](https://console.nebius.com/). When you add a bank card, Nebius charges $25 and adds this amount to your account balance. You need payment details before you can apply a promo code. [Sign up](https://docs.nebius.com/signup-billing/sign-up)
-3. **Apply your Builder Program promo code:** in the console, go to [Billing](https://console.nebius.com/billing/), click **Apply promo code**, enter the code and click **Apply promo code**. Your balance increases by the code's amount; check it in the [transactions list](https://console.nebius.com/billing/transactions). If you don't see the button, check that you added payment details. Apply the code before its expiration date. [How to use a promo code](https://docs.nebius.com/signup-billing/payments/promo-codes#how-to-use-a-promo-code)
+1. **Join the [Nebius AI Builder Program](https://dev.nebius.com/builders).** AI Cloud and Token Factory codes arrive in separate emails. Use the AI Cloud code for the GPU workloads in this module.
+2. **Create a [Nebius AI Cloud account](https://console.nebius.com/).** Follow the instructions in your AI Cloud promo code email. You can use the course promo code without adding a bank card.
+3. **Apply your Builder Program promo code:** in the console, go to [Billing](https://console.nebius.com/billing/), click **Apply promo code**, enter the code and click **Apply promo code**. Your balance increases by the code's amount; check it in the [transactions list](https://console.nebius.com/billing/transactions). Apply the code before its expiration date. [How to use a promo code](https://docs.nebius.com/signup-billing/payments/promo-codes#how-to-use-a-promo-code)
 4. **Clone this repository** and install [uv](https://docs.astral.sh/uv/getting-started/installation/) (`uv` installs Python 3.12 for you).
 5. **Start Jupyter** from the repository root:
 
