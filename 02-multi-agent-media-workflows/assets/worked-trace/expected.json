@@ -1,0 +1,28 @@
+{
+  "steps": 10,
+  "judge_calls": 2,
+  "attempts": {
+    "keyframe": 2,
+    "video": 1
+  },
+  "accept_rate": 0.5,
+  "rejected_share": 0.012987,
+  "llm_tokens": 9140,
+  "latency_s": [
+    4.0,
+    4.0
+  ],
+  "video_latency_s": [
+    300.0
+  ],
+  "cost_by_step": {
+    "llm": 0.0015,
+    "keyframe": 0.004,
+    "judge": 0.002,
+    "video": 0.25
+  },
+  "marginal_cost_usd": 0.2575,
+  "possible_duplicates": 0,
+  "stop_reason": "done",
+  "note": "All numbers are [illustrative]: invented to show the aggregation rules, not measured."
+}

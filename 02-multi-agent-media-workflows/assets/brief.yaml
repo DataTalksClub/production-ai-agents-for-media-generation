@@ -1,0 +1,8 @@
+# Lesson brief for Module 2. Fictional product [placeholder: product, pick before release].
+# Homework 2 uses its own brief (Byte Brew coffee); same fields, so the same rubric judges both.
+product: Lumen Loop, a fictional desk lamp
+audience: people who work from home
+format: "16:9"  # quoted: YAML reads a bare 16:9 as the number 969
+shot: a person at a tidy desk at dusk switches on a Lumen Loop lamp and the room turns warm
+must_show: the lamp, the person, the desk
+must_not: real brand names, logos, readable text

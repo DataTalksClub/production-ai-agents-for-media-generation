@@ -1,0 +1,6 @@
+{
+  "expected": "PASS",
+  "why": "meets the brief: lamp, person and desk in frame, no text or logos",
+  "image": "good_keyframe.png",
+  "checked_against_image": false
+}
