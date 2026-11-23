@@ -51,21 +51,64 @@ Build a media agent for a short coffee ad video: plan → keyframe → judge →
 
 Questions and submission: [homework.md](../cohorts/2026/homework/02-multi-agent-media-workflows/homework.md).
 
-## Module structure (proposed)
+## Module structure
 
-One page per lesson at the module root, all code flat in `code/`, images in `images/`.
+One page per lesson at the module root, all code flat in `code/` (files import each other), task data in `assets/`.
 
 ```text
 02-multi-agent-media-workflows/
-├── README.md                       # lessons index
+├── README.md                       # lessons index, setup
 ├── 01-agent-loop.md
 ├── 02-tools.md
 ├── 03-gpu-tools.md
 ├── 04-long-running-tools.md
 ├── 05-judge-loop.md
-├── images/
-└── code/                           # lesson code, filled in as each lesson is built
+├── assets/
+│   ├── brief.yaml                  # the lesson brief: the Brief fields Homework 2 uses too
+│   ├── rubric.yaml                 # 2.5: rubric v1, criteria that read Brief fields
+│   ├── fixtures/                   # 2.5: bad and good keyframe with their expected verdicts
+│   └── worked-trace/               # a hand-written trace and its totals, for check_trace.py
+└── code/
+    ├── .env                        # you create it: Token Factory key, Endpoint URLs and tokens (git-ignored)
+    ├── nb-agent-loop.ipynb         # 2.1: be the LLM, swap in Token Factory, agent.iter(), limits, state
+    ├── nb-tools.ipynb              # 2.2: schema, validation retry, timeout, cache hit, typed plan
+    ├── nb-gpu-tools.ipynb          # 2.3: the Sana Endpoint as generate_image; MCP also try
+    ├── mcp_server.py               # 2.3: the same image tool over MCP (stdio)
+    ├── video_tool.py               # 2.4: deferred video tool, ticket, reconcile, resume
+    ├── nb-judge.ipynb              # 2.5: rubric v1 and the judge on both fixtures
+    ├── review_loop.py              # 2.5: planner, generator, reviewer loop with caps and budget guard
+    ├── tools.py                    # 2.2–2.5: generate_image, spec hash, Sana backend, settings, Store
+    ├── tracing.py                  # all: events.jsonl writer, run_traced(), totals, metrics.json
+    ├── check_trace.py              # all: check a trace against the field contract, print totals
+    ├── fake.py                     # all: scripted model, placeholder image and video backends
+    └── models.py                   # all: pinned model specs (LLM, judge, Sana, Wan2.2), Brief, Plan
 ```
+
+Every run writes to `code/runs/02-multi-agent-media-workflows/<run_id>/`: `events.jsonl`, `messages.json`, `metrics.json`, `tickets/` and the assets. With `BUCKET` set in `code/.env`, assets and run files are also copied to `s3://<bucket>/runs/02-multi-agent-media-workflows/<run_id>/`.
+
+## Setup
+
+Do this once, before any lesson in this module.
+
+1. **Module 1 setup:** a Nebius account with credits and the repository cloned. See the [Module 1 README](../01-consistent-media-generation-on-serverless-gpus/README.md).
+2. **A Token Factory API key** from [Nebius Token Factory](https://docs.tokenfactory.nebius.com/quickstart). The notebooks ask for it once and save it to `code/.env` as `NEBIUS_API_KEY`.
+3. **Install and start Jupyter** from the repository root:
+
+   ```bash
+   uv sync --extra notebooks
+   uv run jupyter lab
+   ```
+
+4. **Scripts** run from the code folder:
+
+   ```bash
+   cd 02-multi-agent-media-workflows/code
+   uv run python review_loop.py --fake
+   ```
+
+Every notebook has a `MODE` cell and every script a `--fake` flag: a scripted model and placeholder images and videos, fully offline. Start there, then switch to the real models.
+
+Endpoints: lesson 2.3 uses the [Sana](https://console.nebius.com/serverless/endpoint/create?template=sana) template, 2.4 the [Wan2.2-I2V-A14B](https://console.nebius.com/serverless/endpoint/create?template=wan22-i2v-a14b) template, 2.5 both. Start each one when its lesson needs it, and stop it when the lesson ends. Check with `nebius ai endpoint list` that nothing is still `RUNNING`.
 
 # Community Notes
 
