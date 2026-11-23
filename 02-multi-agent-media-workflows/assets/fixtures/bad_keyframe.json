@@ -1,0 +1,6 @@
+{
+  "expected": "RETRY",
+  "why": "breaks must_show: the lamp is not in the frame",
+  "image": "bad_keyframe.png",
+  "checked_against_image": false
+}

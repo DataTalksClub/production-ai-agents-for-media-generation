@@ -1,0 +1,42 @@
+# Rubric v1 for the keyframe judge (lesson 2.5). Learner-authored task data.
+# Criteria read Brief fields, not one brief: the same rubric judges the lesson brief,
+# the Homework 2 brief and Module 3 records mapped to Brief.
+# Score anchors for every criterion: 0 = fails, 0.5 = partly, 1 = clearly meets it.
+# scope: keyframe = judged from the image; video_only = a person checks it in the video.
+version: v1
+criteria:
+  - id: must_show
+    brief_field: must_show
+    question: Is every item in must_show clearly visible?
+    must_have: true
+    scope: keyframe
+    pass_example: all listed items are in frame and recognisable
+    fail_example: one item is missing, cut off or hidden
+  - id: must_not
+    brief_field: must_not
+    question: Is the image free of everything in must_not?
+    must_have: true
+    scope: keyframe
+    pass_example: no logos, brand names or readable text anywhere
+    fail_example: a logo on a cup, or legible text on a screen
+  - id: shot
+    brief_field: shot
+    question: Does the image show the moment the shot describes?
+    must_have: true
+    scope: keyframe
+    pass_example: the setting, the person and the action match the shot
+    fail_example: a different setting, or the wrong moment
+  - id: audience
+    brief_field: audience
+    question: Would the audience recognise themselves in the scene?
+    must_have: false
+    scope: keyframe
+    pass_example: the setting looks like where this audience works or lives
+    fail_example: a setting this audience never sees
+  - id: motion
+    brief_field: shot
+    question: Does the action in the shot happen in the clip?
+    must_have: true
+    scope: video_only
+    pass_example: the action happens smoothly in the clip
+    fail_example: nothing moves, or the subject deforms
