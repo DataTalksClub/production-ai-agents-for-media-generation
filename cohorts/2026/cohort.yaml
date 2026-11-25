@@ -1,0 +1,35 @@
+schema_version: 2
+content_id: 9d68c256-0944-4fab-8ed7-bd521ddaba98
+identifier: "2026"
+course: production-ai-agents-generative-media
+delivery: live
+published: true
+start_date: "2026-11-16"
+end_date: "2027-02-05"
+curriculum: current
+homework:
+  - module: 01-consistent-media-generation-on-serverless-gpus
+    source: cohorts/2026/homework/01-consistent-media-generation-on-serverless-gpus/homework.yaml
+  - module: 02-multi-agent-media-workflows
+    source: cohorts/2026/homework/02-multi-agent-media-workflows/homework.yaml
+  - module: 03-batch-media-generation-at-scale
+    source: cohorts/2026/homework/03-batch-media-generation-at-scale/homework.yaml
+review_criteria:
+  - cohorts/2026/review_criteria/mediagen-capstone.yaml
+projects:
+  - slug: project-attempt-1
+    title: "Capstone Project, Attempt 1"
+    module: 04-evaluation-observability-production
+    description: cohorts/2026/projects/capstone.md
+    submission_due: "2027-01-15T23:59:59Z"
+    review_due: "2027-01-22T23:59:59Z"
+    peers: 3
+    criteria_set: mediagen-capstone
+  - slug: project-attempt-2
+    title: "Capstone Project, Attempt 2"
+    module: 04-evaluation-observability-production
+    description: cohorts/2026/projects/capstone.md
+    submission_due: "2027-01-29T23:59:59Z"
+    review_due: "2027-02-05T23:59:59Z"
+    peers: 3
+    criteria_set: mediagen-capstone

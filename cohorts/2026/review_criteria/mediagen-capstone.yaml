@@ -1,0 +1,84 @@
+slug: mediagen-capstone
+title: Production AI Agents for Generative Media capstone
+description: 'Peers score each of the 8 areas 0, 1 or 2. Full requirements: projects/README.md.'
+criteria:
+- id: system
+  title: System
+  type: scale
+  options:
+  - points: 0
+    text: There is no working end-to-end system that takes records in and produces media out on Nebius Serverless AI.
+  - points: 1
+    text: A working pipeline runs on Nebius Serverless AI, but the batch is incomplete (fewer records than required, or only part of the path works).
+  - points: 2
+    text: 'A production multimodal system runs on Nebius Serverless AI: records in, media out, and a batch of 100 image and audio records, or 10 video records.'
+- id: agent
+  title: Agent
+  type: scale
+  options:
+  - points: 0
+    text: There is no agent, or only a single blocking script with no tools.
+  - points: 1
+    text: There is an agent, but it has fewer than two tools, or it does not orchestrate GPU work.
+  - points: 2
+    text: An agent with at least two tools orchestrates long-running GPU jobs, with job IDs and persisted state, not only blocking calls.
+- id: media
+  title: Media
+  type: scale
+  options:
+  - points: 0
+    text: No GPU media models are used, or only one model is used.
+  - points: 1
+    text: Two or more GPU media models are used, but generated assets are missing or are not stored in object storage.
+  - points: 2
+    text: At least two GPU media models (image, video or audio) are used, and assets are stored in object storage.
+- id: cost
+  title: Cost
+  type: scale
+  options:
+  - points: 0
+    text: There is no cost report.
+  - points: 1
+    text: A cost figure is present, but it has no per-asset or per-request breakdown.
+  - points: 2
+    text: A cost report explains the cost per asset or per request.
+- id: reliability
+  title: Reliability
+  type: scale
+  options:
+  - points: 0
+    text: Failures and interruptions are not handled.
+  - points: 1
+    text: There is some retry or error handling, but a killed run cannot resume without redoing finished work.
+  - points: 2
+    text: A killed run resumes without redoing finished work.
+- id: observability
+  title: Observability
+  type: scale
+  options:
+  - points: 0
+    text: There are no traces, metrics or logs.
+  - points: 1
+    text: Some logs or metrics exist, but there is no per-request trace.
+  - points: 2
+    text: Each request has a trace that answers why this cost and why this long, plus metrics, logs and a dashboard.
+- id: reproducibility
+  title: Reproducibility
+  type: scale
+  options:
+  - points: 0
+    text: The run cannot be repeated from the repository.
+  - points: 1
+    text: The code is public, but versions, prompts or inputs are not pinned enough to replay the run.
+  - points: 2
+    text: The run is reproducible from public MIT code, with pinned versions and inputs, and is OpenAI- and S3-compatible.
+- id: presentation
+  title: Presentation
+  type: scale
+  options:
+  - points: 0
+    text: The project is not shared publicly, or there is no way to understand what was built.
+  - points: 1
+    text: A public repository or post exists, but it does not explain how to run the project or what it produced.
+  - points: 2
+    text: The work is shared publicly, with a clear write-up of what was built, how to run it, and what the results were.
