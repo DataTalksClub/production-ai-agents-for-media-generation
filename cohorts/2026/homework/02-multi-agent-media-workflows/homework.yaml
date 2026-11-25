@@ -1,0 +1,74 @@
+schema_version: 2
+content_id: af14971b-27c4-45ec-8094-98d41afc3df0
+slug: module2
+title: "Homework 2: Media Agent"
+instructions_path: homework.md
+due_at: "2026-12-07T23:59:00Z"
+initial_state: closed
+form:
+  homework_url: true
+  time_spent_lectures: true
+  time_spent_homework: true
+  faq_contribution: true
+  learning_in_public_cap: 7
+questions:
+  - content_id: fb8b31ce-6f7b-4b28-9701-7540c22263be
+    id: q1
+    type: free_form_long
+    answer_type: any
+    prompt: "Did you build an agent, a workflow or a hybrid for this brief? Why? Two or three sentences."
+    points: 1
+  - content_id: 4c7a1766-2c95-4af1-97c9-485719d06a83
+    id: q2
+    type: free_form
+    answer_type: any
+    prompt: "Which image model did you use for the keyframe? Options: Sana, Qwen-Image, Z-Image-Turbo."
+    points: 1
+  - content_id: 39b3861c-fc6b-4ee0-9304-b4b7c6632ff9
+    id: q3
+    type: free_form
+    answer_type: any
+    prompt: "How did your agent call the GPU tools? Options: Plain Python functions, Over MCP, Both."
+    points: 1
+  - content_id: 5435c3b0-47d3-45e7-bdfe-065a0d52343e
+    id: q4
+    type: free_form
+    answer_type: any
+    prompt: "What did the judge return on your fixture keyframe? Options: RETRY, WEAK, PASS, The reply didn't parse."
+    points: 1
+  - content_id: e3fa3f45-6fe7-4036-b693-0d394a7c330c
+    id: q5
+    type: free_form
+    answer_type: any
+    prompt: "How many keyframe attempts did your normal run need before the judge returned `PASS`?"
+    points: 1
+  - content_id: 3d9b6de7-5bfb-4e9d-9fdf-643b6ea2cc41
+    id: q6
+    type: free_form
+    answer_type: any
+    prompt: "How many steps did your normal run take, counting model requests and tool calls?"
+    points: 1
+  - content_id: c483472e-2caf-473e-8992-ccd0d4649dcf
+    id: q7
+    type: free_form
+    answer_type: any
+    prompt: "What was your marginal cost per video, in USD?"
+    points: 1
+  - content_id: ca4cc33d-2a8e-4eda-9e05-1a034e2dce23
+    id: q8
+    type: free_form
+    answer_type: any
+    prompt: "Which step cost the most? Options: Plan (LLM), Keyframe image, Judge, Video."
+    points: 1
+  - content_id: 9e52cded-6f47-423a-b244-a7a8f20d608d
+    id: q9
+    type: free_form
+    answer_type: any
+    prompt: "What was your rejected share, in percent?"
+    points: 1
+  - content_id: a1caad7e-5808-461a-b4d3-80a608e20e0a
+    id: q10
+    type: free_form
+    answer_type: any
+    prompt: "Link to your repository with the code, `brief.yaml`, `fixture_keyframe.png`, `events.jsonl` and the final video."
+    points: 1

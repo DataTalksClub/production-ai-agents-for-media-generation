@@ -1,0 +1,74 @@
+schema_version: 2
+content_id: bbf63e5f-0270-4539-9c1d-f11d7c6ba0c0
+slug: module3
+title: "Homework 3: Factory Scale Challenge"
+instructions_path: homework.md
+due_at: "2026-12-14T23:59:00Z"
+initial_state: closed
+form:
+  homework_url: true
+  time_spent_lectures: true
+  time_spent_homework: true
+  faq_contribution: true
+  learning_in_public_cap: 7
+questions:
+  - content_id: 5ac443cb-493c-4b7e-a98a-86bee9563bb4
+    id: q1
+    type: free_form
+    answer_type: any
+    prompt: "What wall time did you predict for the run, and what did you get? Format: `predicted min, actual min`."
+    points: 1
+  - content_id: 4d406a68-1d7d-44c4-a421-183d68d1c7b5
+    id: q2
+    type: free_form
+    answer_type: any
+    prompt: "How many Jobs ran in parallel at peak? Options: 10, 5–9, Fewer than 5."
+    points: 1
+  - content_id: ca4e7b8f-e159-4e6d-8119-2ea056f4f8ed
+    id: q3
+    type: free_form
+    answer_type: any
+    prompt: "What was the total cost of the run, in USD?"
+    points: 1
+  - content_id: 0ab166b0-6e84-46cf-9851-ebf1cc63b94d
+    id: q4
+    type: free_form
+    answer_type: any
+    prompt: "What was your cost per accepted asset, in USD?"
+    points: 1
+  - content_id: 98ad7233-e16d-4178-9118-afad8d9e362b
+    id: q5
+    type: free_form
+    answer_type: any
+    prompt: "How much did spot save compared with on-demand for the same billable time, in USD?"
+    points: 1
+  - content_id: 297ed75e-d3ba-4a2f-911e-622e699ba6f2
+    id: q6
+    type: free_form
+    answer_type: any
+    prompt: "How many items that were done before the kill were regenerated after the resume?"
+    points: 1
+  - content_id: 88324370-1e2b-4dc0-a3db-42bcfe1fda33
+    id: q7
+    type: free_form
+    answer_type: any
+    prompt: "Which 3.3 setting gave you the lowest cost per accepted asset? Options: One record per Job, Several records per model load, more than one model load per Job, All records in a Job share one model load, Other."
+    points: 1
+  - content_id: fcd687ad-47f8-4ecb-8915-9a095d179e77
+    id: q8
+    type: free_form
+    answer_type: any
+    prompt: "What were your p50 and p95 generation times per image, in seconds? Format: `p50, p95`."
+    points: 1
+  - content_id: 14661f6c-3502-4547-885e-c6c6bb6c1a59
+    id: q9
+    type: free_form
+    answer_type: any
+    prompt: "What was the judge pass rate on your run, in percent?"
+    points: 1
+  - content_id: 0310f384-2562-49db-9108-ccd53206c776
+    id: q10
+    type: free_form
+    answer_type: any
+    prompt: "If you used Sana or Kokoro-82M in Homework 1: what was your median generation time then, and what is it now, in seconds? Format: `HW1 s, HW3 s`. Otherwise enter `n/a`."
+    points: 1
