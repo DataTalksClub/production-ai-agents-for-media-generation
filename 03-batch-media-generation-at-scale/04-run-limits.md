@@ -1,5 +1,4 @@
 ---
-video_url: ""
 prev_url: 03-optimizing-cost.md
 next_url: ../04-evaluation-observability-production/01-evaluating-media-quality.md
 ---

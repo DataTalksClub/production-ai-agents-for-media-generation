@@ -1,5 +1,4 @@
 ---
-video_url: ""
 prev_url: 03-gpu-tools.md
 next_url: 05-judge-loop.md
 ---

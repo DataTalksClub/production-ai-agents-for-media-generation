@@ -1,5 +1,4 @@
 ---
-video_url: ""
 prev_url: 01-evaluating-media-quality.md
 next_url: 03-tracing-mlflow.md
 ---

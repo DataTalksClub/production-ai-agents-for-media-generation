@@ -1,5 +1,4 @@
 ---
-video_url: ""
 prev_url: 01-batch-jobs.md
 next_url: 03-optimizing-cost.md
 ---

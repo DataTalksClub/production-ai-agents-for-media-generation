@@ -1,5 +1,4 @@
 ---
-video_url: ""
 prev_url: 02-tools.md
 next_url: 04-long-running-tools.md
 ---

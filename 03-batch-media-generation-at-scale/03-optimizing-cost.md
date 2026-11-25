@@ -1,5 +1,4 @@
 ---
-video_url: ""
 prev_url: 02-spot-and-interruption.md
 next_url: 04-run-limits.md
 ---

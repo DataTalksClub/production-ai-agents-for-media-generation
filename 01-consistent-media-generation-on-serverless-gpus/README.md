@@ -32,7 +32,7 @@ By the end of this module, you will be able to:
 ## Lessons
 
 * [01 - Landscape: Modalities and Model Families](01-landscape.md)
-* [01b - What "Consistent" Means](01b-consistency.md)
+* [01b - What "Consistent" Means](01-consistency.md)
 * [02 - First Media Generation in a Few Minutes](02-first-generation.md)
 * [03 - Containers for Generative AI](03-containers.md)
 * [04 - Serving vs Batch Inference: the Same Generation for Different Use Cases](04-serving-vs-batch.md)
@@ -76,7 +76,7 @@ One page per lesson at the module root, all code flat in `code/` (files import e
 01-consistent-media-generation-on-serverless-gpus/
 ├── README.md                       # lessons index, models, setup
 ├── 01-landscape.md
-├── 01b-consistency.md
+├── 01-consistency.md
 ├── 02-first-generation.md
 ├── 03-containers.md
 ├── 04-serving-vs-batch.md

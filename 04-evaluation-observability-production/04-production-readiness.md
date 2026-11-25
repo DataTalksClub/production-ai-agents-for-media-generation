@@ -1,5 +1,4 @@
 ---
-video_url: ""
 prev_url: 03-tracing-mlflow.md
 next_url: ../projects/README.md
 ---

@@ -1,5 +1,4 @@
 ---
-video_url: ""
 prev_url: 02-fine-tune-style.md
 next_url: 04-production-readiness.md
 ---

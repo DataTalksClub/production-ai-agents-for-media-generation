@@ -1,5 +1,4 @@
 ---
-video_url: ""
 prev_url: 01-agent-loop.md
 next_url: 03-gpu-tools.md
 ---

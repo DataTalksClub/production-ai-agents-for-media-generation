@@ -1,5 +1,4 @@
 ---
-video_url: ""
 prev_url: ../03-batch-media-generation-at-scale/04-run-limits.md
 next_url: 02-fine-tune-style.md
 ---

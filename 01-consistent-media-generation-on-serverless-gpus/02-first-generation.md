@@ -7,7 +7,7 @@ code:
     path: code/nb-first-generation-devlab.ipynb
   - label: Image client
     path: code/image.py
-prev_url: 01b-consistency.md
+prev_url: 01-consistency.md
 next_url: 03-containers.md
 ---
 # 02 - First Media Generation in a Few Minutes
@@ -234,5 +234,5 @@ Free resources to go deeper:
 10. [Hugging Face Diffusion Models Course](https://huggingface.co/learn/diffusion-course/unit0/1) (free course): Diffusers basics in notebooks.
 
 <!-- nav:start -->
-[← Previous: 01b - What "Consistent" Means](01b-consistency.md) · [Next: 03 - Containers for Generative AI →](03-containers.md)
+[← Previous: 01b - What "Consistent" Means](01-consistency.md) · [Next: 03 - Containers for Generative AI →](03-containers.md)
 <!-- nav:end -->

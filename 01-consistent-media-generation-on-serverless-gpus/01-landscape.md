@@ -1,7 +1,7 @@
 ---
 video_url: "https://youtu.be/ssxOBJDUdYw"
 prev_url: README.md
-next_url: 01b-consistency.md
+next_url: 01-consistency.md
 ---
 
 # 01 - Landscape: Modalities and Model Families
@@ -24,7 +24,7 @@ We start with one child: Emma, a 7-year-old who wishes for a telescope.
   </tr>
   <tr>
     <td>Illustration. Sana, 512x512, 20 steps, seed 7, <code>1.2 s</code></td>
-    <td>Clip. Wan2.2-I2V-A14B, animated from this frame (made <a href="01b-consistency.md">in lesson 01b</a>), 640x480, 81 frames at 16 fps (5 s), 20 steps, <code>40.7 s</code>. <a href="https://drive.google.com/file/d/1UmhniMAGMvvpEsSNNmyGTsS9mDvxFgle/view">Watch the clip</a></td>
+    <td>Clip. Wan2.2-I2V-A14B, animated from this frame (made <a href="01-consistency.md">in lesson 01b</a>), 640x480, 81 frames at 16 fps (5 s), 20 steps, <code>40.7 s</code>. <a href="https://drive.google.com/file/d/1UmhniMAGMvvpEsSNNmyGTsS9mDvxFgle/view">Watch the clip</a></td>
   </tr>
   <tr>
     <td>Greeting. Kokoro-82M, voice af_bella, <code>0.4 s</code>: "Happy holidays, Emma! We heard you wished for a telescope. May all your nights be full of stars." <a href="https://drive.google.com/file/d/1ZCgQ6BFjjlCTAICdrJxbjwZVqma1loDD/view">Listen</a><br><audio src="assets/3_greeting.mp3" controls></audio></td>
@@ -261,7 +261,7 @@ If we added the clip to Emma's card, we would write image-to-video on line 1, Wa
 
 We'll measure your real numbers in [lesson 05](05-measuring-costs.md). 
 
-Next, we look at how to keep Emma the same across assets in [01b - What "Consistent" Means](01b-consistency.md).
+Next, we look at how to keep Emma the same across assets in [01b - What "Consistent" Means](01-consistency.md).
 
 ## References
 
@@ -281,5 +281,5 @@ Free resources to go deeper, picked for this lesson's topics:
 12. [ComfyUI Wan2.2 workflows](https://docs.comfy.org/tutorials/video/wan/wan2_2) (docs): the text-to-video and image-to-video pipelines node by node. Run them locally or on Comfy Cloud.
 
 <!-- nav:start -->
-[← Previous: Module 1: Consistent Media Generation on Serverless GPUs](README.md) · [Next: 01b - What "Consistent" Means →](01b-consistency.md)
+[← Previous: Module 1: Consistent Media Generation on Serverless GPUs](README.md) · [Next: 01b - What "Consistent" Means →](01-consistency.md)
 <!-- nav:end -->

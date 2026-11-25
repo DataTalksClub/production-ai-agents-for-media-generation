@@ -1,5 +1,4 @@
 ---
-video_url: ""
 prev_url: 04-long-running-tools.md
 next_url: ../03-batch-media-generation-at-scale/01-batch-jobs.md
 ---

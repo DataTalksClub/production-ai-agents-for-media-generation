@@ -1,5 +1,4 @@
 ---
-video_url: ""
 prev_url: 01-landscape.md
 next_url: 02-first-generation.md
 ---
