@@ -1,0 +1,23 @@
+schema_version: 2
+content_id: 41bc7d33-5536-48af-a734-c321a2ffcff0
+title: "Module 1: Consistent Media Generation on Serverless GPUs"
+summary: "Run image, video and audio models on serverless GPUs, for serving and for batch, and measure what one asset costs."
+units:
+  - content_id: 72feef2e-ddd7-4017-a341-9b05bf837a32
+    title: "Landscape: Modalities and Model Families"
+    path: 01-landscape.md
+  - content_id: 8a2ca9d4-d5d5-4d13-bf2d-5a5c669568b1
+    title: "What \"Consistent\" Means"
+    path: 01-consistency.md
+  - content_id: d9566d6a-b568-47a4-8a42-a2a0fcb44f32
+    title: "First Media Generation in a Few Minutes"
+    path: 02-first-generation.md
+  - content_id: ca4eec5f-f336-481c-8858-ef953de48353
+    title: "Containers for Generative AI"
+    path: 03-containers.md
+  - content_id: 325a4597-f2dc-43b7-90d2-b28cba653bf8
+    title: "Serving vs Batch Inference: the Same Generation for Different Use Cases"
+    path: 04-serving-vs-batch.md
+  - content_id: 0adea96d-17ab-4b19-81b0-025c057c64b8
+    title: "Measuring Startup, Load and Generation Costs"
+    path: 05-measuring-costs.md

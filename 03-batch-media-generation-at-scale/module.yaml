@@ -1,0 +1,17 @@
+schema_version: 2
+content_id: 480e52fc-94c4-4790-a2af-9c8e1d735bbe
+title: "Module 3: Batch Media Generation at Scale"
+summary: "Run the same generation for every record over parallel Jobs, survive interrupted Spot runs, lower the cost of usable outputs, and stop a run that breaks a spending or quality limit."
+units:
+  - content_id: 7f320048-5ebb-4efd-b09b-42f1fbc43139
+    title: "Batch Generation with Serverless Jobs"
+    path: 01-batch-jobs.md
+  - content_id: 03e61ded-aeee-430a-9999-fe5a78d3d50b
+    title: "Spot GPUs and Surviving Interruptions"
+    path: 02-spot-and-interruption.md
+  - content_id: de2bb4fc-720d-4480-b04f-0ef4b65a34d4
+    title: "Reducing Media Generation Costs"
+    path: 03-optimizing-cost.md
+  - content_id: 3aca9b7b-6748-4d37-80f0-c8621730da4c
+    title: "Keeping Batch Runs Within Limits"
+    path: 04-run-limits.md

@@ -1,0 +1,17 @@
+schema_version: 2
+content_id: 711de05b-4356-4c82-8b20-c543c10f3566
+title: "Module 4: Evaluation, Observability and Production"
+summary: "Measure asset quality, optionally tune a style, trace what each record cost and why it took that long, and decide whether the factory is ready to ship."
+units:
+  - content_id: a77d63f5-88d5-4949-a94e-96d81416e144
+    title: "Evaluating Media Quality"
+    path: 01-evaluating-media-quality.md
+  - content_id: 5d905d30-ec7d-4663-a604-162c7a1b7b64
+    title: "Fine-Tuning for Consistent Style (Optional)"
+    path: 02-fine-tune-style.md
+  - content_id: 7af4cda0-9c9a-469b-87c9-9fa85aa5b53f
+    title: "Tracing Runs with MLflow"
+    path: 03-tracing-mlflow.md
+  - content_id: 77df696d-9f90-4975-9c09-196f476424ce
+    title: "Production Readiness and Go/No-Go"
+    path: 04-production-readiness.md

@@ -1,0 +1,28 @@
+schema_version: 2
+content_id: 5aab67a8-d948-4147-ba69-c7565f2b722a
+slug: production-ai-agents-generative-media
+title: Production AI Agents for Generative Media
+current_cohort: "2026"
+cohorts:
+  - identifier: "2026"
+    content: root
+description: |
+  Production AI Agents for Generative Media is a free, project-based course on building production AI systems in which agents orchestrate GPU-powered image, video and audio models. Across four modules you build one system, a Personalized Media Factory: a brief goes in, an agent plans the asset, GPU models on serverless infrastructure generate it, a check regenerates what isn't good enough, and the factory scales from one record to a thousand with a cost per asset.
+
+  Each module ends with a homework assignment, and the course finishes with a peer-reviewed capstone: a production multimodal agent of your own, shared publicly.
+outcome: Build, scale and monitor agents that run image, video and audio models on serverless GPUs, and know what each asset costs.
+starting_point: You build software or ML systems and want to add image, video or audio generation that runs reliably at scale.
+prerequisites: You know Python, Docker basics, HTTP APIs and the command line. Prior LLM or MLOps course experience helps but isn't required, and no diffusion theory is needed.
+progression:
+  - heading: I can call a media model, but not run it in production
+    description: I want to know how to host GPU media models, keep their outputs consistent and say what one asset costs.
+  - heading: I give an agent GPU models as tools and scale them out
+    description: I build generate, evaluate and regenerate loops, fan out batch runs on spot GPUs and survive interruptions.
+  - heading: I ship a measured, observable media agent
+    description: I add evals, tracing and an SLO, then make a go/no-go call on a capstone system that runs on serverless GPUs.
+urls:
+  repository: https://github.com/DataTalksClub/production-ai-agents-for-media-generation
+  docs: https://datatalks.club/docs/courses/production-ai-agents-generative-media/
+  faq: https://datatalks.club/faq/production-ai-agents-generative-media.html
+hashtag: aimediagen
+published: true
