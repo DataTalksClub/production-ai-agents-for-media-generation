@@ -1,4 +1,5 @@
 ---
+video_url: "https://youtu.be/uipMy9uKWtM"
 prev_url: 01-environment-preparation.md
 next_url: 03-gpu-tools.md
 ---
