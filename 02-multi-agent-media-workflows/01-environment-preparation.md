@@ -14,10 +14,10 @@ Now we'll set up a project for that:
 ```bash
 uv init
 uv add python-dotenv requests jupyter pillow
-wget https://raw.githubusercontent.com/alexeygrigorev/production-ai-agents-for-media-generation/main/02-multi-agent-media-workflows/code-agent/gen.py
+wget https://raw.githubusercontent.com/DataTalksClub/production-ai-agents-for-media-generation/main/02-multi-agent-media-workflows/code/gen.py
 ```
 
-The last command downloads `gen.py`. It's the code from module 1 for sending requests to the endpoints, wrapped into two classes: `ImageGenerator` and `VideoGenerator`.
+The last command downloads [`gen.py`](code/gen.py). It's the code from module 1 for sending requests to the endpoints, wrapped into two classes: `ImageGenerator` and `VideoGenerator`.
 
 We keep the endpoint URLs in `.env`:
 

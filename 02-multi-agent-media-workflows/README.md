@@ -76,6 +76,7 @@ One page per lesson at the module root, all code flat in `code/` (files import e
 │   └── worked-trace/               # a hand-written trace and its totals, for check_trace.py
 └── code/
     ├── .env                        # you create it: Token Factory key, Endpoint URLs and tokens (git-ignored)
+    ├── gen.py                      # 2.1–2.2: ImageGenerator and VideoGenerator for the Sana and Wan2.2 Endpoints
     ├── nb-gpu-tools.ipynb          # 2.3: the Sana Endpoint as generate_image; MCP also try
     ├── mcp_server.py               # 2.3: the same image tool over MCP (stdio)
     ├── video_tool.py               # 2.4: deferred video tool, ticket, reconcile, resume
