@@ -1,5 +1,6 @@
 ---
 video_url: "https://youtu.be/MvYApjjGsv0"
+video_duration_seconds: 867
 code:
   - label: Notebook (on your laptop)
     path: code/nb-first-generation-local.ipynb

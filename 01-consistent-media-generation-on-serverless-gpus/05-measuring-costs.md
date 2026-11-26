@@ -1,5 +1,6 @@
 ---
 video_url: "https://youtu.be/s56Oo8zBXok"
+video_duration_seconds: 637
 code:
   - label: Cost per card, what to optimize, GPUs, API comparison (notebook)
     path: code/nb-measuring-costs.ipynb

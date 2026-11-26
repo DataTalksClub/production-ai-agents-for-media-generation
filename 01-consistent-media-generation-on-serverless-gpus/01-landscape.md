@@ -1,5 +1,6 @@
 ---
 video_url: "https://youtu.be/ssxOBJDUdYw"
+video_duration_seconds: 1127
 prev_url: README.md
 next_url: 01-consistency.md
 ---

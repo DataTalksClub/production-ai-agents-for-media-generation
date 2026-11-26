@@ -1,5 +1,6 @@
 ---
 video_url: "https://youtu.be/WiaAO-c2arU"
+video_duration_seconds: 550
 code:
   - label: What not to put in a GPU container
     path: code/docker/Dockerfile.bad
