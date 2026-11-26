@@ -44,7 +44,7 @@ To build one card, we run 5 steps:
 4. Clip: Wan2.2-I2V-A14B animates that frame into a 5-second clip.
 5. Greeting and jingle: Kokoro reads the card text and ACE-Step writes a short tune. Neither depends on the images.
 
-See [`code/emma_gift.ipynb`](code/emma_gift.ipynb) if you're interested how this was generated.
+See [`code/nb-emma-gift.ipynb`](code/nb-emma-gift.ipynb) if you're interested how this was generated.
 
 Before we write any code, we have to choose:
 
