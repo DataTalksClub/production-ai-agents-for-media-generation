@@ -26,3 +26,12 @@ urls:
   faq: https://datatalks.club/faq/production-ai-agents-generative-media.html
 hashtag: aimediagen
 published: true
+instructors:
+  - name: Alexey Grigorev
+    url: https://linkedin.com/in/agrigorev
+  - name: Mikhail Rozhkov
+    url: https://www.linkedin.com/in/mnrozhkov/
+  - name: Marouane Khoukh
+    url: https://linkedin.com/in/marouanekhoukh/
+  - name: Aleksandr Iziumov
+    url: https://linkedin.com/in/aiziumov/
