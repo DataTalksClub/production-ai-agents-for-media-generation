@@ -31,12 +31,12 @@ By the end of this module, you will be able to:
 
 ## Lessons
 
-* [01 - Landscape: Modalities and Model Families](01-landscape.md)
-* [01b - What "Consistent" Means](01-consistency.md)
-* [02 - First Media Generation in a Few Minutes](02-first-generation.md)
-* [03 - Containers for Generative AI](03-containers.md)
-* [04 - Serving vs Batch Inference: the Same Generation for Different Use Cases](04-serving-vs-batch.md)
-* [05 - Measuring Startup, Load and Generation Costs](05-measuring-costs.md)
+* [01 - Landscape: Modalities and Model Families](01-landscape.md) - Review the image, video, speech and music models for each asset on a holiday card, with their GPUs, licences and costs.
+* [01b - What "Consistent" Means](01-consistency.md) - Define five kinds of consistency for generated media and keep one character the same using reference images.
+* [02 - First Media Generation in a Few Minutes](02-first-generation.md) - Deploy the Sana model as a Nebius Endpoint, generate a card image from a notebook, and test seed behavior, then stop it.
+* [03 - Containers for Generative AI](03-containers.md) - Find the faults in a broken GPU Dockerfile and fix its base image, dependencies, weights, secrets and outputs.
+* [04 - Serving vs Batch Inference: the Same Generation for Different Use Cases](04-serving-vs-batch.md) - Compare serving with batch inference and run Santa's card pipeline as one GPU Job that writes results to a bucket.
+* [05 - Measuring Startup, Load and Generation Costs](05-measuring-costs.md) - Split one batch run into startup, model load and per-card costs, then compare GPUs, spot prices and self-hosting against an API.
 
 ## Models used in this module
 

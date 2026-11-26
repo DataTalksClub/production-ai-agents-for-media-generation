@@ -34,11 +34,11 @@ Default path for the whole module: one [PydanticAI](https://pydantic.dev/docs/ai
 
 ## Lessons
 
-* [2.1 The Agent Loop: Deep Dive](01-agent-loop.md)
-* [2.2 Tools and Structured Outputs](02-tools.md)
-* [2.3 GPU Workloads as Agentic Tools](03-gpu-tools.md)
-* [2.4 Long-running Tools: Submit, Poll, Resume](04-long-running-tools.md)
-* [2.5 Planner, Generator, Reviewer: the Judge Loop](05-judge-loop.md)
+* [2.1 The Agent Loop: Deep Dive](01-agent-loop.md) - Build a PydanticAI agent with one image tool and trace each model request and tool call in order.
+* [2.2 Tools and Structured Outputs](02-tools.md) - Design an image tool with typed arguments, three retry kinds, a timeout, and a spec-hash cache to avoid repeated GPU calls.
+* [2.3 GPU Workloads as Agentic Tools](03-gpu-tools.md) - Give the agent a Sana image model on a Nebius Endpoint as a tool, keeping the endpoint token out of prompts and traces.
+* [2.4 Long-running Tools: Submit, Poll, Resume](04-long-running-tools.md) - Turn video generation into a deferred tool with a ticket, so a killed agent resumes without submitting the video twice.
+* [2.5 Planner, Generator, Reviewer: the Judge Loop](05-judge-loop.md) - Write a versioned rubric and build a judge loop that retries or stops before paid video generation when keyframes fail.
 
 ## Homework 2: Media Agent
 
