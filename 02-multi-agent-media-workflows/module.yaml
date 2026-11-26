@@ -4,11 +4,11 @@ title: "Module 2: Multi-Agent Media Workflows"
 summary: "Give an agent GPU workloads as tools, keep the agent on CPU, and build a planner, generator and reviewer loop that regenerates an asset instead of accepting the first output."
 units:
   - content_id: 5028fb2d-5856-470a-80ea-e1ab6b33638b
-    title: "The Agent Loop: Deep Dive"
-    path: 01-agent-loop.md
+    title: "Environment Preparation"
+    path: 01-environment-preparation.md
   - content_id: 0a1dacfe-bd88-4480-bf02-20b983bc8886
-    title: "Tools and Structured Outputs"
-    path: 02-tools.md
+    title: "Creating the Media Agent"
+    path: 02-agent.md
   - content_id: 09b75b98-9fb2-4d5f-925c-c2d2acc50489
     title: "GPU Workloads as Agentic Tools"
     path: 03-gpu-tools.md

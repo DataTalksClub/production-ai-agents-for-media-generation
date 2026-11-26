@@ -30,12 +30,18 @@ By the end of this module, you will be able to:
 * Handle long-running tools: submit, poll, resume, without paying for the same GPU work twice
 * Write a versioned rubric from the brief and build a planner, generator and reviewer loop with attempt caps, runtime gates and metrics
 
-Default path for the whole module: one [PydanticAI](https://pydantic.dev/docs/ai/) agent on Token Factory, the [Sana](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-sana/README.md) Endpoint from Module 1 for images, [Wan2.2-I2V-A14B](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-wan22-i2v-a14b/README.md) for video. Every model request, tool call and check writes one event to `events.jsonl` in the run folder. Every lesson script also runs with `--fake`: fully offline, with a scripted model and placeholder assets, so you can read the code path without credits.
+Default path for the whole module:
+
+- one [PydanticAI](https://pydantic.dev/docs/ai/) agent on Token Factory
+- the [Sana](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-sana/README.md) Endpoint from Module 1 for images
+- [Wan2.2-I2V-A14B](https://github.com/nebius/serverless-ai-cookbook/blob/main/templates/endpoint-wan22-i2v-a14b/README.md) for video
+
+Every model request, tool call and check writes one event to `events.jsonl` in the run folder. Every lesson script also runs with `--fake`: fully offline, with a scripted model and placeholder assets, so you can read the code path without credits.
 
 ## Lessons
 
-* [2.1 The Agent Loop: Deep Dive](01-agent-loop.md) - Build a PydanticAI agent with one image tool and trace each model request and tool call in order.
-* [2.2 Tools and Structured Outputs](02-tools.md) - Design an image tool with typed arguments, three retry kinds, a timeout, and a spec-hash cache to avoid repeated GPU calls.
+* [2.1 Environment Preparation](01-environment-preparation.md) - Set up the Sana and Wan2.2 Endpoints and generate a keyframe image and a video from it with `gen.py`.
+* [2.2 Creating the Media Agent](02-agent.md) - Give a PydanticAI agent the image and video tools, print its tool calls, and let it look at the image before it makes the video.
 * [2.3 GPU Workloads as Agentic Tools](03-gpu-tools.md) - Give the agent a Sana image model on a Nebius Endpoint as a tool, keeping the endpoint token out of prompts and traces.
 * [2.4 Long-running Tools: Submit, Poll, Resume](04-long-running-tools.md) - Turn video generation into a deferred tool with a ticket, so a killed agent resumes without submitting the video twice.
 * [2.5 Planner, Generator, Reviewer: the Judge Loop](05-judge-loop.md) - Write a versioned rubric and build a judge loop that retries or stops before paid video generation when keyframes fail.
@@ -58,8 +64,8 @@ One page per lesson at the module root, all code flat in `code/` (files import e
 ```text
 02-multi-agent-media-workflows/
 ├── README.md                       # lessons index, setup
-├── 01-agent-loop.md
-├── 02-tools.md
+├── 01-environment-preparation.md
+├── 02-agent.md
 ├── 03-gpu-tools.md
 ├── 04-long-running-tools.md
 ├── 05-judge-loop.md
@@ -70,8 +76,6 @@ One page per lesson at the module root, all code flat in `code/` (files import e
 │   └── worked-trace/               # a hand-written trace and its totals, for check_trace.py
 └── code/
     ├── .env                        # you create it: Token Factory key, Endpoint URLs and tokens (git-ignored)
-    ├── nb-agent-loop.ipynb         # 2.1: be the LLM, swap in Token Factory, agent.iter(), limits, state
-    ├── nb-tools.ipynb              # 2.2: schema, validation retry, timeout, cache hit, typed plan
     ├── nb-gpu-tools.ipynb          # 2.3: the Sana Endpoint as generate_image; MCP also try
     ├── mcp_server.py               # 2.3: the same image tool over MCP (stdio)
     ├── video_tool.py               # 2.4: deferred video tool, ticket, reconcile, resume

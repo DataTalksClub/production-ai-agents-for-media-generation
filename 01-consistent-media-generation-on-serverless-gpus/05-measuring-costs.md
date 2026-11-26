@@ -5,7 +5,7 @@ code:
   - label: Cost per card, what to optimize, GPUs, API comparison (notebook)
     path: code/nb-measuring-costs.ipynb
 prev_url: 04-serving-vs-batch.md
-next_url: ../02-multi-agent-media-workflows/01-agent-loop.md
+next_url: ../02-multi-agent-media-workflows/01-environment-preparation.md
 ---
 
 # 05 - Measuring Startup, Load and Generation Costs
@@ -297,7 +297,7 @@ Price isn't the whole decision:
 
 ## What's next
 
-You can now say what one asset costs, from one run's times and a price. Module 2 gives the pipeline an agent, starting with [the agent loop from scratch](../02-multi-agent-media-workflows/01-agent-loop.md). Module 3 comes back to Santa's 200,000 cards, starting from the one-GPU baseline above.
+You can now say what one asset costs, from one run's times and a price. Module 2 gives the pipeline an agent, starting with [the environment for the agent](../02-multi-agent-media-workflows/01-environment-preparation.md). Module 3 comes back to Santa's 200,000 cards, starting from the one-GPU baseline above.
 
 ## References
 
@@ -309,5 +309,5 @@ You can now say what one asset costs, from one run's times and a price. Module 2
 - [Wan2.2-I2V-A14B](https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B-Diffusers), model card
 
 <!-- nav:start -->
-[← Previous: 04 - Serving vs Batch Inference: the Same Generation for Different Use Cases](04-serving-vs-batch.md) · [Next: 2.1 The Agent Loop: Deep Dive →](../02-multi-agent-media-workflows/01-agent-loop.md)
+[← Previous: 04 - Serving vs Batch Inference: the Same Generation for Different Use Cases](04-serving-vs-batch.md) · [Next: 2.1 Environment Preparation →](../02-multi-agent-media-workflows/01-environment-preparation.md)
 <!-- nav:end -->

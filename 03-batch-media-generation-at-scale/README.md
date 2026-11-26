@@ -12,7 +12,7 @@ Run → Recover → Optimize → Control
 > **Updated 13 Nov 2026.** This lesson plan replaces the earlier outline. Lessons may still change before the module starts.
 
 > [!NOTE]
-> This module builds on Module 1 and Module 2: Jobs, the Object Storage bucket and the cost terms from [1.4](../01-consistent-media-generation-on-serverless-gpus/04-serving-vs-batch.md) and [1.5](../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md), the idempotency key from [2.2](../02-multi-agent-media-workflows/02-tools.md), tickets from [2.4](../02-multi-agent-media-workflows/04-long-running-tools.md) and the judge and rubric v1 from [2.5](../02-multi-agent-media-workflows/05-judge-loop.md).
+> This module builds on Module 1 and Module 2: Jobs, the Object Storage bucket and the cost terms from [1.4](../01-consistent-media-generation-on-serverless-gpus/04-serving-vs-batch.md) and [1.5](../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md), tickets from [2.4](../02-multi-agent-media-workflows/04-long-running-tools.md) and the judge and rubric v1 from [2.5](../02-multi-agent-media-workflows/05-judge-loop.md).
 
 > [!IMPORTANT]
 > Parallel Jobs need quota. Serverless AI Jobs count toward Compute quotas: one VM, one disk and one allocation per running Job, plus GPUs for regular VMs. A new account starts with 2 regular and 2 preemptible VMs per region. Homework 3 runs 10 Jobs in parallel, so request an increase to at least 10 preemptible VMs, 10 disks and the matching allocations before the homework week. How to check and increase quotas: [3.1](01-batch-jobs.md#quotas-set-how-many-jobs-run-at-once).

@@ -1,5 +1,5 @@
 ---
-prev_url: 02-tools.md
+prev_url: 02-agent.md
 next_url: 04-long-running-tools.md
 ---
 # 2.3 GPU Workloads as Agentic Tools
@@ -171,5 +171,5 @@ Then ask the IDE agent for a keyframe and look for the PNG in `code/runs/02-mult
 Next: [2.4 Long-running Tools: Submit, Poll, Resume](04-long-running-tools.md), where the tool is a video that takes minutes.
 
 <!-- nav:start -->
-[← Previous: 2.2 Tools and Structured Outputs](02-tools.md) · [Next: 2.4 Long-running Tools: Submit, Poll, Resume →](04-long-running-tools.md)
+[← Previous: 2.2 Creating the Media Agent](02-agent.md) · [Next: 2.4 Long-running Tools: Submit, Poll, Resume →](04-long-running-tools.md)
 <!-- nav:end -->
