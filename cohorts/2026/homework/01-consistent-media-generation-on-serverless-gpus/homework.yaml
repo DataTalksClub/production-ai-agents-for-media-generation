@@ -3,7 +3,7 @@ content_id: 3171e29b-b206-4157-914c-6aef82847e39
 slug: module1
 title: "Homework 1: GPU Media Worker"
 instructions_path: homework.md
-due_at: "2026-11-30T23:59:00Z"
+due_at: "2026-11-30T23:59:59Z"
 initial_state: open
 form:
   homework_url: true

@@ -3,7 +3,7 @@ content_id: bbf63e5f-0270-4539-9c1d-f11d7c6ba0c0
 slug: module3
 title: "Homework 3: Factory Scale Challenge"
 instructions_path: homework.md
-due_at: "2026-12-14T23:59:00Z"
+due_at: "2026-12-14T23:59:59Z"
 initial_state: closed
 form:
   homework_url: true

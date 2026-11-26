@@ -3,7 +3,7 @@ content_id: af14971b-27c4-45ec-8094-98d41afc3df0
 slug: module2
 title: "Homework 2: Media Agent"
 instructions_path: homework.md
-due_at: "2026-12-07T23:59:00Z"
+due_at: "2026-12-07T23:59:59Z"
 initial_state: closed
 form:
   homework_url: true
