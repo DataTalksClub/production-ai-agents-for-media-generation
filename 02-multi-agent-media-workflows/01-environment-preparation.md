@@ -1,4 +1,5 @@
 ---
+video_url: "https://youtu.be/EWFMDi9p7sk"
 prev_url: ../01-consistent-media-generation-on-serverless-gpus/05-measuring-costs.md
 next_url: 02-agent.md
 ---
