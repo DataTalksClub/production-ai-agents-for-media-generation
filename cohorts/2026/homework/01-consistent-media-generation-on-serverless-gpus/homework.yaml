@@ -26,21 +26,50 @@ questions:
     points: 1
   - content_id: 1fe8c7f0-08b7-4c91-870f-0090ca97f02d
     id: q3
-    type: free_form
+    type: multiple_choice
     answer_type: any
-    prompt: "Which modality? Options: Image, Video, Speech, Music, Other."
+    prompt: "Which modality?"
+    options:
+      - id: image
+        label: "Image"
+      - id: video
+        label: "Video"
+      - id: speech
+        label: "Speech"
+      - id: music
+        label: "Music"
+      - id: other
+        label: "Other"
     points: 1
   - content_id: 317781df-f128-4521-9ab3-0ca7cf515d66
     id: q4
-    type: free_form
+    type: multiple_choice
     answer_type: any
-    prompt: "How did you run it? Options: Endpoint, DevLab, Job."
+    prompt: "How did you run it?"
+    options:
+      - id: endpoint
+        label: "Endpoint"
+      - id: devlab
+        label: "DevLab"
+      - id: job
+        label: "Job"
     points: 1
   - content_id: 9f7db44f-b22c-4384-b2cb-6bdd02912bd6
     id: q5
-    type: free_form
+    type: multiple_choice
     answer_type: any
-    prompt: "Which GPU did you run on? Options: L40S, H100, H200, RTX PRO 6000, Other."
+    prompt: "Which GPU did you run on?"
+    options:
+      - id: l40s
+        label: "L40S"
+      - id: h100
+        label: "H100"
+      - id: h200
+        label: "H200"
+      - id: rtx-pro-6000
+        label: "RTX PRO 6000"
+      - id: other
+        label: "Other"
     points: 1
   - content_id: 12a1aeef-818b-4e6e-ac7a-412783c1184b
     id: q6
